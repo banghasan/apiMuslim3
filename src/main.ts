@@ -61,8 +61,8 @@ const appendAccessLog = async (line: string, stamp: Date) => {
 const accessLogger: MiddlewareHandler<AppEnv> = async (c, next) => {
   const start = performance.now();
   await next();
-  const forwarded = c.req.header("x-forwarded-for") ??
-    c.req.header("x-real-ip");
+  const forwarded =
+    c.req.header("x-forwarded-for") ?? c.req.header("x-real-ip");
   let ip = forwarded?.split(",")[0].trim();
   if (!ip) {
     const addr = c.env?.connInfo?.remoteAddr as
@@ -76,9 +76,9 @@ const accessLogger: MiddlewareHandler<AppEnv> = async (c, next) => {
   if (!ip) ip = "unknown";
   const rt = (performance.now() - start).toFixed(2);
   const logTime = new Date();
-  const line = `[${
-    formatTimestamp(logTime)
-  }] ${ip} ${c.req.method} ${c.req.path} ${c.res.status} ${rt}ms`;
+  const line = `[${formatTimestamp(
+    logTime,
+  )}] ${ip} ${c.req.method} ${c.req.path} ${c.res.status} ${rt}ms`;
   if (logVerbose) {
     console.log(line);
   }
@@ -148,7 +148,7 @@ const sholatData = await loadSholatData();
 registerSholatRoutes(app, sholatData);
 
 app.notFound((c) =>
-  c.json({ status: false, message: "not found or anything .." }, 404)
+  c.json({ status: false, message: "not found or anything .." }, 404),
 );
 app.onError((err, c) => {
   console.error(err);
@@ -164,6 +164,12 @@ app.doc("/doc/sholat", {
   info: {
     title: "API Muslim",
     version: "v3.0.0",
+    tags: [
+      {
+        name: "Sholat",
+        description: "Endpoint terkait sholat",
+      },
+    ],
     description:
       "Endpoint untuk daftar kabupaten/kota beserta pencarian ID yang digunakan untuk jadwal sholat.",
   },
@@ -176,7 +182,6 @@ app.doc("/doc/sholat", {
 });
 
 console.log(`Listening on http://${docHost}:${port}`);
-Deno.serve(
-  { hostname: host, port },
-  (request, connInfo) => app.fetch(request, { connInfo }),
+Deno.serve({ hostname: host, port }, (request, connInfo) =>
+  app.fetch(request, { connInfo }),
 );
