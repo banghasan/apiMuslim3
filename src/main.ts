@@ -1,14 +1,17 @@
-import "jsr:@std/dotenv/load";
+import "@std/dotenv/load";
 import type { MiddlewareHandler } from "hono";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { loadSholatData, registerSholatRoutes } from "./routes/sholat.ts";
-import type { AppEnv } from "./types.ts";
+import { loadSholatData, registerSholatRoutes } from "~/routes/sholat.ts";
+import type { AppEnv } from "~/types.ts";
 
 const logDir = new URL("../data/log/", import.meta.url);
 await Deno.mkdir(logDir, { recursive: true });
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
-const redocScriptFile = new URL("../redoc.standalone.js", import.meta.url);
+const redocScriptFile = new URL(
+  "./static/redoc.standalone.js",
+  import.meta.url,
+);
 const redocScriptBytes = await Deno.readFile(redocScriptFile);
 
 const timezone = Deno.env.get("TIMEZONE") ?? "Asia/Jakarta";
@@ -58,8 +61,8 @@ const appendAccessLog = async (line: string, stamp: Date) => {
 const accessLogger: MiddlewareHandler<AppEnv> = async (c, next) => {
   const start = performance.now();
   await next();
-  const forwarded =
-    c.req.header("x-forwarded-for") ?? c.req.header("x-real-ip");
+  const forwarded = c.req.header("x-forwarded-for") ??
+    c.req.header("x-real-ip");
   let ip = forwarded?.split(",")[0].trim();
   if (!ip) {
     const addr = c.env?.connInfo?.remoteAddr as
@@ -73,7 +76,9 @@ const accessLogger: MiddlewareHandler<AppEnv> = async (c, next) => {
   if (!ip) ip = "unknown";
   const rt = (performance.now() - start).toFixed(2);
   const logTime = new Date();
-  const line = `[${formatTimestamp(logTime)}] ${ip} ${c.req.method} ${c.req.path} ${c.res.status} ${rt}ms`;
+  const line = `[${
+    formatTimestamp(logTime)
+  }] ${ip} ${c.req.method} ${c.req.path} ${c.res.status} ${rt}ms`;
   if (logVerbose) {
     console.log(line);
   }
@@ -143,7 +148,7 @@ const sholatData = await loadSholatData();
 registerSholatRoutes(app, sholatData);
 
 app.notFound((c) =>
-  c.json({ status: false, message: "not found or anything .." }, 404),
+  c.json({ status: false, message: "not found or anything .." }, 404)
 );
 app.onError((err, c) => {
   console.error(err);
@@ -171,6 +176,7 @@ app.doc("/doc/sholat", {
 });
 
 console.log(`Listening on http://${docHost}:${port}`);
-Deno.serve({ hostname: host, port }, (request, connInfo) =>
-  app.fetch(request, { connInfo }),
+Deno.serve(
+  { hostname: host, port },
+  (request, connInfo) => app.fetch(request, { connInfo }),
 );

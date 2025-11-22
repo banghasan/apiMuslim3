@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.2",
+    "@std/dotenv/load": "jsr:@std/dotenv@^0.225.2/load",
+    "@hono/zod-openapi": "npm:@hono/zod-openapi@^1.1.5",
+    "hono": "npm:hono@^4.10.6",
+    "hono/logger": "npm:hono@^4.10.6/logger",
+    "~/": "./src/"
+  }
+}

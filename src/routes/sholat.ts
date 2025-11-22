@@ -1,6 +1,6 @@
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
-import type { AppEnv } from "../types.ts";
+import type { AppEnv } from "~/types.ts";
 
 export type RawEntry = {
   value: string;
@@ -40,7 +40,7 @@ const successSchema = z
 const errorSchema = z
   .object({
     status: z.literal(false).openapi({ example: false }),
-    message: z.string().openapi({ example: "not found or anything .." }),
+    message: z.string().openapi({ example: "Data tidak ditemukan." }),
   })
   .openapi("ErrorResponse");
 
@@ -50,7 +50,7 @@ const successResponse = (data: Location[]) => ({
   data,
 });
 
-const errorResponse = (message = "not found or anything ..") => ({
+const errorResponse = (message = "Data tidak ditemukan.") => ({
   status: false as const,
   message,
 });
