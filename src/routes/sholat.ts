@@ -116,7 +116,7 @@ export const registerSholatRoutes = (
     createRoute({
       method: "get",
       path,
-      summary: "Kab/kota berdasar ID",
+      summary: "Kab/kota Berdasar ID",
       description: "Mendapatkan kabupaten atau kota berdasarkan ID.",
       tags: ["Sholat"],
       request: {
