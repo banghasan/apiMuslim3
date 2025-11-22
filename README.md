@@ -8,7 +8,7 @@ REST API sederhana berbasis [Hono](https://hono.dev/) + Deno yang mengekspose da
 - Endpoint pencarian kata kunci (`/sholat/kota|kabkota/(cari|find)/{keyword}`).
 - Response konsisten dengan struktur `status`, `message`, dan `data`.
 - Middleware logger akses.
-- Dokumentasi OpenAPI otomatis pada `/doc/sholat` menggunakan `@hono/zod-openapi`.
+- Dokumentasi OpenAPI otomatis pada `/doc/sholat` menggunakan `@hono/zod-openapi` + ReDoc viewer di `/doc`.
 
 ## Persiapan
 1. Pastikan [Deno](https://deno.land/) sudah terpasang (versi 1.42+ direkomendasikan).
@@ -32,12 +32,13 @@ deno task start
 ```
 Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada `.env`).
 
-## Logging
+## Dokumentasi & Logging
 - Setiap akses dapat disimpan ke file harian di `data/log/YYYYMMDD.log` (aktifkan `LOG_WRITE=true`).
 - Format log: `[timestamp] IP METHOD PATH STATUS DURATIONms`.
 - `TIMEZONE` menentukan waktu pada log dan response logger.
 - Set `LOG_VERBOSE=true` untuk menampilkan log akses yang sama di console; default `false`.
 - Set `LOG_WRITE=true` untuk menyalakan penulisan log ke file harian; default `false`.
+- Dokumen OpenAPI dalam format JSON tersedia di `/doc/sholat`, dan halaman ReDoc siap pakai berada di `/doc`.
 
 ## Endpoint Utama
 - `GET /sholat/kota/all`, `/sholat/kota/semua`, `/sholat/kabkota/all`, `/sholat/kabkota/semua` – daftar seluruh lokasi.

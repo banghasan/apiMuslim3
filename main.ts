@@ -31,6 +31,8 @@ const parsedSource = JSON.parse(
 ) as KabKotaSource;
 const faviconFile = new URL("./favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
+const redocScriptFile = new URL("./redoc.standalone.js", import.meta.url);
+const redocScriptBytes = await Deno.readFile(redocScriptFile);
 
 const locationMap = new Map<string, Location>();
 for (const group of Object.values(parsedSource.map ?? {})) {
@@ -151,6 +153,39 @@ const accessLogger: MiddlewareHandler<AppEnv> = async (c, next) => {
 };
 
 const app = new OpenAPIHono<AppEnv>();
+const redocPage = `<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <title>API Sholat Kab/Kota - ReDoc</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      redoc {
+        width: 100%;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="redoc-container"></div>
+    <script src="/doc/redoc.standalone.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        if (window.Redoc) {
+          Redoc.init('/doc/sholat', {}, document.getElementById('redoc-container'));
+        } else {
+          document.getElementById('redoc-container').innerText =
+            'Gagal memuat dokumentasi.';
+        }
+      });
+    </script>
+  </body>
+</html>`;
+
 app.use("*", accessLogger);
 app.get(
   "/favicon.ico",
@@ -162,6 +197,19 @@ app.get(
       },
     }),
 );
+app.get(
+  "/doc/redoc.standalone.js",
+  () =>
+    new Response(redocScriptBytes, {
+      headers: {
+        "content-type": "application/javascript",
+        "cache-control": "public, max-age=604800",
+      },
+    }),
+);
+app.get("/doc", (c) => c.html(redocPage));
+app.get("/doc/", (c) => c.html(redocPage));
+app.get("/doc/index.html", (c) => c.html(redocPage));
 
 const allPaths = [
   "/sholat/kota/all",
