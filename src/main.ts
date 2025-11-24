@@ -1,6 +1,7 @@
 import "@std/dotenv/load";
 import type { MiddlewareHandler } from "hono";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { registerCalRoutes } from "~/routes/cal.ts";
 import { loadSholatData, registerSholatRoutes } from "~/routes/sholat.ts";
 import type { AppEnv } from "~/types.ts";
 
@@ -146,9 +147,10 @@ app.get("/doc/index.html", (c) => c.html(redocPage));
 
 const sholatData = await loadSholatData();
 registerSholatRoutes(app, sholatData);
+registerCalRoutes(app);
 
 app.notFound((c) =>
-  c.json({ status: false, message: "not found or anything .." }, 404),
+  c.json({ status: false, message: "Data tidak ditemukan .." }, 404),
 );
 app.onError((err, c) => {
   console.error(err);

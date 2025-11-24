@@ -6,6 +6,7 @@ REST API sederhana berbasis [Hono](https://hono.dev/) + Deno yang mengekspose da
 - Endpoint daftar lengkap kabupaten/kota (`/sholat/kota|kabkota/(all|semua)`).
 - Endpoint detail berdasarkan ID (`/sholat/kota|kabkota/{id}`).
 - Endpoint pencarian kata kunci (`/sholat/kota|kabkota/(cari|find)/{keyword}`).
+- Endpoint kalender (`/cal/...`) untuk konversi tanggal Masehi ↔ Hijriyah dengan opsi metode perhitungan.
 - Response konsisten dengan struktur `status`, `message`, dan `data`.
 - Middleware logger akses.
 - Dokumentasi OpenAPI otomatis pada `/doc/sholat` menggunakan `@hono/zod-openapi` + ReDoc viewer di `/doc`.
@@ -44,6 +45,9 @@ Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada `.
 - `GET /sholat/kota/all`, `/sholat/kota/semua`, `/sholat/kabkota/all`, `/sholat/kabkota/semua` – daftar seluruh lokasi.
 - `GET /sholat/kota/{id}`, `/sholat/kabkota/{id}` – detail lokasi tertentu.
 - `GET /sholat/kota/cari/{keyword}`, `/sholat/kota/find/{keyword}`, `/sholat/kabkota/cari/{keyword}`, `/sholat/kabkota/find/{keyword}` – pencarian bebas (case-insensitive).
+- `GET /cal/today` – kalender hari ini (Masehi & Hijriyah); parameter `adj` hanya mempengaruhi tanggal Hijriyah, sedangkan CE tetap hari ini.
+- `GET /cal/hijr/{YYYY-MM-DD}` – konversi tanggal Masehi (format `YYYY-MM-DD`) ke Hijriyah; `adj` hanya mempengaruhi Hijriyah.
+- `GET /cal/ce/{YYYY-MM-DD}` – konversi tanggal Hijriyah ke tanggal Masehi; `adj` hanya mempengaruhi Masehi.
 
 Contoh respons sukses:
 ```json
@@ -64,6 +68,39 @@ Jika data tidak ditemukan akan mengembalikan:
 {
   "status": false,
   "message": "not found or anything .."
+}
+```
+
+## Parameter Kalender
+- `adj` (opsional, default `0`): penyesuaian hari; nilai negatif mundur, positif maju.
+- `method` (opsional, default `standar`): pilih `standar`, `islamic-umalqura`, atau `islamic-civil`.
+- `utc` atau `tz` (opsional, default `Asia/Jakarta`): menentukan zona waktu perhitungan kalender.
+
+Contoh respons `/cal/today`:
+```json
+{
+  "status": true,
+  "message": "success",
+  "data": {
+    "method": "standar",
+    "adjustment": 0,
+    "ce": {
+      "today": "Senin, 24 November 2025",
+      "day": 24,
+      "dayName": "Senin",
+      "month": 11,
+      "monthName": "November",
+      "year": 2025
+    },
+    "hijr": {
+      "today": "Senin, 2 Jumadilakhir 1447 H",
+      "day": 2,
+      "dayName": "Senin",
+      "month": 6,
+      "monthName": "Jumadilakhir",
+      "year": 1447
+    }
+  }
 }
 ```
 
