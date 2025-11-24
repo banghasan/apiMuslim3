@@ -135,6 +135,36 @@ const errorResponse = (message = "Data tidak ditemukan.") => ({
   message,
 });
 
+const DEFAULT_JADWAL_TIMEZONE = Deno.env.get("TIMEZONE") ?? "Asia/Jakarta";
+
+const safeJadwalTimeZone = (value?: string | null) => {
+  const input = (value ?? "").trim();
+  if (!input) return DEFAULT_JADWAL_TIMEZONE;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: input });
+    return input;
+  } catch {
+    return DEFAULT_JADWAL_TIMEZONE;
+  }
+};
+
+const getTodayPeriod = (timeZone: string) => {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const formatted = formatter.format(new Date());
+  const [year, month, day] = formatted.split("-");
+  return {
+    year,
+    month,
+    day,
+    key: `${year}-${month}-${day}`,
+  };
+};
+
 const pad2 = (value: string | number) => String(value).trim().padStart(2, "0");
 
 type SchedulePeriod =
@@ -236,6 +266,7 @@ export const registerSholatRoutes = (
   const searchPaths = ["/sholat/kabkota/cari/{keyword}"];
 
   const jadwalPaths = ["/sholat/jadwal/{id}/{period}"];
+  const jadwalTodayPaths = ["/sholat/jadwal/{id}/today"];
 
   const createAllRoute = (path: string) =>
     createRoute({
@@ -378,10 +409,62 @@ export const registerSholatRoutes = (
       },
     });
 
+  const jadwalTodayQuerySchema = z.object({
+    tz: z
+      .string()
+      .openapi({
+        example: "Asia/Jakarta",
+        description: "Zona waktu perhitungan jadwal. Default Asia/Jakarta.",
+      })
+      .optional(),
+    utc: z
+      .string()
+      .openapi({
+        example: "Asia/Makassar",
+        description: "Alias parameter zona waktu.",
+      })
+      .optional(),
+  });
+
+  const createJadwalTodayRoute = (path: string) =>
+    createRoute({
+      method: "get",
+      path,
+      summary: "Jadwal Sholat Hari Ini",
+      description:
+        "Menampilkan jadwal sholat kab/kota untuk tanggal hari ini berdasarkan zona waktu pilihan.",
+      tags: ["Sholat"],
+      request: {
+        params: z.object({
+          id: z
+            .string()
+            .openapi({ example: "58a2fc6ed39fd083f55d4182bf88826d" }),
+        }),
+        query: jadwalTodayQuerySchema,
+      },
+      responses: {
+        200: {
+          description: "Jadwal hari ini berhasil ditemukan.",
+          content: {
+            "application/json": {
+              schema: jadwalSuccessSchema,
+            },
+          },
+        },
+        404: {
+          description: "Data tidak ditemukan untuk hari ini.",
+          content: {
+            "application/json": {
+              schema: errorSchema,
+            },
+          },
+        },
+      },
+    });
+
   for (const path of allPaths) {
-    app.openapi(
-      createAllRoute(path),
-      (c) => c.json(successResponse(locations)),
+    app.openapi(createAllRoute(path), (c) =>
+      c.json(successResponse(locations)),
     );
   }
 
@@ -406,7 +489,7 @@ export const registerSholatRoutes = (
       }
 
       const result = locations.filter((loc) =>
-        loc.lokasi.toLowerCase().includes(normalized)
+        loc.lokasi.toLowerCase().includes(normalized),
       );
 
       if (result.length === 0) {
@@ -414,6 +497,30 @@ export const registerSholatRoutes = (
       }
 
       return c.json(successResponse(result), 200);
+    });
+  }
+
+  for (const path of jadwalTodayPaths) {
+    app.openapi(createJadwalTodayRoute(path), async (c) => {
+      const { id } = c.req.valid("param");
+      const { tz, utc } = c.req.valid("query");
+      const timeZone = safeJadwalTimeZone(utc ?? tz);
+      const today = getTodayPeriod(timeZone);
+      const monthlyData = await loadScheduleFile(id, today.year, today.month);
+      if (!monthlyData) {
+        return c.json(errorResponse(), 404);
+      }
+      const entry = monthlyData.jadwal[today.key];
+      if (!entry) {
+        return c.json(errorResponse(), 404);
+      }
+      return c.json(
+        successJadwalResponse({
+          ...monthlyData,
+          jadwal: { [today.key]: entry },
+        }),
+        200,
+      );
     });
   }
 
@@ -438,8 +545,7 @@ export const registerSholatRoutes = (
       }
 
       if (parsedPeriod.type === "daily") {
-        const key =
-          `${parsedPeriod.year}-${parsedPeriod.month}-${parsedPeriod.day}`;
+        const key = `${parsedPeriod.year}-${parsedPeriod.month}-${parsedPeriod.day}`;
         const entry = monthlyData.jadwal[key];
         if (!entry) {
           return c.json(errorResponse(), 404);

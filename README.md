@@ -45,6 +45,7 @@ Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada `.
 - `GET /sholat/kota/all`, `/sholat/kota/semua`, `/sholat/kabkota/all`, `/sholat/kabkota/semua` – daftar seluruh lokasi.
 - `GET /sholat/kota/{id}`, `/sholat/kabkota/{id}` – detail lokasi tertentu.
 - `GET /sholat/kota/cari/{keyword}`, `/sholat/kota/find/{keyword}`, `/sholat/kabkota/cari/{keyword}`, `/sholat/kabkota/find/{keyword}` – pencarian bebas (case-insensitive).
+- `GET /sholat/jadwal/{id}/today` – jadwal sholat hari ini per kab/kota dengan opsi `tz`/`utc` untuk zona waktu.
 - `GET /cal/today` – kalender hari ini (Masehi & Hijriyah); parameter `adj` hanya mempengaruhi tanggal Hijriyah, sedangkan CE tetap hari ini.
 - `GET /cal/hijr/{YYYY-MM-DD}` – konversi tanggal Masehi (format `YYYY-MM-DD`) ke Hijriyah; `adj` hanya mempengaruhi Hijriyah.
 - `GET /cal/ce/{YYYY-MM-DD}` – konversi tanggal Hijriyah ke tanggal Masehi; `adj` hanya mempengaruhi Masehi.
