@@ -106,4 +106,13 @@ Contoh respons `/cal/today`:
 ```
 
 ## Dokumentasi
-Akses `GET /doc/apimuslim` untuk mendapatkan spesifikasi OpenAPI (JSON) yang dapat diimpor ke Postman/Insomnia atau generator klien lainnya.
+Dokumentasi tersedia:
+
+- Akses `/doc` untuk informasi web base API Muslim v3 ini.
+- Akses `GET /doc/apimuslim` untuk mendapatkan spesifikasi OpenAPI (JSON) yang dapat diimpor ke Postman/Insomnia atau generator klien lainnya.
+
+
+## Kontak
+
+- Email: banghasan@gmail.com
+- Telegram: [bangHasan](https://t.me/hasanudinhs)
