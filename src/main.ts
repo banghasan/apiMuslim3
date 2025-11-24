@@ -171,6 +171,10 @@ app.doc("/doc/sholat", {
         name: "Sholat",
         description: "Endpoint terkait sholat",
       },
+      {
+        name: "Kalender",
+        description: "Endpoint konversi kalender CE dan Hijriyah",
+      },
     ],
     description:
       "Endpoint untuk daftar kabupaten/kota beserta pencarian ID yang digunakan untuk jadwal sholat.",

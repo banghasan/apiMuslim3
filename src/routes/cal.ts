@@ -1,4 +1,5 @@
 import type { Context } from "hono";
+import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import type { AppEnv } from "~/types.ts";
 
@@ -27,6 +28,88 @@ type DateInfo = {
   monthName: string;
   year: number;
 };
+
+const calendarMethodEnum = z
+  .enum(["standar", "islamic-umalqura", "islamic-civil"])
+  .openapi({
+    description: "Metode perhitungan kalender.",
+    example: "standar",
+  });
+
+const dateInfoSchema = z
+  .object({
+    today: z.string().openapi({ example: "Senin, 24 November 2025" }),
+    day: z.number().int().openapi({ example: 24 }),
+    dayName: z.string().openapi({ example: "Senin" }),
+    month: z.number().int().openapi({ example: 11 }),
+    monthName: z.string().openapi({ example: "November" }),
+    year: z.number().int().openapi({ example: 2025 }),
+  })
+  .openapi("CalendarDateInfo");
+
+const calendarDataSchema = z
+  .object({
+    method: calendarMethodEnum,
+    adjustment: z.number().int().openapi({ example: 0 }),
+    ce: dateInfoSchema,
+    hijr: dateInfoSchema,
+  })
+  .openapi("CalendarData");
+
+const calendarSuccessSchema = z
+  .object({
+    status: z.literal(true).openapi({ example: true }),
+    message: z.string().openapi({ example: "success" }),
+    data: calendarDataSchema,
+  })
+  .openapi("CalendarSuccess");
+
+const calendarErrorSchema = z
+  .object({
+    status: z.literal(false).openapi({ example: false }),
+    message: z.string().openapi({
+      example: "Format tanggal Masehi tidak valid. Gunakan YYYY-MM-DD.",
+    }),
+  })
+  .openapi("CalendarError");
+
+const calendarQuerySchema = z.object({
+  adj: z
+    .string()
+    .openapi({
+      example: "1",
+      description: "Penyesuaian hari. Nilai negatif untuk mundur.",
+    })
+    .optional(),
+  method: z
+    .string()
+    .openapi({
+      example: "islamic-umalqura",
+      description: "Metode kalender, alias `m` tersedia.",
+    })
+    .optional(),
+  m: z
+    .string()
+    .openapi({
+      example: "standar",
+      description: "Alias singkat untuk parameter `method`.",
+    })
+    .optional(),
+  utc: z
+    .string()
+    .openapi({
+      example: "Asia/Jakarta",
+      description: "Zona waktu IANA. Alias `tz` tersedia.",
+    })
+    .optional(),
+  tz: z
+    .string()
+    .openapi({
+      example: "Asia/Makassar",
+      description: "Alias dari parameter `utc`.",
+    })
+    .optional(),
+});
 
 const methodMap: Record<string, CalendarSelection> = {
   standar: { method: "standar", calendar: "islamic" },
@@ -332,7 +415,101 @@ const getCommonParams = (c: Context<AppEnv>) => {
 };
 
 export const registerCalRoutes = (app: OpenAPIHono<AppEnv>) => {
-  app.get("/cal/today", (c) => {
+  const todayRoute = createRoute({
+    method: "get",
+    path: "/cal/today",
+    summary: "Kalender Hari Ini",
+    description:
+      "Menampilkan tanggal hari ini dalam kalender Masehi (CE) dan Hijriyah secara bersamaan. Parameter `adj` hanya mempengaruhi bagian Hijriyah.",
+    tags: ["Kalender"],
+    request: {
+      query: calendarQuerySchema,
+    },
+    responses: {
+      200: {
+        description: "Kalender berhasil dibuat.",
+        content: {
+          "application/json": {
+            schema: calendarSuccessSchema,
+          },
+        },
+      },
+    },
+  });
+
+  const hijrRoute = createRoute({
+    method: "get",
+    path: "/cal/hijr/{date}",
+    summary: "Konversi Masehi ke Hijriyah",
+    description:
+      "Konversi tanggal Masehi (YYYY-MM-DD) ke Hijriyah. Parameter `adj` hanya mempengaruhi tanggal Hijriyah.",
+    tags: ["Kalender"],
+    request: {
+      params: z.object({
+        date: z.string().openapi({
+          example: "2024-05-10",
+          description: "Tanggal Masehi yang akan dikonversi (YYYY-MM-DD).",
+        }),
+      }),
+      query: calendarQuerySchema,
+    },
+    responses: {
+      200: {
+        description: "Konversi berhasil.",
+        content: {
+          "application/json": {
+            schema: calendarSuccessSchema,
+          },
+        },
+      },
+      400: {
+        description: "Format tanggal tidak valid.",
+        content: {
+          "application/json": {
+            schema: calendarErrorSchema,
+          },
+        },
+      },
+    },
+  });
+
+  const ceRoute = createRoute({
+    method: "get",
+    path: "/cal/ce/{date}",
+    summary: "Konversi Hijriyah ke Masehi",
+    description:
+      "Konversi tanggal Hijriyah (YYYY-MM-DD) ke kalender Masehi. Parameter `adj` hanya mempengaruhi tanggal Masehi.",
+    tags: ["Kalender"],
+    request: {
+      params: z.object({
+        date: z.string().openapi({
+          example: "1445-11-02",
+          description: "Tanggal Hijriyah yang akan dikonversi (YYYY-MM-DD).",
+        }),
+      }),
+      query: calendarQuerySchema,
+    },
+    responses: {
+      200: {
+        description: "Konversi berhasil.",
+        content: {
+          "application/json": {
+            schema: calendarSuccessSchema,
+          },
+        },
+      },
+      400: {
+        description: "Format tanggal tidak valid atau gagal dikonversi.",
+        content: {
+          "application/json": {
+            schema: calendarErrorSchema,
+          },
+        },
+      },
+    },
+  });
+
+  app.openapi(todayRoute, (c) => {
     const { selection, timeZone, adjustment } = getCommonParams(c);
     const now = new Date();
     const todayParts = getGregorianParts(now, timeZone);
@@ -350,8 +527,9 @@ export const registerCalRoutes = (app: OpenAPIHono<AppEnv>) => {
     );
   });
 
-  app.get("/cal/hijr/:date", (c) => {
-    const ceDate = parseGregorianDate(c.req.param("date"));
+  app.openapi(hijrRoute, (c) => {
+    const { date } = c.req.valid("param");
+    const ceDate = parseGregorianDate(date);
     if (!ceDate) {
       return c.json(
         errorResponse("Format tanggal Masehi tidak valid. Gunakan YYYY-MM-DD."),
@@ -373,8 +551,9 @@ export const registerCalRoutes = (app: OpenAPIHono<AppEnv>) => {
     );
   });
 
-  app.get("/cal/ce/:date", (c) => {
-    const hijriDate = parseHijriDate(c.req.param("date"));
+  app.openapi(ceRoute, (c) => {
+    const { date } = c.req.valid("param");
+    const hijriDate = parseHijriDate(date);
     if (!hijriDate) {
       return c.json(
         errorResponse(
