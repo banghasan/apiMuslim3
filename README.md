@@ -1,6 +1,6 @@
 # API Sholat Kab/Kota
 
-REST API sederhana berbasis [Hono](https://hono.dev/) + Deno yang mengekspose daftar kabupaten/kota dari data `data/sholat/kabkota.json`. API ini berguna untuk mengambil ID lokasi jadwal sholat, melakukan pencarian, dan mengecek dokumentasi OpenAPI bawaan.
+REST API sederhana untuk menampilkan jadwal sholat dan kalender Hijriyah, untuk memenuhi kebutuhan dan aktivitas muslim indonesia sehari-hari.
 
 ## Fitur
 - Endpoint daftar lengkap kabupaten/kota (`/sholat/kota|kabkota/(all|semua)`).
@@ -106,4 +106,4 @@ Contoh respons `/cal/today`:
 ```
 
 ## Dokumentasi
-Akses `GET /doc/sholat` untuk mendapatkan spesifikasi OpenAPI (JSON) yang dapat diimpor ke Postman/Insomnia atau generator klien lainnya.
+Akses `GET /doc/apimuslim` untuk mendapatkan spesifikasi OpenAPI (JSON) yang dapat diimpor ke Postman/Insomnia atau generator klien lainnya.

@@ -109,7 +109,7 @@ const redocPage = `<!doctype html>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         if (window.Redoc) {
-          Redoc.init('/doc/sholat', {}, document.getElementById('redoc-container'));
+          Redoc.init('/doc/apimuslim', {}, document.getElementById('redoc-container'));
         } else {
           document.getElementById('redoc-container').innerText =
             'Gagal memuat dokumentasi.';
@@ -161,7 +161,7 @@ const host = Deno.env.get("HOST") ?? "127.0.0.1";
 const port = Number(Deno.env.get("PORT") ?? "8000");
 const docHost = host === "0.0.0.0" ? "localhost" : host;
 
-app.doc("/doc/sholat", {
+app.doc("/doc/apimuslim", {
   openapi: "3.1.0",
   info: {
     title: "API Muslim",
