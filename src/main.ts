@@ -108,7 +108,12 @@ app.doc("/doc/apimuslim", {
     title: "API Muslim",
     version: "v3.0.0",
     description:
-      "Endpoint untuk daftar kabupaten/kota beserta pencarian ID yang digunakan untuk jadwal sholat.",
+      "API Komprehensif untuk kebutuhan Muslim di Indonesia, menyediakan data jadwal sholat, arah kiblat, konversi kalender Hijriah, dan berbagai alat bantu lainnya. Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi",
+  },
+  contact: {
+    name: "bang Hasan",
+    url: "https://myquran.com",
+    email: "banghasan@myquran.com",
   },
   tags: tagDefinitions,
   "x-tagGroups": [
