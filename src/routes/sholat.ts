@@ -209,7 +209,8 @@ export const registerSholatRoutes = (
   const aliasDescription = (path: string) => {
     const aliases = routeAliases[path];
     if (!aliases?.length) return "";
-    return ` Alias:\n ${aliases.join(", ")}.`;
+    const bullet = aliases.map((alias) => ` - \`${alias}\``).join("\n");
+    return `\nAlias:\n${bullet}`;
   };
 
   const sampleId = "eda80a3d5b344bc40f3bc04f65b7a357";
