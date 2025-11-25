@@ -15,6 +15,8 @@ memenuhi kebutuhan dan aktivitas muslim indonesia sehari-hari.
 - Endpoint tools utilitas seperti `/tools/ip` untuk mendeteksi IP & user-agent
   pengguna.
 - Endpoint health check (`/health`) untuk mengetahui apakah API siap digunakan.
+- Rate limiting bawaan 100 request/menit per IP (dan 5 request/menit khusus
+  jadwal sholat bulanan).
 - Response konsisten dengan struktur `status`, `message`, dan `data`.
 - Middleware logger akses.
 - Dokumentasi OpenAPI otomatis pada `/doc/sholat` menggunakan
@@ -131,6 +133,18 @@ deno test --allow-env --allow-read
   user agent.
 - `GET /health` – health check sederhana yang mengembalikan waktu server,
   uptime, timezone, dan environment.
+
+## Rate Limiting
+
+- Semua endpoint dibatasi maksimum 100 request/menit per IP untuk mencegah
+  penyalahgunaan.
+- Endpoint jadwal bulanan `/sholat/jadwal/{id}/{YYYY-MM}` memiliki batas lebih
+  ketat yaitu 5 request/menit per IP.
+- Response mencantumkan header `RateLimit-Limit`, `RateLimit-Remaining`,
+  `RateLimit-Reset`, dan saat limit terlampaui juga `Retry-After` untuk panduan
+  klien.
+- Pengaturan mudah disesuaikan di `src/config/rate_limit.ts` tanpa perlu
+  mengubah kode lain.
 
 Contoh respons sukses:
 

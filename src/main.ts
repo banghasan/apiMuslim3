@@ -2,6 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { config } from "~/config.ts";
 import { createAccessLogger } from "~/middleware/logger.ts";
 import { registerCalRoutes } from "~/routes/cal.ts";
+import { rateLimitConfig } from "~/config/rate_limit.ts";
 import { registerQiblaRoutes } from "~/routes/qibla.ts";
 import { registerToolsRoutes } from "~/routes/tools.ts";
 import { registerSholatRoutes } from "~/routes/sholat.ts";
@@ -10,6 +11,7 @@ import { createJadwalService } from "~/services/jadwal.ts";
 import { createSholatService, loadSholatData } from "~/services/sholat.ts";
 import type { AppEnv } from "~/types.ts";
 import { registerHealthRoutes } from "~/routes/health.ts";
+import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
 
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
@@ -37,6 +39,7 @@ const redocPage = new TextDecoder().decode(docTemplateBytes);
 const startedAt = new Date();
 const app = new OpenAPIHono<AppEnv>();
 app.use("*", createAccessLogger(config));
+app.use("*", createRateLimitMiddleware(rateLimitConfig));
 app.get(
   "/favicon.ico",
   () =>
