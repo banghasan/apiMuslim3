@@ -1,4 +1,4 @@
-const MAX_QUEUE = 60;
+const MAX_QUEUE = 10;
 const RATE_DELAY_MS = 1000;
 
 type GeocodeJob = {
