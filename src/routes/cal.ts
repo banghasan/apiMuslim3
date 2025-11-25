@@ -19,12 +19,14 @@ import {
 import { buildCodeSamples } from "~/lib/docs.ts";
 import type { AppEnv } from "~/types.ts";
 
-const calendarMethodEnum = z
-  .enum(["standar", "islamic-umalqura", "islamic-civil"])
-  .openapi({
-    description: "Metode perhitungan kalender.",
-    example: "standar",
-  });
+const calendarMethodEnum = z.enum([
+  "standar",
+  "islamic-umalqura",
+  "islamic-civil",
+]).openapi({
+  description: "Metode perhitungan kalender.",
+  example: "standar",
+});
 
 const dateInfoSchema = z
   .object({
@@ -144,7 +146,7 @@ export const registerCalRoutes = (
   app: OpenAPIHono<AppEnv>,
   docBaseUrl: string,
 ) => {
-  const sampleHijrDate = "2024-05-10";
+  const sampleHijrDate = "1991-06-23";
   const sampleCeHijr = "1445-11-02";
   const calendarMethodParam = "method=islamic-umalqura";
   const ceAliases = [
@@ -154,9 +156,7 @@ export const registerCalRoutes = (
     "/cal/julian/{date}",
   ];
   const ceAliasDescription = `\nAlias:\n${
-    ceAliases
-      .map((alias) => ` - \`${alias}\``)
-      .join("\n")
+    ceAliases.map((alias) => ` - \`${alias}\``).join("\n")
   }`;
   const toHonoPath = (path: string) => path.replace(/\{([^}]+)\}/g, ":$1");
   const registerAliasRoutes = (
