@@ -190,8 +190,7 @@ export const registerSholatRoutes = (
 
   type RouteHandler = (c: Context<AppEnv>) => Promise<Response> | Response;
   type RouteMethod = "get" | "post";
-  const toHonoPath = (path: string) =>
-    path.replace(/\{([^}]+)\}/g, ":$1");
+  const toHonoPath = (path: string) => path.replace(/\{([^}]+)\}/g, ":$1");
   const registerAliasRoutes = (
     path: string,
     method: RouteMethod,
@@ -210,7 +209,7 @@ export const registerSholatRoutes = (
   const aliasDescription = (path: string) => {
     const aliases = routeAliases[path];
     if (!aliases?.length) return "";
-    return ` Alias: ${aliases.join(", ")}.`;
+    return ` Alias:\n ${aliases.join(", ")}.`;
   };
 
   const sampleId = "eda80a3d5b344bc40f3bc04f65b7a357";
@@ -256,10 +255,9 @@ export const registerSholatRoutes = (
       method: "get",
       path,
       summary: "Kab/kota Semua",
-      description:
-        `Daftar lengkap seluruh kabupaten/kota yang tersedia.${aliasDescription(
-          path,
-        )}`,
+      description: `Daftar lengkap seluruh kabupaten/kota yang tersedia.${aliasDescription(
+        path,
+      )}`,
       tags: ["Sholat"],
       responses: {
         200: {
@@ -285,10 +283,9 @@ export const registerSholatRoutes = (
       method: "get",
       path,
       summary: "Kab/kota Berdasar ID",
-      description:
-        `Mendapatkan kabupaten atau kota berdasarkan ID.${aliasDescription(
-          path,
-        )}`,
+      description: `Mendapatkan kabupaten atau kota berdasarkan ID.${aliasDescription(
+        path,
+      )}`,
       tags: ["Sholat"],
       request: {
         params: z.object({
@@ -333,10 +330,9 @@ export const registerSholatRoutes = (
       method: "get",
       path,
       summary: "Kab/kota Pencarian",
-      description:
-        `Pencarian Kabupaten atau Kota berdasarkan kata kunci.${aliasDescription(
-          path,
-        )}`,
+      description: `Pencarian Kabupaten atau Kota berdasarkan kata kunci.${aliasDescription(
+        path,
+      )}`,
       tags: ["Sholat"],
       request: {
         params: z.object({
@@ -391,10 +387,9 @@ export const registerSholatRoutes = (
       method: "post",
       path,
       summary: "Kab/kota Pencarian (POST)",
-      description:
-        `Pencarian Kabupaten atau Kota melalui body JSON.${aliasDescription(
-          path,
-        )}`,
+      description: `Pencarian Kabupaten atau Kota melalui body JSON.${aliasDescription(
+        path,
+      )}`,
       tags: ["Sholat"],
       request: {
         body: {
@@ -452,7 +447,7 @@ export const registerSholatRoutes = (
       path,
       summary: "Jadwal Sholat",
       description:
-        "Jadwal sholat harian (YYYY-MM-DD) atau bulanan (YYYY-MM) berdasarkan ID kab/kota.",
+        "Jadwal sholat harian (`YYYY-MM-DD`) atau bulanan (`YYYY-MM`) berdasarkan ID kab/kota.",
       tags: ["Sholat"],
       request: {
         params: z.object({
@@ -462,7 +457,7 @@ export const registerSholatRoutes = (
           period: z.string().openapi({
             example: "2026-06-23",
             description:
-              "Gunakan format YYYY-MM untuk bulanan atau YYYY-MM-DD untuk harian.",
+              "Gunakan format `YYYY-MM` untuk bulanan atau `YYYY-MM-DD` untuk harian.",
           }),
         }),
       },

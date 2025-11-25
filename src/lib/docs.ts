@@ -9,11 +9,12 @@ export const buildCurlSample = (
   const normalizedBase = normalizeBaseUrl(baseUrl || "");
   const prefix = path.startsWith("/") ? "" : "/";
   const url = `${normalizedBase}${prefix}${path}`;
+  const suffix = " | jq";
   if (method === "POST") {
     if (body) {
-      return `curl -s -X POST "${url}" -H "Content-Type: application/json" -d '${body}'`;
+      return `curl -s -X POST "${url}" -H "Content-Type: application/json" -d '${body}'${suffix}`;
     }
-    return `curl -s -X POST "${url}"`;
+    return `curl -s -X POST "${url}"${suffix}`;
   }
-  return `curl -s "${url}"`;
+  return `curl -s "${url}"${suffix}`;
 };

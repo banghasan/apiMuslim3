@@ -185,7 +185,7 @@ app.doc("/doc/apimuslim", {
   servers: [
     {
       url: docBaseUrl,
-      description: "Server aktif berdasarkan konfigurasi ENV",
+      description: "Gunakan basis URL ini saat mencoba contoh API",
     },
   ],
 });
