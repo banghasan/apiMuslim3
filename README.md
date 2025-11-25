@@ -67,6 +67,28 @@ Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada
 - `DOC_BASE_URL` menentukan basis URL yang dipakai pada daftar server OpenAPI
   dan contoh `curl` otomatis di ReDoc.
 
+## Panduan Dokumentasi Cepat
+
+1. Jalankan server kemudian buka `DOC_BASE_URL/doc` (contoh:
+   `http://localhost:8000/doc`).
+2. Gunakan tombol “Cari di Dokumentasi (Ctrl+/)” di bagian atas halaman untuk
+   fokus ke kolom pencarian ReDoc.
+3. Klik salah satu tautan kategori (Sholat, Kalender, Qibla, Tools) untuk
+   melompat ke bagian terkait. Hash yang dipakai ReDoc dapat dirujuk langsung
+   seperti contoh berikut.
+
+| Kategori | Penjelasan Singkat                                           | Tautan (akses setelah server jalan) |
+| -------- | ------------------------------------------------------------ | ----------------------------------- |
+| Sholat   | Daftar lokasi, pencarian, jadwal sholat harian/bulanan.      | `/doc#/tag/Sholat`                  |
+| Kalender | Konversi tanggal Masehi ↔ Hijriyah, opsi metode perhitungan. | `/doc#/tag/Kalender`                |
+| Qibla    | Hitung arah kiblat berdasarkan koordinat.                    | `/doc#/tag/Qibla`                   |
+| Tools    | Utilitas seperti `/tools/ip` & `/tools/geocode`.             | `/doc#/tag/Tools`                   |
+
+Contoh: untuk melihat dokumentasi endpoint qibla secara cepat, buka
+`http://localhost:8000/doc#/tag/Qibla` setelah server menyala. README ini juga
+menyediakan contoh `curl`/JavaScript/PHP/Python/Go di setiap endpoint pada ReDoc
+untuk memulai integrasi dengan cepat.
+
 ## Cache & Lingkungan
 
 - `APP_ENV` menentukan perilaku cache; nilai default `development` menonaktifkan
