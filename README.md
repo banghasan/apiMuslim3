@@ -6,6 +6,8 @@ API Komprehensif untuk kebutuhan Muslim di Indonesia, menyediakan data jadwal
 sholat, arah kiblat, konversi kalender Hijriah, dan berbagai alat bantu lainnya.
 Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi
 
+![API Documentation Preview](https://raw.githubusercontent.com/banghasan/apiMuslim3/main/screenshot/api-doc-screenshot.webp)
+
 ## Fitur
 
 - Endpoint daftar lengkap kabupaten/kota (`/sholat/kota|kabkota/(all|semua)`).
