@@ -15,17 +15,11 @@ import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
 
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
-const redocScriptFile = new URL(
-  "./static/redoc.standalone.js",
-  import.meta.url,
-);
+const redocScriptFile = new URL("./static/redoc.standalone.js", import.meta.url);
 const redocScriptBytes = await Deno.readFile(redocScriptFile);
 const myQuranLogoFile = new URL("./static/api-myquran.png", import.meta.url);
 const myQuranLogoBytes = await Deno.readFile(myQuranLogoFile);
-const appleTouchIconFile = new URL(
-  "./static/apple-touch-icon.png",
-  import.meta.url,
-);
+const appleTouchIconFile = new URL("./static/apple-touch-icon.png", import.meta.url);
 const appleTouchIconBytes = await Deno.readFile(appleTouchIconFile);
 const favicon32File = new URL("./static/favicon-32x32.png", import.meta.url);
 const favicon32Bytes = await Deno.readFile(favicon32File);
@@ -40,9 +34,7 @@ const sholatService = createSholatService({
   data: sholatData,
 });
 const jadwalService = createJadwalService(config);
-const geocodeService = config.mapsCoApiKey
-  ? createGeocodeService(config.mapsCoApiKey)
-  : null;
+const geocodeService = config.mapsCoApiKey ? createGeocodeService(config.mapsCoApiKey) : null;
 
 // Load documentation HTML template
 const docTemplateFile = new URL("./static/doc.html", import.meta.url);
@@ -135,7 +127,8 @@ app.get("/", (c) =>
       "Diskusi pada Grup Telegram @apimuslim",
       "myQuran.com",
     ],
-  }));
+  }),
+);
 
 registerSholatRoutes(app, {
   sholatService,
@@ -156,9 +149,7 @@ registerHealthRoutes({
   config,
 });
 
-app.notFound((c) =>
-  c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
-);
+app.notFound((c) => c.json({ status: false, message: "Data tidak ditemukan .." }, 404));
 app.onError((err, c) => {
   console.error(err);
   return c.json({ status: false, message: "internal server error" }, 500);
@@ -167,8 +158,12 @@ app.onError((err, c) => {
 const tagDefinitions = [
   {
     name: "Sholat",
-    description:
-      "Kamu dapat mengakses endpoint salat yang mencakup detail penting seperti cakupan kota-kota yang tersedia, jadwal salat harian yang akurat, dan informasi teknis relevan lainnya. Silakan gunakan data ini sesuai kebutuhan integrasi Anda",
+    description: `Kamu dapat mengakses endpoint salat yang mencakup detail penting seperti cakupan kota-kota yang tersedia, jadwal salat harian yang akurat, dan informasi teknis relevan lainnya. Silakan gunakan data ini sesuai kebutuhan integrasi Anda
+> Sumber data dari situs [kemenag bimaislam](https://bimasislam.kemenag.go.id/web/jadwalshalat)
+
+    Terakhir diupdate pada 25 November 2025
+
+Kolom kota dan kabupaten telah disesuaikan sebagaimana sumber.`,
   },
   {
     name: "Kalender",
@@ -190,8 +185,7 @@ Pilihan metode yang dapat dipilih:
   },
   {
     name: "Tools",
-    description:
-      "Beragam alat bantu seperti deteksi IP, geocode, dan health check API.",
+    description: "Beragam alat bantu seperti deteksi IP, geocode, dan health check API.",
   },
 ];
 
@@ -200,13 +194,17 @@ app.doc("/doc/apimuslim", {
   info: {
     title: "API Muslim",
     version: "v3.0.0",
-    description:
-      "API Komprehensif untuk kebutuhan Muslim di Indonesia, menyediakan data jadwal sholat, arah kiblat, konversi kalender Hijriah, dan berbagai alat bantu lainnya. Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi",
-  },
-  contact: {
-    name: "bang Hasan",
-    url: "https://myquran.com",
-    email: "banghasan@myquran.com",
+    description: `![](https://raw.githubusercontent.com/banghasan/apiMuslim3/main/src/static/api-myquran_text.png)
+\
+> API Komprehensif untuk kebutuhan Muslim di Indonesia, menyediakan data jadwal sholat, arah kiblat, konversi kalender Hijriah, dan berbagai alat bantu lainnya. Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi
+
+alQuran dan lainnya, *insyaAllah*, segera.
+
+## Kontak
+Saran, ide, diskusi dan komunikasi dapat melalui:
+- Grup Telegram [@ApiMuslim](https://t.me/apimuslim)
+- Email: banghasan@myquran.com
+`,
   },
   tags: tagDefinitions,
   "x-tagGroups": [
@@ -225,7 +223,6 @@ app.doc("/doc/apimuslim", {
 
 const docHost = config.host === "0.0.0.0" ? "localhost" : config.host;
 console.log(`Listening on http://${docHost}:${config.port}`);
-Deno.serve(
-  { hostname: config.host, port: config.port },
-  (request, connInfo) => app.fetch(request, { connInfo }),
+Deno.serve({ hostname: config.host, port: config.port }, (request, connInfo) =>
+  app.fetch(request, { connInfo }),
 );
