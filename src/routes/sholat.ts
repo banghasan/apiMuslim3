@@ -1,6 +1,7 @@
 import type { Context } from "hono";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
+import { buildCurlSample } from "~/lib/docs.ts";
 import {
   getTodayPeriod,
   JadwalEntry,
@@ -162,6 +163,7 @@ export const loadSholatData = async (): Promise<SholatData> => {
 export const registerSholatRoutes = (
   app: OpenAPIHono<AppEnv>,
   { locations, idIndex }: SholatData,
+  docBaseUrl: string,
 ) => {
   const allPath = "/sholat/kabkota/semua";
   const byIdPath = "/sholat/kabkota/{id}";
@@ -210,6 +212,11 @@ export const registerSholatRoutes = (
     if (!aliases?.length) return "";
     return ` Alias: ${aliases.join(", ")}.`;
   };
+
+  const sampleId = "eda80a3d5b344bc40f3bc04f65b7a357";
+  const sampleKeyword = "kediri";
+  const samplePeriod = "2026-06-23";
+  const searchBody = JSON.stringify({ keyword: sampleKeyword });
 
   const respondAllLocations: RouteHandler = (c) =>
     c.json(successResponse(locations));
@@ -264,6 +271,13 @@ export const registerSholatRoutes = (
           },
         },
       },
+      "x-codeSamples": [
+        {
+          lang: "curl",
+          label: "cURL",
+          source: buildCurlSample(docBaseUrl, "GET", "/sholat/kabkota/semua"),
+        },
+      ],
     });
 
   const createByIdRoute = (path: string) =>
@@ -301,6 +315,17 @@ export const registerSholatRoutes = (
           },
         },
       },
+      "x-codeSamples": [
+        {
+          lang: "curl",
+          label: "cURL",
+          source: buildCurlSample(
+            docBaseUrl,
+            "GET",
+            `/sholat/kabkota/${sampleId}`,
+          ),
+        },
+      ],
     });
 
   const createSearchRoute = (path: string) =>
@@ -344,6 +369,17 @@ export const registerSholatRoutes = (
           },
         },
       },
+      "x-codeSamples": [
+        {
+          lang: "curl",
+          label: "cURL",
+          source: buildCurlSample(
+            docBaseUrl,
+            "GET",
+            `/sholat/kabkota/cari/${sampleKeyword}`,
+          ),
+        },
+      ],
     });
 
   const searchBodySchema = z.object({
@@ -396,6 +432,18 @@ export const registerSholatRoutes = (
           },
         },
       },
+      "x-codeSamples": [
+        {
+          lang: "curl",
+          label: "cURL",
+          source: buildCurlSample(
+            docBaseUrl,
+            "POST",
+            "/sholat/kabkota/cari",
+            searchBody,
+          ),
+        },
+      ],
     });
 
   const createJadwalRoute = (path: string) =>
@@ -444,6 +492,17 @@ export const registerSholatRoutes = (
           },
         },
       },
+      "x-codeSamples": [
+        {
+          lang: "curl",
+          label: "cURL",
+          source: buildCurlSample(
+            docBaseUrl,
+            "GET",
+            `/sholat/jadwal/${sampleId}/${samplePeriod}`,
+          ),
+        },
+      ],
     });
 
   const jadwalTodayQuerySchema = z.object({
@@ -497,6 +556,17 @@ export const registerSholatRoutes = (
           },
         },
       },
+      "x-codeSamples": [
+        {
+          lang: "curl",
+          label: "cURL",
+          source: buildCurlSample(
+            docBaseUrl,
+            "GET",
+            `/sholat/jadwal/${sampleId}/today?tz=Asia%2FJakarta`,
+          ),
+        },
+      ],
     });
 
   app.openapi(createAllRoute(allPath), respondAllLocations);

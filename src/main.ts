@@ -146,8 +146,15 @@ app.get("/doc/", (c) => c.html(redocPage));
 app.get("/doc/index.html", (c) => c.html(redocPage));
 
 const sholatData = await loadSholatData();
-registerSholatRoutes(app, sholatData);
-registerCalRoutes(app);
+
+const host = Deno.env.get("HOST") ?? "127.0.0.1";
+const port = Number(Deno.env.get("PORT") ?? "8000");
+const docHost = host === "0.0.0.0" ? "localhost" : host;
+const defaultBaseUrl = `http://${docHost}:${port}`;
+const docBaseUrl = Deno.env.get("DOC_BASE_URL") ?? defaultBaseUrl;
+
+registerSholatRoutes(app, sholatData, docBaseUrl);
+registerCalRoutes(app, docBaseUrl);
 
 app.notFound((c) =>
   c.json({ status: false, message: "Data tidak ditemukan .." }, 404),
@@ -156,10 +163,6 @@ app.onError((err, c) => {
   console.error(err);
   return c.json({ status: false, message: "internal server error" }, 500);
 });
-
-const host = Deno.env.get("HOST") ?? "127.0.0.1";
-const port = Number(Deno.env.get("PORT") ?? "8000");
-const docHost = host === "0.0.0.0" ? "localhost" : host;
 
 app.doc("/doc/apimuslim", {
   openapi: "3.1.0",
@@ -181,7 +184,7 @@ app.doc("/doc/apimuslim", {
   },
   servers: [
     {
-      url: `http://${docHost}:${port}`,
+      url: docBaseUrl,
       description: "Server aktif berdasarkan konfigurasi ENV",
     },
   ],

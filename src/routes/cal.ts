@@ -16,6 +16,7 @@ import {
   safeCalendarTimeZone,
   shiftZonedDate,
 } from "~/lib/calendar.ts";
+import { buildCurlSample } from "~/lib/docs.ts";
 import type { AppEnv } from "~/types.ts";
 
 const calendarMethodEnum = z
@@ -126,7 +127,13 @@ const getCommonParams = (c: Context<AppEnv>) => {
   return { selection, timeZone, adjustment };
 };
 
-export const registerCalRoutes = (app: OpenAPIHono<AppEnv>) => {
+export const registerCalRoutes = (
+  app: OpenAPIHono<AppEnv>,
+  docBaseUrl: string,
+) => {
+  const sampleHijrDate = "2024-05-10";
+  const sampleCeHijr = "1445-11-02";
+  const calendarMethodParam = "method=islamic-umalqura";
   const todayRoute = createRoute({
     method: "get",
     path: "/cal/today",
@@ -137,17 +144,28 @@ export const registerCalRoutes = (app: OpenAPIHono<AppEnv>) => {
     request: {
       query: calendarQuerySchema,
     },
-    responses: {
-      200: {
-        description: "Kalender berhasil dibuat.",
-        content: {
-          "application/json": {
-            schema: calendarSuccessSchema,
+      responses: {
+        200: {
+          description: "Kalender berhasil dibuat.",
+          content: {
+            "application/json": {
+              schema: calendarSuccessSchema,
+            },
           },
         },
       },
-    },
-  });
+      "x-codeSamples": [
+        {
+          lang: "curl",
+          label: "cURL",
+          source: buildCurlSample(
+            docBaseUrl,
+            "GET",
+            "/cal/today?adj=1&tz=Asia%2FJakarta",
+          ),
+        },
+      ],
+    });
 
   const hijrRoute = createRoute({
     method: "get",
@@ -165,25 +183,36 @@ export const registerCalRoutes = (app: OpenAPIHono<AppEnv>) => {
       }),
       query: calendarQuerySchema,
     },
-    responses: {
-      200: {
-        description: "Konversi berhasil.",
-        content: {
-          "application/json": {
-            schema: calendarSuccessSchema,
+      responses: {
+        200: {
+          description: "Konversi berhasil.",
+          content: {
+            "application/json": {
+              schema: calendarSuccessSchema,
+            },
+          },
+        },
+        400: {
+          description: "Format tanggal tidak valid.",
+          content: {
+            "application/json": {
+              schema: calendarErrorSchema,
+            },
           },
         },
       },
-      400: {
-        description: "Format tanggal tidak valid.",
-        content: {
-          "application/json": {
-            schema: calendarErrorSchema,
-          },
+      "x-codeSamples": [
+        {
+          lang: "curl",
+          label: "cURL",
+          source: buildCurlSample(
+            docBaseUrl,
+            "GET",
+            `/cal/hijr/${sampleHijrDate}?${calendarMethodParam}`,
+          ),
         },
-      },
-    },
-  });
+      ],
+    });
 
   const ceRoute = createRoute({
     method: "get",
@@ -201,25 +230,36 @@ export const registerCalRoutes = (app: OpenAPIHono<AppEnv>) => {
       }),
       query: calendarQuerySchema,
     },
-    responses: {
-      200: {
-        description: "Konversi berhasil.",
-        content: {
-          "application/json": {
-            schema: calendarSuccessSchema,
+      responses: {
+        200: {
+          description: "Konversi berhasil.",
+          content: {
+            "application/json": {
+              schema: calendarSuccessSchema,
+            },
+          },
+        },
+        400: {
+          description: "Format tanggal tidak valid atau gagal dikonversi.",
+          content: {
+            "application/json": {
+              schema: calendarErrorSchema,
+            },
           },
         },
       },
-      400: {
-        description: "Format tanggal tidak valid atau gagal dikonversi.",
-        content: {
-          "application/json": {
-            schema: calendarErrorSchema,
-          },
+      "x-codeSamples": [
+        {
+          lang: "curl",
+          label: "cURL",
+          source: buildCurlSample(
+            docBaseUrl,
+            "GET",
+            `/cal/ce/${sampleCeHijr}?${calendarMethodParam}`,
+          ),
         },
-      },
-    },
-  });
+      ],
+    });
 
   app.openapi(todayRoute, (c) => {
     const { selection, timeZone, adjustment } = getCommonParams(c);
