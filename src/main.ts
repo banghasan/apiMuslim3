@@ -15,13 +15,18 @@ import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
 
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
-const redocScriptFile = new URL(
-  "./static/redoc.standalone.js",
-  import.meta.url,
-);
+const redocScriptFile = new URL("./static/redoc.standalone.js", import.meta.url);
 const redocScriptBytes = await Deno.readFile(redocScriptFile);
 const myQuranLogoFile = new URL("./static/api-myquran.png", import.meta.url);
 const myQuranLogoBytes = await Deno.readFile(myQuranLogoFile);
+const appleTouchIconFile = new URL("./static/apple-touch-icon.png", import.meta.url);
+const appleTouchIconBytes = await Deno.readFile(appleTouchIconFile);
+const favicon32File = new URL("./static/favicon-32x32.png", import.meta.url);
+const favicon32Bytes = await Deno.readFile(favicon32File);
+const favicon16File = new URL("./static/favicon-16x16.png", import.meta.url);
+const favicon16Bytes = await Deno.readFile(favicon16File);
+const manifestFile = new URL("./static/site.webmanifest", import.meta.url);
+const manifestBytes = await Deno.readFile(manifestFile);
 
 const sholatData = await loadSholatData();
 const sholatService = createSholatService({
@@ -29,9 +34,7 @@ const sholatService = createSholatService({
   data: sholatData,
 });
 const jadwalService = createJadwalService(config);
-const geocodeService = config.mapsCoApiKey
-  ? createGeocodeService(config.mapsCoApiKey)
-  : null;
+const geocodeService = config.mapsCoApiKey ? createGeocodeService(config.mapsCoApiKey) : null;
 
 // Load documentation HTML template
 const docTemplateFile = new URL("./static/doc.html", import.meta.url);
@@ -75,6 +78,46 @@ app.get(
       },
     }),
 );
+app.get(
+  "/apple-touch-icon.png",
+  () =>
+    new Response(appleTouchIconBytes, {
+      headers: {
+        "content-type": "image/png",
+        "cache-control": "public, max-age=604800",
+      },
+    }),
+);
+app.get(
+  "/favicon-32x32.png",
+  () =>
+    new Response(favicon32Bytes, {
+      headers: {
+        "content-type": "image/png",
+        "cache-control": "public, max-age=604800",
+      },
+    }),
+);
+app.get(
+  "/favicon-16x16.png",
+  () =>
+    new Response(favicon16Bytes, {
+      headers: {
+        "content-type": "image/png",
+        "cache-control": "public, max-age=604800",
+      },
+    }),
+);
+app.get(
+  "/site.webmanifest",
+  () =>
+    new Response(manifestBytes, {
+      headers: {
+        "content-type": "application/manifest+json",
+        "cache-control": "public, max-age=604800",
+      },
+    }),
+);
 
 registerSholatRoutes(app, {
   sholatService,
@@ -95,9 +138,7 @@ registerHealthRoutes({
   config,
 });
 
-app.notFound((c) =>
-  c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
-);
+app.notFound((c) => c.json({ status: false, message: "Data tidak ditemukan .." }, 404));
 app.onError((err, c) => {
   console.error(err);
   return c.json({ status: false, message: "internal server error" }, 500);
@@ -124,8 +165,7 @@ Nama lainnya adalah Syamsiah, Syamsiah atau Tahun Matahari. Penamaan ini mengacu
   },
   {
     name: "Tools",
-    description:
-      "Beragam alat bantu seperti deteksi IP, geocode, dan health check API.",
+    description: "Beragam alat bantu seperti deteksi IP, geocode, dan health check API.",
   },
 ];
 
@@ -159,7 +199,6 @@ app.doc("/doc/apimuslim", {
 
 const docHost = config.host === "0.0.0.0" ? "localhost" : config.host;
 console.log(`Listening on http://${docHost}:${config.port}`);
-Deno.serve(
-  { hostname: config.host, port: config.port },
-  (request, connInfo) => app.fetch(request, { connInfo }),
+Deno.serve({ hostname: config.host, port: config.port }, (request, connInfo) =>
+  app.fetch(request, { connInfo }),
 );

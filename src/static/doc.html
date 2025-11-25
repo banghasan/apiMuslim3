@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="utf-8" />
@@ -8,6 +8,10 @@
       name="description"
       content="Dokumentasi lengkap API Muslim v3 - Jadwal Sholat, Kalender Hijriah, Arah Kiblat, dan Tools lainnya"
     />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -54,7 +58,11 @@
 
       body {
         font-family:
-          "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Inter",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
           sans-serif;
         background: var(--content-bg);
         color: var(--content-text);
@@ -265,22 +273,26 @@
             href="#tag/Sholat"
             data-tag-link="Sholat"
             title="Lihat dokumentasi API Jadwal Sholat"
-          >🕌 Sholat</a>
+            >🕌 Sholat</a
+          >
           <a
             href="#tag/Kalender"
             data-tag-link="Kalender"
             title="Lihat dokumentasi API Kalender Hijriah"
-          >📅 Kalender</a>
+            >📅 Kalender</a
+          >
           <a
             href="#tag/Qibla"
             data-tag-link="Qibla"
             title="Lihat dokumentasi API Arah Kiblat"
-          >🧭 Qibla</a>
+            >🧭 Qibla</a
+          >
           <a
             href="#tag/Tools"
             data-tag-link="Tools"
             title="Lihat dokumentasi API Tools"
-          >🛠️ Tools</a>
+            >🛠️ Tools</a
+          >
         </nav>
       </div>
     </header>
@@ -302,24 +314,20 @@
 
         // Fungsi untuk menghubungkan link navigasi dengan tag
         const hookTagLinks = () => {
-          document.querySelectorAll("[data-tag-link]").forEach(
-            (link) => {
-              link.addEventListener("click", (event) => {
-                event.preventDefault();
-                const tagName = link.getAttribute("data-tag-link");
-                if (tagName) {
-                  window.location.hash = "tag/" +
-                    encodeURIComponent(tagName);
-                  setTimeout(() => {
-                    const headerHeight =
-                      document.querySelector(".doc-header")
-                        .offsetHeight;
-                    window.scrollBy(0, -headerHeight - 10);
-                  }, 100);
-                }
-              });
-            },
-          );
+          document.querySelectorAll("[data-tag-link]").forEach((link) => {
+            link.addEventListener("click", (event) => {
+              event.preventDefault();
+              const tagName = link.getAttribute("data-tag-link");
+              if (tagName) {
+                window.location.hash = "tag/" + encodeURIComponent(tagName);
+                setTimeout(() => {
+                  const headerHeight =
+                    document.querySelector(".doc-header").offsetHeight;
+                  window.scrollBy(0, -headerHeight - 10);
+                }, 100);
+              }
+            });
+          });
         };
 
         // Event listener untuk tombol cari
@@ -462,8 +470,7 @@
                   },
                   code: {
                     fontSize: "14px",
-                    fontFamily:
-                      '"Fira Code", "Consolas", "Monaco", monospace',
+                    fontFamily: '"Fira Code", "Consolas", "Monaco", monospace',
                     lineHeight: "1.6",
                     fontWeight: "400",
                     color: "#0f172a",

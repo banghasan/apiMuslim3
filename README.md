@@ -2,7 +2,9 @@
 
 # API Muslim indonesia
 
-API Komprehensif untuk kebutuhan Muslim di Indonesia, menyediakan data jadwal sholat, arah kiblat, konversi kalender Hijriah, dan berbagai alat bantu lainnya. Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi
+API Komprehensif untuk kebutuhan Muslim di Indonesia, menyediakan data jadwal
+sholat, arah kiblat, konversi kalender Hijriah, dan berbagai alat bantu lainnya.
+Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi
 
 ## Fitur
 
