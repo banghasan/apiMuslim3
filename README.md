@@ -32,6 +32,7 @@ memenuhi kebutuhan dan aktivitas muslim indonesia sehari-hari.
    LOG_WRITE=false
    APP_ENV=development
    DOC_BASE_URL=http://localhost:8000
+   MAPSCO_API_KEY=
    ```
 
 ## Menjalankan Server
@@ -73,6 +74,7 @@ Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada
 - Atur `APP_ENV=production` untuk mengaktifkan cache in-memory pada pencarian
   sholat dan jadwal bulanan, sehingga respon lebih cepat pada lingkungan
   produksi.
+- `MAPSCO_API_KEY` wajib diisi bila ingin memakai `/tools/geocode` (maps.co).
 
 ## Pengujian
 

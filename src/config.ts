@@ -14,6 +14,7 @@ export type AppConfig = {
   logVerbose: boolean;
   logWrite: boolean;
   enableCache: boolean;
+  mapsCoApiKey: string;
 };
 
 export const loadConfig = (): AppConfig => {
@@ -27,6 +28,7 @@ export const loadConfig = (): AppConfig => {
   const logVerbose = parseBoolean(Deno.env.get("LOG_VERBOSE"), false);
   const logWrite = parseBoolean(Deno.env.get("LOG_WRITE"), false);
   const enableCache = env === "production";
+  const mapsCoApiKey = Deno.env.get("MAPSCO_API_KEY") ?? "";
   return {
     env,
     host,
@@ -36,6 +38,7 @@ export const loadConfig = (): AppConfig => {
     logVerbose,
     logWrite,
     enableCache,
+    mapsCoApiKey,
   };
 };
 

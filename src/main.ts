@@ -5,6 +5,7 @@ import { registerCalRoutes } from "~/routes/cal.ts";
 import { registerQiblaRoutes } from "~/routes/qibla.ts";
 import { registerToolsRoutes } from "~/routes/tools.ts";
 import { registerSholatRoutes } from "~/routes/sholat.ts";
+import { createGeocodeService } from "~/services/geocode.ts";
 import { createJadwalService } from "~/services/jadwal.ts";
 import { createSholatService, loadSholatData } from "~/services/sholat.ts";
 import type { AppEnv } from "~/types.ts";
@@ -23,6 +24,9 @@ const sholatService = createSholatService({
   data: sholatData,
 });
 const jadwalService = createJadwalService(config);
+const geocodeService = config.mapsCoApiKey
+  ? createGeocodeService(config.mapsCoApiKey)
+  : null;
 
 const redocPage = `<!doctype html>
 <html lang="id">
@@ -90,7 +94,11 @@ registerSholatRoutes(app, {
 });
 registerCalRoutes(app, config.docBaseUrl);
 registerQiblaRoutes({ app, docBaseUrl: config.docBaseUrl });
-registerToolsRoutes({ app, docBaseUrl: config.docBaseUrl });
+registerToolsRoutes({
+  app,
+  docBaseUrl: config.docBaseUrl,
+  geocodeService,
+});
 
 app.notFound((c) =>
   c.json({ status: false, message: "Data tidak ditemukan .." }, 404)

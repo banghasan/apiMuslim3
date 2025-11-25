@@ -28,6 +28,7 @@ const baseConfig: AppConfig = {
   logVerbose: false,
   logWrite: false,
   enableCache: false,
+  mapsCoApiKey: "",
 };
 
 const defaultService = createJadwalService(baseConfig);
