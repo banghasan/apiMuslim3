@@ -248,4 +248,4 @@ Dokumentasi tersedia:
 Saran, ide dan pertanyaan dapat melalui kontak:
 
 - Email: banghasan@myquran.com
-- Telegram: [bangHasan](https://t.me/hasanudinhs)
+- Telegram: Grup Telegram [apimuslim](https://t.me/apimuslim)
