@@ -2,35 +2,14 @@ import type { Context } from "hono";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { buildCurlSample } from "~/lib/docs.ts";
-import {
-  getTodayPeriod,
+import type {
   JadwalEntry,
   JadwalResponseData,
-  loadScheduleFile,
-  parseSchedulePeriod,
-  safeJadwalTimeZone,
-} from "~/lib/jadwal.ts";
+  JadwalService,
+} from "~/services/jadwal.ts";
+import { parseSchedulePeriod } from "~/services/jadwal.ts";
+import type { Location, SholatService } from "~/services/sholat.ts";
 import type { AppEnv } from "~/types.ts";
-
-export type RawEntry = {
-  value: string;
-  text: string;
-};
-
-export type KabKotaSource = {
-  fetchedAt?: string;
-  map?: Record<string, RawEntry[]>;
-};
-
-export type Location = {
-  id: string;
-  lokasi: string;
-};
-
-export type SholatData = {
-  locations: Location[];
-  idIndex: Map<string, Location>;
-};
 
 const locationSchema = z
   .object({
@@ -132,45 +111,20 @@ const normalizeKeyword = (value: string) => {
   return { ok: true as const, value: replaced.toLowerCase() };
 };
 
-export const loadSholatData = async (): Promise<SholatData> => {
-  const kabKotaFile = new URL(
-    "../../data/sholat/kabkota.json",
-    import.meta.url,
-  );
-  const parsedSource = JSON.parse(
-    await Deno.readTextFile(kabKotaFile),
-  ) as KabKotaSource;
-
-  const locationMap = new Map<string, Location>();
-  for (const group of Object.values(parsedSource.map ?? {})) {
-    for (const entry of group ?? []) {
-      if (!entry?.value || !entry?.text) continue;
-      if (!locationMap.has(entry.value)) {
-        locationMap.set(entry.value, {
-          id: entry.value,
-          lokasi: entry.text.trim(),
-        });
-      }
-    }
-  }
-
-  const locations = Array.from(locationMap.values());
-  const idIndex = new Map(locations.map((loc) => [loc.id, loc] as const));
-
-  return { locations, idIndex };
-};
-
-type SholatRouteOptions = {
-  enableCache?: boolean;
+type SholatRouteDeps = {
+  sholatService: SholatService;
+  jadwalService: JadwalService;
+  docBaseUrl: string;
 };
 
 export const registerSholatRoutes = (
   app: OpenAPIHono<AppEnv>,
-  { locations, idIndex }: SholatData,
-  docBaseUrl: string,
-  options?: SholatRouteOptions,
+  { sholatService, jadwalService, docBaseUrl }: SholatRouteDeps,
 ) => {
-  const enableCache = options?.enableCache ?? false;
+  const locations = sholatService.locations;
+  const idIndex = sholatService.idIndex;
+  const { safeJadwalTimeZone, getTodayPeriod, loadScheduleFile } =
+    jadwalService;
   const allPath = "/sholat/kabkota/semua";
   const byIdPath = "/sholat/kabkota/{id}";
   const searchPath = "/sholat/kabkota/cari/{keyword}";
@@ -223,32 +177,15 @@ export const registerSholatRoutes = (
   const sampleKeyword = "kediri";
   const samplePeriod = "2026-06-23";
   const searchBody = JSON.stringify({ keyword: sampleKeyword });
-  type SearchCacheValue = { data: Location[]; storedAt: number };
-  const searchCache = enableCache ? new Map<string, SearchCacheValue>() : null;
-  const searchCacheTtl = 10 * 60 * 1000;
-  const getCachedSearch = (needle: string): Location[] | null => {
-    if (!searchCache) return null;
-    const cached = searchCache.get(needle);
-    if (!cached) return null;
-    if (Date.now() - cached.storedAt > searchCacheTtl) {
-      searchCache.delete(needle);
-      return null;
-    }
-    return cached.data;
-  };
-  const setSearchCache = (needle: string, data: Location[]) => {
-    if (!searchCache) return;
-    searchCache.set(needle, { data, storedAt: Date.now() });
-  };
 
   const respondAllLocations: RouteHandler = (c) =>
-    c.json(successResponse(locations));
+    c.json(successResponse(sholatService.getAllLocations()));
   const respondById = (c: Context<AppEnv>, rawId: string) => {
     const id = rawId.trim();
     if (!id) {
       return c.json(errorResponse(), 404);
     }
-    const location = idIndex.get(id);
+    const location = sholatService.findById(id);
     if (!location) {
       return c.json(errorResponse(), 404);
     }
@@ -260,23 +197,11 @@ export const registerSholatRoutes = (
       return c.json(errorResponse(normalized.message), 400);
     }
     const needle = normalized.value;
-    const cached = getCachedSearch(needle);
-    if (cached) {
-      return c.json(successResponse(cached), 200);
-    }
-
-    const result = locations.filter((loc) =>
-      loc.lokasi.toLowerCase().includes(needle)
-    );
+    const result = sholatService.searchLocations(needle);
 
     if (result.length === 0) {
       return c.json(errorResponse(), 404);
     }
-
-    if (enableCache) {
-      setSearchCache(needle, result);
-    }
-
     return c.json(successResponse(result), 200);
   };
 

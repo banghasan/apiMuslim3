@@ -1,12 +1,12 @@
-import "@std/dotenv/load";
-import type { MiddlewareHandler } from "hono";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { config } from "~/config.ts";
+import { createAccessLogger } from "~/middleware/logger.ts";
 import { registerCalRoutes } from "~/routes/cal.ts";
-import { loadSholatData, registerSholatRoutes } from "~/routes/sholat.ts";
+import { registerSholatRoutes } from "~/routes/sholat.ts";
+import { createJadwalService } from "~/services/jadwal.ts";
+import { createSholatService, loadSholatData } from "~/services/sholat.ts";
 import type { AppEnv } from "~/types.ts";
 
-const logDir = new URL("../data/log/", import.meta.url);
-await Deno.mkdir(logDir, { recursive: true });
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
 const redocScriptFile = new URL(
@@ -15,100 +15,12 @@ const redocScriptFile = new URL(
 );
 const redocScriptBytes = await Deno.readFile(redocScriptFile);
 
-const timezone = Deno.env.get("TIMEZONE") ?? "Asia/Jakarta";
-const logVerbose =
-  (Deno.env.get("LOG_VERBOSE") ?? "false").toLowerCase() === "true";
-const logWrite =
-  (Deno.env.get("LOG_WRITE") ?? "false").toLowerCase() === "true";
-let timeFormatter: Intl.DateTimeFormat | null = null;
-let dateFormatter: Intl.DateTimeFormat | null = null;
-try {
-  timeFormatter = new Intl.DateTimeFormat("id-ID", {
-    timeZone: timezone,
-    dateStyle: "medium",
-    timeStyle: "medium",
-  });
-  dateFormatter = new Intl.DateTimeFormat("en-CA", {
-    timeZone: timezone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-} catch (error) {
-  console.warn(
-    `Invalid TIMEZONE "${timezone}", fallback to ISO string.`,
-    error,
-  );
-}
-
-const formatTimestamp = (value = new Date()) =>
-  timeFormatter?.format(value) ?? value.toISOString();
-const formatLogDate = (value: Date) =>
-  (dateFormatter?.format(value) ?? value.toISOString().slice(0, 10)).replaceAll(
-    "-",
-    "",
-  );
-
-type AccessLogEntry = { line: string; stamp: Date };
-const logQueue: AccessLogEntry[] = [];
-let logFlushScheduled = false;
-const flushAccessLogs = async () => {
-  while (logQueue.length) {
-    const entry = logQueue.shift()!;
-    const fileUrl = new URL(`${formatLogDate(entry.stamp)}.log`, logDir);
-    try {
-      await Deno.writeTextFile(fileUrl, `${entry.line}\n`, { append: true });
-    } catch (error) {
-      console.error("Failed to write access log", error);
-    }
-  }
-};
-const scheduleLogFlush = () => {
-  if (!logWrite || logFlushScheduled) return;
-  logFlushScheduled = true;
-  setTimeout(async () => {
-    try {
-      await flushAccessLogs();
-    } finally {
-      logFlushScheduled = false;
-      if (logQueue.length) scheduleLogFlush();
-    }
-  }, 0);
-};
-const enqueueAccessLog = (line: string, stamp: Date) => {
-  if (!logWrite) return;
-  logQueue.push({ line, stamp });
-  scheduleLogFlush();
-};
-
-const accessLogger: MiddlewareHandler<AppEnv> = async (c, next) => {
-  const start = performance.now();
-  await next();
-  const forwarded = c.req.header("x-forwarded-for") ??
-    c.req.header("x-real-ip");
-  let ip = forwarded?.split(",")[0].trim();
-  if (!ip) {
-    const addr = c.env?.connInfo?.remoteAddr as
-      | Deno.NetAddr
-      | Deno.UnixAddr
-      | undefined;
-    if (addr && typeof addr === "object" && "hostname" in addr) {
-      ip = addr.hostname;
-    }
-  }
-  if (!ip) ip = "unknown";
-  const rt = (performance.now() - start).toFixed(2);
-  const logTime = new Date();
-  const line = `[${
-    formatTimestamp(
-      logTime,
-    )
-  }] ${ip} ${c.req.method} ${c.req.path} ${c.res.status} ${rt}ms`;
-  if (logVerbose) {
-    console.log(line);
-  }
-  enqueueAccessLog(line, logTime);
-};
+const sholatData = await loadSholatData();
+const sholatService = createSholatService({
+  enableCache: config.enableCache,
+  data: sholatData,
+});
+const jadwalService = createJadwalService(config);
 
 const redocPage = `<!doctype html>
 <html lang="id">
@@ -144,7 +56,7 @@ const redocPage = `<!doctype html>
 </html>`;
 
 const app = new OpenAPIHono<AppEnv>();
-app.use("*", accessLogger);
+app.use("*", createAccessLogger(config));
 app.get(
   "/favicon.ico",
   () =>
@@ -169,18 +81,12 @@ app.get("/doc", (c) => c.html(redocPage));
 app.get("/doc/", (c) => c.html(redocPage));
 app.get("/doc/index.html", (c) => c.html(redocPage));
 
-const sholatData = await loadSholatData();
-
-const host = Deno.env.get("HOST") ?? "127.0.0.1";
-const port = Number(Deno.env.get("PORT") ?? "8000");
-const docHost = host === "0.0.0.0" ? "localhost" : host;
-const defaultBaseUrl = `http://${docHost}:${port}`;
-const docBaseUrl = Deno.env.get("DOC_BASE_URL") ?? defaultBaseUrl;
-const appEnv = (Deno.env.get("APP_ENV") ?? "development").toLowerCase();
-const enableCache = appEnv === "production";
-
-registerSholatRoutes(app, sholatData, docBaseUrl, { enableCache });
-registerCalRoutes(app, docBaseUrl);
+registerSholatRoutes(app, {
+  sholatService,
+  jadwalService,
+  docBaseUrl: config.docBaseUrl,
+});
+registerCalRoutes(app, config.docBaseUrl);
 
 app.notFound((c) =>
   c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
@@ -196,10 +102,7 @@ app.doc("/doc/apimuslim", {
     title: "API Muslim",
     version: "v3.0.0",
     tags: [
-      {
-        name: "Sholat",
-        description: "Endpoint terkait sholat",
-      },
+      { name: "Sholat", description: "Endpoint terkait sholat" },
       {
         name: "Kalender",
         description: "Endpoint konversi kalender CE dan Hijriyah",
@@ -210,14 +113,15 @@ app.doc("/doc/apimuslim", {
   },
   servers: [
     {
-      url: docBaseUrl,
+      url: config.docBaseUrl,
       description: "Gunakan basis URL ini saat mencoba contoh API",
     },
   ],
 });
 
-console.log(`Listening on http://${docHost}:${port}`);
+const docHost = config.host === "0.0.0.0" ? "localhost" : config.host;
+console.log(`Listening on http://${docHost}:${config.port}`);
 Deno.serve(
-  { hostname: host, port },
+  { hostname: config.host, port: config.port },
   (request, connInfo) => app.fetch(request, { connInfo }),
 );
