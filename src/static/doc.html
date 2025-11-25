@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="utf-8" />
@@ -58,7 +58,11 @@
 
       body {
         font-family:
-          "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Inter",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
           sans-serif;
         background: var(--content-bg);
         color: var(--content-text);
@@ -257,7 +261,7 @@
       <div class="doc-header-content">
         <div class="doc-brand">
           <div class="doc-logo">
-            <img src="/doc/api-myquran.png" alt="Logo myQuran" />
+            <img data-doc-asset="api-myquran.png" alt="Logo myQuran" />
           </div>
           <div>
             <h1>API Muslim Indonesia</h1>
@@ -269,30 +273,66 @@
             href="#tag/Sholat"
             data-tag-link="Sholat"
             title="Lihat dokumentasi API Jadwal Sholat"
-          >🕌 Sholat</a>
+            >🕌 Sholat</a
+          >
           <a
             href="#tag/Kalender"
             data-tag-link="Kalender"
             title="Lihat dokumentasi API Kalender Hijriah"
-          >📅 Kalender</a>
+            >📅 Kalender</a
+          >
           <a
             href="#tag/Qibla"
             data-tag-link="Qibla"
             title="Lihat dokumentasi API Arah Kiblat"
-          >🧭 Qibla</a>
+            >🧭 Qibla</a
+          >
           <a
             href="#tag/Tools"
             data-tag-link="Tools"
             title="Lihat dokumentasi API Tools"
-          >🛠️ Tools</a>
+            >🛠️ Tools</a
+          >
         </nav>
       </div>
     </header>
     <div id="redoc-container"></div>
-    <script src="/doc/redoc.standalone.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const container = document.getElementById("redoc-container");
+
+        const docBasePath = (() => {
+          const { pathname } = window.location;
+          if (pathname.endsWith("/")) {
+            return pathname;
+          }
+          if (pathname.includes(".")) {
+            return pathname.replace(/[^/]+$/, "");
+          }
+          return `${pathname}/`;
+        })();
+        const docBaseUrl = new URL(
+          docBasePath,
+          window.location.origin,
+        ).toString();
+        const buildDocUrl = (relativePath) =>
+          new URL(relativePath.replace(/^\/+/, ""), docBaseUrl).toString();
+
+        document.querySelectorAll("[data-doc-asset]").forEach((element) => {
+          const assetName = element.getAttribute("data-doc-asset");
+          if (assetName) {
+            element.setAttribute("src", buildDocUrl(assetName));
+          }
+        });
+
+        const loadRedocScript = () =>
+          new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = buildDocUrl("redoc.standalone.js");
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
 
         // Fungsi untuk fokus ke kolom pencarian
         const focusRedocSearch = () => {
@@ -306,24 +346,20 @@
 
         // Fungsi untuk menghubungkan link navigasi dengan tag
         const hookTagLinks = () => {
-          document.querySelectorAll("[data-tag-link]").forEach(
-            (link) => {
-              link.addEventListener("click", (event) => {
-                event.preventDefault();
-                const tagName = link.getAttribute("data-tag-link");
-                if (tagName) {
-                  window.location.hash = "tag/" +
-                    encodeURIComponent(tagName);
-                  setTimeout(() => {
-                    const headerHeight =
-                      document.querySelector(".doc-header")
-                        .offsetHeight;
-                    window.scrollBy(0, -headerHeight - 10);
-                  }, 100);
-                }
-              });
-            },
-          );
+          document.querySelectorAll("[data-tag-link]").forEach((link) => {
+            link.addEventListener("click", (event) => {
+              event.preventDefault();
+              const tagName = link.getAttribute("data-tag-link");
+              if (tagName) {
+                window.location.hash = "tag/" + encodeURIComponent(tagName);
+                setTimeout(() => {
+                  const headerHeight =
+                    document.querySelector(".doc-header").offsetHeight;
+                  window.scrollBy(0, -headerHeight - 10);
+                }, 100);
+              }
+            });
+          });
         };
 
         // Event listener untuk tombol cari
@@ -345,10 +381,14 @@
 
         hookTagLinks();
 
-        // Inisialisasi Redoc
-        if (window.Redoc) {
-          Redoc.init(
-            "/doc/apimuslim",
+        const initializeRedoc = () => {
+          if (!window.Redoc) {
+            container.innerText =
+              "Maaf, library dokumentasi tidak tersedia. Silakan hubungi administrator.";
+            return Promise.resolve();
+          }
+          return Redoc.init(
+            buildDocUrl("apimuslim"),
             {
               scrollYOffset: 70,
               hideDownloadButton: false,
@@ -466,8 +506,7 @@
                   },
                   code: {
                     fontSize: "14px",
-                    fontFamily:
-                      '"Fira Code", "Consolas", "Monaco", monospace',
+                    fontFamily: '"Fira Code", "Consolas", "Monaco", monospace',
                     lineHeight: "1.6",
                     fontWeight: "400",
                     color: "#0f172a",
@@ -502,10 +541,15 @@
               document.getElementById("redoc-container").innerText =
                 "Maaf, dokumentasi gagal dimuat. Silakan refresh halaman atau hubungi administrator.";
             });
-        } else {
-          document.getElementById("redoc-container").innerText =
-            "Maaf, library dokumentasi tidak tersedia. Silakan hubungi administrator.";
-        }
+        };
+
+        loadRedocScript()
+          .then(() => initializeRedoc())
+          .catch((error) => {
+            console.error("Gagal memuat library dokumentasi:", error);
+            container.innerText =
+              "Maaf, library dokumentasi tidak tersedia. Silakan hubungi administrator.";
+          });
       });
     </script>
   </body>
