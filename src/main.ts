@@ -15,10 +15,7 @@ import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
 
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
-const redocScriptFile = new URL(
-  "./static/redoc.standalone.js",
-  import.meta.url,
-);
+const redocScriptFile = new URL("./static/redoc.standalone.js", import.meta.url);
 const redocScriptBytes = await Deno.readFile(redocScriptFile);
 
 const sholatData = await loadSholatData();
@@ -27,9 +24,7 @@ const sholatService = createSholatService({
   data: sholatData,
 });
 const jadwalService = createJadwalService(config);
-const geocodeService = config.mapsCoApiKey
-  ? createGeocodeService(config.mapsCoApiKey)
-  : null;
+const geocodeService = config.mapsCoApiKey ? createGeocodeService(config.mapsCoApiKey) : null;
 
 // Load documentation HTML template
 const docTemplateFile = new URL("./static/doc.html", import.meta.url);
@@ -83,9 +78,7 @@ registerHealthRoutes({
   config,
 });
 
-app.notFound((c) =>
-  c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
-);
+app.notFound((c) => c.json({ status: false, message: "Data tidak ditemukan .." }, 404));
 app.onError((err, c) => {
   console.error(err);
   return c.json({ status: false, message: "internal server error" }, 500);
@@ -95,7 +88,7 @@ const tagDefinitions = [
   {
     name: "Sholat",
     description:
-      "Endpoint terkait sholat: kota-kota yang didukung, jadwal sholat harian, dan lainnya.",
+      "Kamu dapat mengakses endpoint salat yang mencakup detail penting seperti cakupan kota-kota yang tersedia, jadwal salat harian yang akurat, dan informasi teknis relevan lainnya. Silakan gunakan data ini sesuai kebutuhan integrasi Anda",
   },
   {
     name: "Kalender",
@@ -108,13 +101,12 @@ Nama lainnya adalah Syamsiah, Syamsiah atau Tahun Matahari. Penamaan ini mengacu
   {
     name: "Qibla",
     description:
-      "Endpoint perhitungan arah kiblat berdasarkan koordinat latitude/longitude.",
+      "Untuk perhitungan arah kiblat, silakan gunakan endpoint ini dengan mengirimkan koordinat latitude/longitude yang relevan. Sebagai alternatif, jika data koordinat belum tersedia, kamu bisa mendapatkan data tersebut terlebih dahulu melalui endpoint helper kami, yaitu `/tools/geocode`",
   },
   { name: "Tools", description: "Beragam alat bantu (IP, dsb)." },
   {
     name: "Health",
-    description:
-      "Endpoint pemantauan sederhana untuk memastikan API siap digunakan.",
+    description: "Endpoint pemantauan sederhana untuk memastikan API siap digunakan.",
   },
 ];
 
@@ -148,7 +140,6 @@ app.doc("/doc/apimuslim", {
 
 const docHost = config.host === "0.0.0.0" ? "localhost" : config.host;
 console.log(`Listening on http://${docHost}:${config.port}`);
-Deno.serve(
-  { hostname: config.host, port: config.port },
-  (request, connInfo) => app.fetch(request, { connInfo }),
+Deno.serve({ hostname: config.host, port: config.port }, (request, connInfo) =>
+  app.fetch(request, { connInfo }),
 );
