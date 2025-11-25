@@ -55,27 +55,25 @@ const statsErrorSchema = z
   })
   .openapi("StatsError");
 
-export const registerStatsRoutes = (
-  { app, statsService, docBaseUrl }: RegisterStatsDeps,
-) => {
-  const statsRoute = createRoute({
+export const registerStatsRoutes = ({ app, statsService, docBaseUrl }: RegisterStatsDeps) => {
+  const statsCurrentRoute = createRoute({
     method: "get",
     path: "/stats",
-    summary: "Stats Tahunan",
-    description:
-      "Mengembalikan total hit grup berdasarkan tahun untuk seluruh API.",
+    summary: "Stats Terkini",
+    description: "Menampilkan detail hits bulanan dan rata-rata untuk tahun berjalan.",
     tags: ["Stats"],
     responses: {
       200: {
-        description: "Statistik tersedia.",
-        content: { "application/json": { schema: statsListResponseSchema } },
+        description: "Statistik tahun berjalan tersedia.",
+        content: { "application/json": { schema: statsDetailResponseSchema } },
       },
     },
     "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/stats"),
   });
 
-  app.openapi(statsRoute, (c) => {
-    const data = statsService.getYearlyStats();
+  app.openapi(statsCurrentRoute, (c) => {
+    const year = new Date().getFullYear();
+    const data = statsService.getYearDetail(year);
     return c.json({ status: true, message: "success", data });
   });
 
@@ -83,8 +81,7 @@ export const registerStatsRoutes = (
     method: "get",
     path: "/stats/{year}",
     summary: "Stats Bulanan",
-    description:
-      "Menampilkan rinci hits bulanan untuk tahun tertentu beserta rata-rata per bulan.",
+    description: "Menampilkan rinci hits bulanan untuk tahun tertentu beserta rata-rata per bulan.",
     tags: ["Stats"],
     request: {
       params: z.object({
@@ -114,6 +111,26 @@ export const registerStatsRoutes = (
       return c.json({ status: false, message: "Tahun tidak valid." }, 400);
     }
     const data = statsService.getYearDetail(year);
+    return c.json({ status: true, message: "success", data });
+  });
+
+  const statsAllRoute = createRoute({
+    method: "get",
+    path: "/stats/all",
+    summary: "Stats Tahunan",
+    description: "Mengembalikan total hit grup berdasarkan tahun untuk seluruh API.",
+    tags: ["Stats"],
+    responses: {
+      200: {
+        description: "Statistik tersedia.",
+        content: { "application/json": { schema: statsListResponseSchema } },
+      },
+    },
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/stats/all"),
+  });
+
+  app.openapi(statsAllRoute, (c) => {
+    const data = statsService.getYearlyStats();
     return c.json({ status: true, message: "success", data });
   });
 };
