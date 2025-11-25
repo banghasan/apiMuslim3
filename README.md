@@ -1,7 +1,8 @@
-# API Sholat Kab/Kota
+![myQuran API Logo](https://raw.githubusercontent.com/banghasan/apiMuslim3/main/src/static/api-myquran_text.png)
 
-REST API sederhana untuk menampilkan jadwal sholat dan kalender Hijriyah, untuk
-memenuhi kebutuhan dan aktivitas muslim indonesia sehari-hari.
+# API Muslim indonesia
+
+API Komprehensif untuk kebutuhan Muslim di Indonesia, menyediakan data jadwal sholat, arah kiblat, konversi kalender Hijriah, dan berbagai alat bantu lainnya. Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi
 
 ## Fitur
 
@@ -15,11 +16,10 @@ memenuhi kebutuhan dan aktivitas muslim indonesia sehari-hari.
 - Endpoint tools utilitas seperti `/tools/ip` untuk mendeteksi IP & user-agent
   pengguna.
 - Endpoint health check (`/health`) untuk mengetahui apakah API siap digunakan.
-- Rate limiting bawaan 100 request/menit per IP (dan 5 request/menit khusus
-  jadwal sholat bulanan).
+- Rate limiting Per menit per IP
 - Response konsisten dengan struktur `status`, `message`, dan `data`.
 - Middleware logger akses.
-- Dokumentasi OpenAPI otomatis pada `/doc/sholat` menggunakan
+- Dokumentasi OpenAPI otomatis pada `/doc/apimuslim` menggunakan
   `@hono/zod-openapi` + ReDoc viewer di `/doc`.
 
 ## Persiapan
@@ -220,5 +220,5 @@ Dokumentasi tersedia:
 
 Saran, ide dan pertanyaan dapat melalui kontak:
 
-- Email: banghasan@gmail.com
+- Email: banghasan@myquran.com
 - Telegram: [bangHasan](https://t.me/hasanudinhs)
