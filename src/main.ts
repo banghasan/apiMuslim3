@@ -101,7 +101,7 @@ registerToolsRoutes({
 });
 
 app.notFound((c) =>
-  c.json({ status: false, message: "Data tidak ditemukan .." }, 404),
+  c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
 );
 app.onError((err, c) => {
   console.error(err);
@@ -150,6 +150,7 @@ app.doc("/doc/apimuslim", {
 
 const docHost = config.host === "0.0.0.0" ? "localhost" : config.host;
 console.log(`Listening on http://${docHost}:${config.port}`);
-Deno.serve({ hostname: config.host, port: config.port }, (request, connInfo) =>
-  app.fetch(request, { connInfo }),
+Deno.serve(
+  { hostname: config.host, port: config.port },
+  (request, connInfo) => app.fetch(request, { connInfo }),
 );

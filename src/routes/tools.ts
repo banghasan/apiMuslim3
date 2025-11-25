@@ -242,8 +242,9 @@ const normalizeGeocodeEntry = (value: unknown): GeocodeEntry | null => {
   const type = typeof raw.type === "string" ? raw.type : "";
   const lat = typeof raw.lat === "string" ? raw.lat : String(raw.lat ?? "");
   const lon = typeof raw.lon === "string" ? raw.lon : String(raw.lon ?? "");
-  const displayName =
-    typeof raw.display_name === "string" ? raw.display_name : "";
+  const displayName = typeof raw.display_name === "string"
+    ? raw.display_name
+    : "";
   if (
     !Number.isFinite(placeId) ||
     !clazz ||

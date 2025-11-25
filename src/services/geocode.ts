@@ -26,8 +26,7 @@ export const createGeocodeService = (
   const fetchImpl = options.fetchImpl ?? fetch;
   const maxQueue = options.maxQueue ?? MAX_QUEUE;
   const rateDelay = options.rateDelayMs ?? RATE_DELAY_MS;
-  const schedule =
-    options.scheduleFn ??
+  const schedule = options.scheduleFn ??
     ((cb: () => void, delay: number) => setTimeout(cb, delay));
   const immediateFlush = options.immediateFlush ?? false;
 

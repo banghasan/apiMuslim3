@@ -295,7 +295,9 @@ export const convertHijriToGregorian = (
   return createZonedDate(gregorian, timeZone);
 };
 
-export const parseCalendarMethod = (value?: string | null): CalendarSelection => {
+export const parseCalendarMethod = (
+  value?: string | null,
+): CalendarSelection => {
   if (!value) return methodMap.standar;
   const key = value.trim().toLowerCase();
   return methodMap[key] ?? methodMap.standar;

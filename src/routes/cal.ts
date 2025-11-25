@@ -153,9 +153,11 @@ export const registerCalRoutes = (
     "/cal/syamsiah/{date}",
     "/cal/julian/{date}",
   ];
-  const ceAliasDescription = `\nAlias:\n${ceAliases
-    .map((alias) => ` - \`${alias}\``)
-    .join("\n")}`;
+  const ceAliasDescription = `\nAlias:\n${
+    ceAliases
+      .map((alias) => ` - \`${alias}\``)
+      .join("\n")
+  }`;
   const toHonoPath = (path: string) => path.replace(/\{([^}]+)\}/g, ":$1");
   const registerAliasRoutes = (
     aliases: string[],
@@ -237,7 +239,8 @@ export const registerCalRoutes = (
     method: "get",
     path: "/cal/ce/{date}",
     summary: "Hijriyah ke Masehi",
-    description: `Konversi tanggal Hijriyah (\`YYYY-MM-DD\`) ke kalender Masehi. Parameter \`adj\` hanya mempengaruhi tanggal Masehi.${ceAliasDescription}`,
+    description:
+      `Konversi tanggal Hijriyah (\`YYYY-MM-DD\`) ke kalender Masehi. Parameter \`adj\` hanya mempengaruhi tanggal Masehi.${ceAliasDescription}`,
     tags: ["Kalender"],
     request: {
       params: z.object({
@@ -363,7 +366,13 @@ export const registerCalRoutes = (
     const query = c.req.valid("query");
     return respondCeConversion(c, date, query);
   });
-  registerAliasRoutes(ceAliases, (c) =>
-    respondCeConversion(c, c.req.param("date") ?? "", readQueryFromContext(c)),
+  registerAliasRoutes(
+    ceAliases,
+    (c) =>
+      respondCeConversion(
+        c,
+        c.req.param("date") ?? "",
+        readQueryFromContext(c),
+      ),
   );
 };
