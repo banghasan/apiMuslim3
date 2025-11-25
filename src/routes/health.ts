@@ -6,14 +6,12 @@ import type { AppEnv } from "~/types.ts";
 
 const healthDataSchema = z
   .object({
-    serverTime: z
-      .string()
-      .datetime()
-      .openapi({ example: "2025-01-01T12:00:00.000Z" }),
-    startedAt: z
-      .string()
-      .datetime()
-      .openapi({ example: "2025-01-01T08:00:00.000Z" }),
+    serverTime: z.string().datetime().openapi({
+      example: "2025-01-01T12:00:00.000Z",
+    }),
+    startedAt: z.string().datetime().openapi({
+      example: "2025-01-01T08:00:00.000Z",
+    }),
     uptimeSeconds: z.number().int().nonnegative().openapi({ example: 14400 }),
     env: z.string().openapi({ example: "production" }),
     timezone: z.string().openapi({ example: "Asia/Jakarta" }),
@@ -47,7 +45,7 @@ export const registerHealthRoutes = ({
     summary: "Health Check",
     description:
       "Endpoint sederhana untuk memastikan API aktif. Merespon waktu server saat ini, waktu mulai aplikasi, serta uptime dalam hitungan detik.",
-    tags: ["Health"],
+    tags: ["Tools"],
     responses: {
       200: {
         description: "Server berjalan normal.",

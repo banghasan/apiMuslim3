@@ -85,8 +85,7 @@ Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada
 | Sholat   | Daftar lokasi, pencarian, jadwal sholat harian/bulanan.      | `/doc#/tag/Sholat`                  |
 | Kalender | Konversi tanggal Masehi ↔ Hijriyah, opsi metode perhitungan. | `/doc#/tag/Kalender`                |
 | Qibla    | Hitung arah kiblat berdasarkan koordinat.                    | `/doc#/tag/Qibla`                   |
-| Tools    | Utilitas seperti `/tools/ip` & `/tools/geocode`.             | `/doc#/tag/Tools`                   |
-| Health   | Health check sederhana memastikan API hidup.                 | `/doc#/tag/Health`                  |
+| Tools    | Utilitas seperti `/tools/ip`, `/tools/geocode`, dan `/health`. | `/doc#/tag/Tools`                 |
 
 Contoh: untuk melihat dokumentasi endpoint qibla secara cepat, buka
 `http://localhost:8000/doc#/tag/Qibla` setelah server menyala. README ini juga
