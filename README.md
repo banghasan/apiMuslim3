@@ -12,6 +12,8 @@ memenuhi kebutuhan dan aktivitas muslim indonesia sehari-hari.
   opsi metode perhitungan.
 - Endpoint arah kiblat (`/qibla/{lat,lng}`) untuk mendapatkan derajat kiblat
   dari koordinat tertentu.
+- Endpoint tools utilitas seperti `/tools/ip` untuk mendeteksi IP & user-agent
+  pengguna.
 - Response konsisten dengan struktur `status`, `message`, dan `data`.
 - Middleware logger akses.
 - Dokumentasi OpenAPI otomatis pada `/doc/sholat` menggunakan
@@ -99,6 +101,8 @@ deno test --allow-env --allow-read
   `adj` hanya mempengaruhi Masehi.
 - `GET /qibla/{lat,lng}` – arah kiblat (derajat dari utara) berdasarkan
   koordinat derajat desimal.
+- `GET /tools/ip` – deteksi IP pengguna (memperhatikan proxy/Cloudflare) beserta
+  user agent.
 
 Contoh respons sukses:
 

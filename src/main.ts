@@ -3,6 +3,7 @@ import { config } from "~/config.ts";
 import { createAccessLogger } from "~/middleware/logger.ts";
 import { registerCalRoutes } from "~/routes/cal.ts";
 import { registerQiblaRoutes } from "~/routes/qibla.ts";
+import { registerToolsRoutes } from "~/routes/tools.ts";
 import { registerSholatRoutes } from "~/routes/sholat.ts";
 import { createJadwalService } from "~/services/jadwal.ts";
 import { createSholatService, loadSholatData } from "~/services/sholat.ts";
@@ -89,6 +90,7 @@ registerSholatRoutes(app, {
 });
 registerCalRoutes(app, config.docBaseUrl);
 registerQiblaRoutes({ app, docBaseUrl: config.docBaseUrl });
+registerToolsRoutes({ app, docBaseUrl: config.docBaseUrl });
 
 app.notFound((c) =>
   c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
@@ -109,6 +111,7 @@ app.doc("/doc/apimuslim", {
         name: "Kalender",
         description: "Endpoint konversi kalender CE dan Hijriyah",
       },
+      { name: "Tools", description: "Beragam alat bantu (IP, dsb)." },
     ],
     description:
       "Endpoint untuk daftar kabupaten/kota beserta pencarian ID yang digunakan untuk jadwal sholat.",
