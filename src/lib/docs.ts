@@ -21,7 +21,8 @@ export const buildCurlSample = (
 
 const escapeSingleQuotes = (value: string) => value.replace(/'/g, "\\'");
 
-const escapeDoubleQuotes = (value: string) => value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+const escapeDoubleQuotes = (value: string) =>
+  value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
 const buildPhpSample = (url: string, method: "GET" | "POST", body?: string) => {
   const headers = [
@@ -50,7 +51,11 @@ const buildPhpSample = (url: string, method: "GET" | "POST", body?: string) => {
   return lines.join("\n");
 };
 
-const buildPythonSample = (url: string, method: "GET" | "POST", body?: string) => {
+const buildPythonSample = (
+  url: string,
+  method: "GET" | "POST",
+  body?: string,
+) => {
   const lines = [
     "import requests",
     "",
@@ -59,7 +64,9 @@ const buildPythonSample = (url: string, method: "GET" | "POST", body?: string) =
     '    "Accept": "application/json",',
     ...(method === "POST" ? ['    "Content-Type": "application/json",'] : []),
     "}",
-    ...(method === "POST" && body ? [`payload = '${escapeSingleQuotes(body)}'`] : []),
+    ...(method === "POST" && body
+      ? [`payload = '${escapeSingleQuotes(body)}'`]
+      : []),
     "",
     method === "POST"
       ? "response = requests.post(url, headers=headers, data=payload)"
@@ -93,7 +100,9 @@ const buildGoSample = (url: string, method: "GET" | "POST", body?: string) => {
     "\t\tpanic(err)",
     "\t}",
     '\treq.Header.Set("Accept", "application/json")',
-    ...(method === "POST" ? ['\treq.Header.Set("Content-Type", "application/json")'] : []),
+    ...(method === "POST"
+      ? ['\treq.Header.Set("Content-Type", "application/json")']
+      : []),
     "",
     "\tres, err := client.Do(req)",
     "\tif err != nil {",
@@ -108,7 +117,11 @@ const buildGoSample = (url: string, method: "GET" | "POST", body?: string) => {
   return lines.join("\n");
 };
 
-const buildNodeAxiosSample = (url: string, method: "GET" | "POST", body?: string) => {
+const buildNodeAxiosSample = (
+  url: string,
+  method: "GET" | "POST",
+  body?: string,
+) => {
   const lines = [
     'import axios from "axios";',
     "",
@@ -119,7 +132,9 @@ const buildNodeAxiosSample = (url: string, method: "GET" | "POST", body?: string
     '    Accept: "application/json",',
     ...(method === "POST" ? ['    "Content-Type": "application/json",'] : []),
     "  },",
-    ...(method === "POST" && body ? [`  data: '${escapeSingleQuotes(body)}',`] : []),
+    ...(method === "POST" && body
+      ? [`  data: '${escapeSingleQuotes(body)}',`]
+      : []),
     "};",
     "",
     "axios.request(options)",
@@ -133,7 +148,11 @@ const buildNodeAxiosSample = (url: string, method: "GET" | "POST", body?: string
   return lines.join("\n");
 };
 
-const buildDartSample = (url: string, method: "GET" | "POST", body?: string) => {
+const buildDartSample = (
+  url: string,
+  method: "GET" | "POST",
+  body?: string,
+) => {
   const hasBody = method === "POST" && Boolean(body);
   const lines = [
     "import 'dart:convert';",
@@ -160,7 +179,11 @@ const buildDartSample = (url: string, method: "GET" | "POST", body?: string) => 
   return lines.join("\n");
 };
 
-const buildCSharpSample = (url: string, method: "GET" | "POST", body?: string) => {
+const buildCSharpSample = (
+  url: string,
+  method: "GET" | "POST",
+  body?: string,
+) => {
   const hasBody = method === "POST" && Boolean(body);
   const lines = [
     "using System;",
@@ -180,10 +203,12 @@ const buildCSharpSample = (url: string, method: "GET" | "POST", body?: string) =
     '        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));',
     ...(hasBody
       ? [
-          `        request.Content = new StringContent("${escapeDoubleQuotes(
+        `        request.Content = new StringContent("${
+          escapeDoubleQuotes(
             body!,
-          )}", Encoding.UTF8, "application/json");`,
-        ]
+          )
+        }", Encoding.UTF8, "application/json");`,
+      ]
       : []),
     "        using var response = await client.SendAsync(request);",
     "        response.EnsureSuccessStatusCode();",
