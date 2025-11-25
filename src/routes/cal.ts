@@ -134,6 +134,22 @@ export const registerCalRoutes = (
   const sampleHijrDate = "2024-05-10";
   const sampleCeHijr = "1445-11-02";
   const calendarMethodParam = "method=islamic-umalqura";
+  const ceAliases = [
+    "/cal/masehi/{date}",
+    "/cal/ad/{date}",
+    "/cal/syamsiah/{date}",
+    "/cal/julian/{date}",
+  ];
+  const ceAliasDescription = `\nAlias:\n${ceAliases.map((alias) => ` - \`${alias}\``).join("\n")}`;
+  const toHonoPath = (path: string) => path.replace(/\{([^}]+)\}/g, ":$1");
+  const registerAliasRoutes = (
+    aliases: string[],
+    handler: (c: Context<AppEnv>) => Promise<Response> | Response,
+  ) => {
+    for (const alias of aliases) {
+      app.get(toHonoPath(alias), handler);
+    }
+  };
   const todayRoute = createRoute({
     method: "get",
     path: "/cal/today",
@@ -172,13 +188,13 @@ export const registerCalRoutes = (
     path: "/cal/hijr/{date}",
     summary: "Konversi Masehi ke Hijriyah",
     description:
-      "Konversi tanggal Masehi (YYYY-MM-DD) ke Hijriyah. Parameter `adj` hanya mempengaruhi tanggal Hijriyah.",
+      "Konversi tanggal Masehi (`YYYY-MM-DD`) ke Hijriyah. Parameter `adj` hanya mempengaruhi tanggal Hijriyah.",
     tags: ["Kalender"],
     request: {
       params: z.object({
         date: z.string().openapi({
           example: "2024-05-10",
-          description: "Tanggal Masehi yang akan dikonversi (YYYY-MM-DD).",
+          description: "Tanggal Masehi yang akan dikonversi (`YYYY-MM-DD`).",
         }),
       }),
       query: calendarQuerySchema,
@@ -218,14 +234,13 @@ export const registerCalRoutes = (
     method: "get",
     path: "/cal/ce/{date}",
     summary: "Konversi Hijriyah ke Masehi",
-    description:
-      "Konversi tanggal Hijriyah (YYYY-MM-DD) ke kalender Masehi. Parameter `adj` hanya mempengaruhi tanggal Masehi.",
+    description: `Konversi tanggal Hijriyah (\`YYYY-MM-DD\`) ke kalender Masehi. Parameter \`adj\` hanya mempengaruhi tanggal Masehi.${ceAliasDescription}`,
     tags: ["Kalender"],
     request: {
       params: z.object({
         date: z.string().openapi({
           example: "1445-11-02",
-          description: "Tanggal Hijriyah yang akan dikonversi (YYYY-MM-DD).",
+          description: "Tanggal Hijriyah yang akan dikonversi (`YYYY-MM-DD`).",
         }),
       }),
       query: calendarQuerySchema,
@@ -260,6 +275,43 @@ export const registerCalRoutes = (
       },
     ],
   });
+
+  const respondCeConversion = (c: Context<AppEnv>, rawDate: string) => {
+    const hijriDate = parseHijriDate(rawDate);
+    if (!hijriDate) {
+      return c.json(
+        errorResponse(
+          "Format tanggal hijriyah tidak valid. Gunakan YYYY-MM-DD.",
+        ),
+        400,
+      );
+    }
+    const { selection, timeZone, adjustment } = getCommonParams(c);
+    const baseDate = convertHijriToGregorian(
+      hijriDate,
+      selection.calendar,
+      timeZone,
+    );
+    if (!baseDate) {
+      return c.json(
+        errorResponse(
+          "Gagal mengkonversi tanggal hijriyah ke kalender Masehi untuk metode ini.",
+        ),
+        400,
+      );
+    }
+    const ceDate = shiftZonedDate(baseDate, adjustment, timeZone);
+    const ce = buildCeInfo(ceDate, timeZone);
+    const hijr = buildHijriInfo(baseDate, timeZone, selection.calendar);
+    return c.json(
+      successResponse({
+        method: selection.method,
+        adjustment,
+        ce,
+        hijr,
+      }),
+    );
+  };
 
   app.openapi(todayRoute, (c) => {
     const { selection, timeZone, adjustment } = getCommonParams(c);
@@ -305,39 +357,9 @@ export const registerCalRoutes = (
 
   app.openapi(ceRoute, (c) => {
     const { date } = c.req.valid("param");
-    const hijriDate = parseHijriDate(date);
-    if (!hijriDate) {
-      return c.json(
-        errorResponse(
-          "Format tanggal hijriyah tidak valid. Gunakan YYYY-MM-DD.",
-        ),
-        400,
-      );
-    }
-    const { selection, timeZone, adjustment } = getCommonParams(c);
-    const baseDate = convertHijriToGregorian(
-      hijriDate,
-      selection.calendar,
-      timeZone,
-    );
-    if (!baseDate) {
-      return c.json(
-        errorResponse(
-          "Gagal mengkonversi tanggal hijriyah ke kalender Masehi untuk metode ini.",
-        ),
-        400,
-      );
-    }
-    const ceDate = shiftZonedDate(baseDate, adjustment, timeZone);
-    const ce = buildCeInfo(ceDate, timeZone);
-    const hijr = buildHijriInfo(baseDate, timeZone, selection.calendar);
-    return c.json(
-      successResponse({
-        method: selection.method,
-        adjustment,
-        ce,
-        hijr,
-      }),
-    );
+    return respondCeConversion(c, date);
   });
+  registerAliasRoutes(ceAliases, (c) =>
+    respondCeConversion(c, c.req.param("date") ?? ""),
+  );
 };
