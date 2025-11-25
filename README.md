@@ -10,6 +10,8 @@ memenuhi kebutuhan dan aktivitas muslim indonesia sehari-hari.
 - Endpoint pencarian kata kunci (`/sholat/kota|kabkota/(cari|find)/{keyword}`).
 - Endpoint kalender (`/cal/...`) untuk konversi tanggal Masehi ↔ Hijriyah dengan
   opsi metode perhitungan.
+- Endpoint arah kiblat (`/qibla/{lat,lng}`) untuk mendapatkan derajat kiblat
+  dari koordinat tertentu.
 - Response konsisten dengan struktur `status`, `message`, dan `data`.
 - Middleware logger akses.
 - Dokumentasi OpenAPI otomatis pada `/doc/sholat` menggunakan
@@ -95,6 +97,8 @@ deno test --allow-env --allow-read
   ke Hijriyah; `adj` hanya mempengaruhi Hijriyah.
 - `GET /cal/ce/{YYYY-MM-DD}` – konversi tanggal Hijriyah ke tanggal Masehi;
   `adj` hanya mempengaruhi Masehi.
+- `GET /qibla/{lat,lng}` – arah kiblat (derajat dari utara) berdasarkan
+  koordinat derajat desimal.
 
 Contoh respons sukses:
 
@@ -164,9 +168,12 @@ Dokumentasi tersedia:
 
 - Akses `/doc` untuk informasi web base API Muslim v3 ini.
 - Akses `GET /doc/apimuslim` untuk mendapatkan spesifikasi OpenAPI (`JSON`) yang
-  dapat diimpor ke [Postman](https://www.postman.com)/[Insomnia](https://insomnia.rest/) atau generator klien lainnya.
+  dapat diimpor ke [Postman](https://www.postman.com) atau
+  [Insomnia](https://insomnia.rest/) atau generator klien lainnya.
 
 ## Kontak
-Saran ide dan pertanyaan dapat melalui kontak:
+
+Saran, ide dan pertanyaan dapat melalui kontak:
+
 - Email: banghasan@gmail.com
 - Telegram: [bangHasan](https://t.me/hasanudinhs)

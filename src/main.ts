@@ -2,6 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { config } from "~/config.ts";
 import { createAccessLogger } from "~/middleware/logger.ts";
 import { registerCalRoutes } from "~/routes/cal.ts";
+import { registerQiblaRoutes } from "~/routes/qibla.ts";
 import { registerSholatRoutes } from "~/routes/sholat.ts";
 import { createJadwalService } from "~/services/jadwal.ts";
 import { createSholatService, loadSholatData } from "~/services/sholat.ts";
@@ -87,6 +88,7 @@ registerSholatRoutes(app, {
   docBaseUrl: config.docBaseUrl,
 });
 registerCalRoutes(app, config.docBaseUrl);
+registerQiblaRoutes({ app, docBaseUrl: config.docBaseUrl });
 
 app.notFound((c) =>
   c.json({ status: false, message: "Data tidak ditemukan .." }, 404)

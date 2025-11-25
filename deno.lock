@@ -7,7 +7,10 @@
     "jsr:@std/internal@1": "1.0.12",
     "npm:@hono/zod-openapi@*": "1.1.5_hono@4.10.6_zod@4.1.12",
     "npm:@hono/zod-openapi@^1.1.5": "1.1.5_hono@4.10.6_zod@4.1.12",
-    "npm:hono@^4.10.6": "4.10.6"
+    "npm:adhan@*": "4.4.3",
+    "npm:adhan@4.4.3": "4.4.3",
+    "npm:hono@^4.10.6": "4.10.6",
+    "npm:moment-timezone@*": "0.6.0"
   },
   "jsr": {
     "@std/assert@0.225.3": {
@@ -48,8 +51,20 @@
         "zod"
       ]
     },
+    "adhan@4.4.3": {
+      "integrity": "sha512-568KkQd8OMLUj7o7+d2FDcm6vZHWQrE7vsm/Evssh8sfUDpPyaboj3PVsScZAr7L7sNRgPrtLMmDZZfM7VeAYw=="
+    },
     "hono@4.10.6": {
       "integrity": "sha512-BIdolzGpDO9MQ4nu3AUuDwHZZ+KViNm+EZ75Ae55eMXMqLVhDFqEMXxtUe9Qh8hjL+pIna/frs2j6Y2yD5Ua/g=="
+    },
+    "moment-timezone@0.6.0": {
+      "integrity": "sha512-ldA5lRNm3iJCWZcBCab4pnNL3HSZYXVb/3TYr75/1WCTWYuTqYUb5f/S384pncYjJ88lbO8Z4uPDvmoluHJc8Q==",
+      "dependencies": [
+        "moment"
+      ]
+    },
+    "moment@2.30.1": {
+      "integrity": "sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how=="
     },
     "openapi3-ts@4.5.0": {
       "integrity": "sha512-jaL+HgTq2Gj5jRcfdutgRGLosCy/hT8sQf6VOy+P+g36cZOjI1iukdPnijC+4CmeRzg/jEllJUboEic2FhxhtQ==",
@@ -64,6 +79,12 @@
     "zod@4.1.12": {
       "integrity": "sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ=="
     }
+  },
+  "remote": {
+    "https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.esm.min.js": "951ca9423c16b2c88f225aa0d8540453d7c3136533e2d3b1328a5523361a099f",
+    "https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.js": "9a9d301dbbbe29cb68e4dd1b71fe2063bf9ca68315b6ab782b8ba4406c285a99",
+    "https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js": "6161c09d5eb3e975c04c6bc136bece212973f5eb225cddecc9f74e01bade572c",
+    "https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/cjs/Adhan.js": "c2842523250c33eb67d07759e3e447f5767aa53a5d86fc0b0fbfc1c7cc1e24ee"
   },
   "workspace": {
     "dependencies": [
