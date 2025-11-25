@@ -55,12 +55,15 @@ const statsErrorSchema = z
   })
   .openapi("StatsError");
 
-export const registerStatsRoutes = ({ app, statsService, docBaseUrl }: RegisterStatsDeps) => {
+export const registerStatsRoutes = (
+  { app, statsService, docBaseUrl }: RegisterStatsDeps,
+) => {
   const statsCurrentRoute = createRoute({
     method: "get",
     path: "/stats",
     summary: "Stats Terkini",
-    description: "Menampilkan detail hits bulanan dan rata-rata untuk tahun berjalan.",
+    description:
+      "Menampilkan detail hits bulanan dan rata-rata untuk tahun berjalan.",
     tags: ["Stats"],
     responses: {
       200: {
@@ -81,7 +84,8 @@ export const registerStatsRoutes = ({ app, statsService, docBaseUrl }: RegisterS
     method: "get",
     path: "/stats/{year}",
     summary: "Stats Bulanan",
-    description: "Menampilkan rinci hits bulanan untuk tahun tertentu beserta rata-rata per bulan.",
+    description:
+      "Menampilkan rinci hits bulanan untuk tahun tertentu beserta rata-rata per bulan.",
     tags: ["Stats"],
     request: {
       params: z.object({
@@ -118,7 +122,8 @@ export const registerStatsRoutes = ({ app, statsService, docBaseUrl }: RegisterS
     method: "get",
     path: "/stats/all",
     summary: "Stats Tahunan",
-    description: "Mengembalikan total hit grup berdasarkan tahun untuk seluruh API.",
+    description:
+      "Mengembalikan total hit grup berdasarkan tahun untuk seluruh API.",
     tags: ["Stats"],
     responses: {
       200: {
