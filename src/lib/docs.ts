@@ -21,28 +21,7 @@ export const buildCurlSample = (
 
 const escapeSingleQuotes = (value: string) => value.replace(/'/g, "\\'");
 
-const buildJavaScriptSample = (
-  url: string,
-  method: "GET" | "POST",
-  body?: string,
-) => {
-  const lines = [
-    `fetch("${url}", {`,
-    `  method: "${method}",`,
-    "  headers: {",
-    '    "Accept": "application/json",',
-    ...(method === "POST" ? ['    "Content-Type": "application/json",'] : []),
-    "  },",
-    ...(method === "POST" && body
-      ? [`  body: '${escapeSingleQuotes(body)}',`]
-      : []),
-    "})",
-    "  .then((response) => response.json())",
-    "  .then((data) => console.log(data))",
-    "  .catch((error) => console.error(error));",
-  ];
-  return lines.join("\n");
-};
+const escapeDoubleQuotes = (value: string) => value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 
 const buildPhpSample = (url: string, method: "GET" | "POST", body?: string) => {
   const headers = [
@@ -71,11 +50,7 @@ const buildPhpSample = (url: string, method: "GET" | "POST", body?: string) => {
   return lines.join("\n");
 };
 
-const buildPythonSample = (
-  url: string,
-  method: "GET" | "POST",
-  body?: string,
-) => {
+const buildPythonSample = (url: string, method: "GET" | "POST", body?: string) => {
   const lines = [
     "import requests",
     "",
@@ -84,9 +59,7 @@ const buildPythonSample = (
     '    "Accept": "application/json",',
     ...(method === "POST" ? ['    "Content-Type": "application/json",'] : []),
     "}",
-    ...(method === "POST" && body
-      ? [`payload = '${escapeSingleQuotes(body)}'`]
-      : []),
+    ...(method === "POST" && body ? [`payload = '${escapeSingleQuotes(body)}'`] : []),
     "",
     method === "POST"
       ? "response = requests.post(url, headers=headers, data=payload)"
@@ -120,9 +93,7 @@ const buildGoSample = (url: string, method: "GET" | "POST", body?: string) => {
     "\t\tpanic(err)",
     "\t}",
     '\treq.Header.Set("Accept", "application/json")',
-    ...(method === "POST"
-      ? ['\treq.Header.Set("Content-Type", "application/json")']
-      : []),
+    ...(method === "POST" ? ['\treq.Header.Set("Content-Type", "application/json")'] : []),
     "",
     "\tres, err := client.Do(req)",
     "\tif err != nil {",
@@ -132,6 +103,93 @@ const buildGoSample = (url: string, method: "GET" | "POST", body?: string) => {
     "",
     "\tbodyBytes, _ := io.ReadAll(res.Body)",
     "\tfmt.Println(string(bodyBytes))",
+    "}",
+  ];
+  return lines.join("\n");
+};
+
+const buildNodeAxiosSample = (url: string, method: "GET" | "POST", body?: string) => {
+  const lines = [
+    'import axios from "axios";',
+    "",
+    "const options = {",
+    `  method: "${method}",`,
+    `  url: "${url}",`,
+    "  headers: {",
+    '    Accept: "application/json",',
+    ...(method === "POST" ? ['    "Content-Type": "application/json",'] : []),
+    "  },",
+    ...(method === "POST" && body ? [`  data: '${escapeSingleQuotes(body)}',`] : []),
+    "};",
+    "",
+    "axios.request(options)",
+    "  .then((response) => {",
+    "    console.log(response.data);",
+    "  })",
+    "  .catch((error) => {",
+    "    console.error(error);",
+    "  });",
+  ];
+  return lines.join("\n");
+};
+
+const buildDartSample = (url: string, method: "GET" | "POST", body?: string) => {
+  const hasBody = method === "POST" && Boolean(body);
+  const lines = [
+    "import 'dart:convert';",
+    "import 'package:http/http.dart' as http;",
+    "",
+    "Future<void> main() async {",
+    `  final uri = Uri.parse('${escapeSingleQuotes(url)}');`,
+    "  final headers = {",
+    "    'Accept': 'application/json',",
+    ...(hasBody ? ["    'Content-Type': 'application/json',"] : []),
+    "  };",
+    ...(hasBody ? [`  const payload = '${escapeSingleQuotes(body!)}';`] : []),
+    hasBody
+      ? "  final response = await http.post(uri, headers: headers, body: payload);"
+      : "  final response = await http.get(uri, headers: headers);",
+    "  if (response.statusCode == 200) {",
+    "    final data = jsonDecode(response.body);",
+    "    print(data);",
+    "  } else {",
+    "    print('Request failed: ${response.statusCode}');",
+    "  }",
+    "}",
+  ];
+  return lines.join("\n");
+};
+
+const buildCSharpSample = (url: string, method: "GET" | "POST", body?: string) => {
+  const hasBody = method === "POST" && Boolean(body);
+  const lines = [
+    "using System;",
+    "using System.Net.Http;",
+    "using System.Net.Http.Headers;",
+    ...(hasBody ? ["using System.Text;"] : []),
+    "using System.Threading.Tasks;",
+    "",
+    "class Program",
+    "{",
+    "    static async Task Main()",
+    "    {",
+    "        using var client = new HttpClient();",
+    `        using var request = new HttpRequestMessage(HttpMethod.${
+      method === "POST" ? "Post" : "Get"
+    }, "${url}");`,
+    '        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));',
+    ...(hasBody
+      ? [
+          `        request.Content = new StringContent("${escapeDoubleQuotes(
+            body!,
+          )}", Encoding.UTF8, "application/json");`,
+        ]
+      : []),
+    "        using var response = await client.SendAsync(request);",
+    "        response.EnsureSuccessStatusCode();",
+    "        var responseBody = await response.Content.ReadAsStringAsync();",
+    "        Console.WriteLine(responseBody);",
+    "    }",
     "}",
   ];
   return lines.join("\n");
@@ -152,9 +210,9 @@ export const buildCodeSamples = (
   return [
     { lang: "curl", label: "cURL", source: curlSource },
     {
-      lang: "javascript",
-      label: "JavaScript",
-      source: buildJavaScriptSample(url, method, body),
+      lang: "node",
+      label: "Nodejs",
+      source: buildNodeAxiosSample(url, method, body),
     },
     { lang: "php", label: "PHP", source: buildPhpSample(url, method, body) },
     {
@@ -162,6 +220,16 @@ export const buildCodeSamples = (
       label: "Python",
       source: buildPythonSample(url, method, body),
     },
+    {
+      lang: "dart",
+      label: "Dart",
+      source: buildDartSample(url, method, body),
+    },
     { lang: "go", label: "Go", source: buildGoSample(url, method, body) },
+    {
+      lang: "csharp",
+      label: "C#",
+      source: buildCSharpSample(url, method, body),
+    },
   ];
 };
