@@ -1,6 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
-import { buildCurlSample } from "~/lib/docs.ts";
+import { buildCodeSamples } from "~/lib/docs.ts";
 import type { GeocodeService } from "~/services/geocode.ts";
 import { resolveClientIp } from "~/services/tools.ts";
 import type { AppEnv } from "~/types.ts";
@@ -99,13 +99,7 @@ export const registerToolsRoutes = ({
         content: { "application/json": { schema: ipErrorSchema } },
       },
     },
-    "x-codeSamples": [
-      {
-        lang: "curl",
-        label: "cURL",
-        source: buildCurlSample(docBaseUrl, "GET", "/tools/ip"),
-      },
-    ],
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/tools/ip"),
   });
 
   app.openapi(ipRoute, (c) => {
@@ -161,20 +155,14 @@ export const registerToolsRoutes = ({
         content: { "application/json": { schema: geocodeErrorSchema } },
       },
     },
-    "x-codeSamples": [
-      {
-        lang: "curl",
-        label: "cURL",
-        source: buildCurlSample(
-          docBaseUrl,
-          "POST",
-          "/tools/geocode",
-          JSON.stringify({
-            query: "Masjid Istiqlal Jakarta",
-          }),
-        ),
-      },
-    ],
+    "x-codeSamples": buildCodeSamples(
+      docBaseUrl,
+      "POST",
+      "/tools/geocode",
+      JSON.stringify({
+        query: "Masjid Istiqlal Jakarta",
+      }),
+    ),
   });
 
   app.openapi(geocodeRoute, async (c) => {

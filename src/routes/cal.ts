@@ -16,7 +16,7 @@ import {
   safeCalendarTimeZone,
   shiftZonedDate,
 } from "~/lib/calendar.ts";
-import { buildCurlSample } from "~/lib/docs.ts";
+import { buildCodeSamples } from "~/lib/docs.ts";
 import type { AppEnv } from "~/types.ts";
 
 const calendarMethodEnum = z
@@ -185,17 +185,11 @@ export const registerCalRoutes = (
         },
       },
     },
-    "x-codeSamples": [
-      {
-        lang: "curl",
-        label: "cURL",
-        source: buildCurlSample(
-          docBaseUrl,
-          "GET",
-          "/cal/today?adj=0&tz=Asia%2FJakarta",
-        ),
-      },
-    ],
+    "x-codeSamples": buildCodeSamples(
+      docBaseUrl,
+      "GET",
+      "/cal/today?adj=0&tz=Asia%2FJakarta",
+    ),
   });
 
   const hijrRoute = createRoute({
@@ -232,17 +226,11 @@ export const registerCalRoutes = (
         },
       },
     },
-    "x-codeSamples": [
-      {
-        lang: "curl",
-        label: "cURL",
-        source: buildCurlSample(
-          docBaseUrl,
-          "GET",
-          `/cal/hijr/${sampleHijrDate}?${calendarMethodParam}`,
-        ),
-      },
-    ],
+    "x-codeSamples": buildCodeSamples(
+      docBaseUrl,
+      "GET",
+      `/cal/hijr/${sampleHijrDate}?${calendarMethodParam}`,
+    ),
   });
 
   const ceRoute = createRoute({
@@ -278,17 +266,11 @@ export const registerCalRoutes = (
         },
       },
     },
-    "x-codeSamples": [
-      {
-        lang: "curl",
-        label: "cURL",
-        source: buildCurlSample(
-          docBaseUrl,
-          "GET",
-          `/cal/ce/${sampleCeHijr}?${calendarMethodParam}`,
-        ),
-      },
-    ],
+    "x-codeSamples": buildCodeSamples(
+      docBaseUrl,
+      "GET",
+      `/cal/ce/${sampleCeHijr}?${calendarMethodParam}`,
+    ),
   });
 
   const respondCeConversion = (

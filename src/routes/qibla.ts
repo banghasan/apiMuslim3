@@ -1,6 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
-import { buildCurlSample } from "~/lib/docs.ts";
+import { buildCodeSamples } from "~/lib/docs.ts";
 import { getQiblaDirection, parseQiblaCoordinate } from "~/services/qibla.ts";
 import type { AppEnv } from "~/types.ts";
 
@@ -62,13 +62,11 @@ export const registerQiblaRoutes = ({ app, docBaseUrl }: RegisterQiblaDeps) => {
         content: { "application/json": { schema: qiblaErrorSchema } },
       },
     },
-    "x-codeSamples": [
-      {
-        lang: "curl",
-        label: "cURL",
-        source: buildCurlSample(docBaseUrl, "GET", `/qibla/${jakartaCoordinate}`),
-      },
-    ],
+    "x-codeSamples": buildCodeSamples(
+      docBaseUrl,
+      "GET",
+      `/qibla/${jakartaCoordinate}`,
+    ),
   });
 
   app.openapi(qiblaRoute, (c) => {
@@ -81,7 +79,11 @@ export const registerQiblaRoutes = ({ app, docBaseUrl }: RegisterQiblaDeps) => {
     return c.json({
       status: true,
       message: "success",
-      data: { latitude: parsed.latitude, longitude: parsed.longitude, direction },
+      data: {
+        latitude: parsed.latitude,
+        longitude: parsed.longitude,
+        direction,
+      },
     });
   });
 };

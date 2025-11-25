@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
-import { buildCurlSample } from "~/lib/docs.ts";
+import { buildCodeSamples } from "~/lib/docs.ts";
 import type {
   JadwalEntry,
   JadwalResponseData,
@@ -213,11 +213,9 @@ export const registerSholatRoutes = (
       method: "get",
       path,
       summary: "Kab/kota Semua",
-      description: `Daftar lengkap seluruh kabupaten/kota yang tersedia.${
-        aliasDescription(
-          path,
-        )
-      }`,
+      description: `Daftar lengkap seluruh kabupaten/kota yang tersedia.${aliasDescription(
+        path,
+      )}`,
       tags: ["Sholat"],
       responses: {
         200: {
@@ -229,13 +227,11 @@ export const registerSholatRoutes = (
           },
         },
       },
-      "x-codeSamples": [
-        {
-          lang: "curl",
-          label: "cURL",
-          source: buildCurlSample(docBaseUrl, "GET", "/sholat/kabkota/semua"),
-        },
-      ],
+      "x-codeSamples": buildCodeSamples(
+        docBaseUrl,
+        "GET",
+        "/sholat/kabkota/semua",
+      ),
     });
 
   const createByIdRoute = (path: string) =>
@@ -243,11 +239,9 @@ export const registerSholatRoutes = (
       method: "get",
       path,
       summary: "Kab/kota Berdasar ID",
-      description: `Mendapatkan kabupaten atau kota berdasarkan ID.${
-        aliasDescription(
-          path,
-        )
-      }`,
+      description: `Mendapatkan kabupaten atau kota berdasarkan ID.${aliasDescription(
+        path,
+      )}`,
       tags: ["Sholat"],
       request: {
         params: z.object({
@@ -274,17 +268,11 @@ export const registerSholatRoutes = (
           },
         },
       },
-      "x-codeSamples": [
-        {
-          lang: "curl",
-          label: "cURL",
-          source: buildCurlSample(
-            docBaseUrl,
-            "GET",
-            `/sholat/kabkota/${sampleId}`,
-          ),
-        },
-      ],
+      "x-codeSamples": buildCodeSamples(
+        docBaseUrl,
+        "GET",
+        `/sholat/kabkota/${sampleId}`,
+      ),
     });
 
   const createSearchRoute = (path: string) =>
@@ -292,11 +280,9 @@ export const registerSholatRoutes = (
       method: "get",
       path,
       summary: "Kab/kota Pencarian",
-      description: `Pencarian Kabupaten atau Kota berdasarkan kata kunci.${
-        aliasDescription(
-          path,
-        )
-      }`,
+      description: `Pencarian Kabupaten atau Kota berdasarkan kata kunci.${aliasDescription(
+        path,
+      )}`,
       tags: ["Sholat"],
       request: {
         params: z.object({
@@ -329,17 +315,11 @@ export const registerSholatRoutes = (
           },
         },
       },
-      "x-codeSamples": [
-        {
-          lang: "curl",
-          label: "cURL",
-          source: buildCurlSample(
-            docBaseUrl,
-            "GET",
-            `/sholat/kabkota/cari/${sampleKeyword}`,
-          ),
-        },
-      ],
+      "x-codeSamples": buildCodeSamples(
+        docBaseUrl,
+        "GET",
+        `/sholat/kabkota/cari/${sampleKeyword}`,
+      ),
     });
 
   const searchBodySchema = z.object({
@@ -351,11 +331,9 @@ export const registerSholatRoutes = (
       method: "post",
       path,
       summary: "Kab/kota Pencarian (POST)",
-      description: `Pencarian Kabupaten atau Kota melalui body JSON.${
-        aliasDescription(
-          path,
-        )
-      }`,
+      description: `Pencarian Kabupaten atau Kota melalui body JSON.${aliasDescription(
+        path,
+      )}`,
       tags: ["Sholat"],
       request: {
         body: {
@@ -393,18 +371,12 @@ export const registerSholatRoutes = (
           },
         },
       },
-      "x-codeSamples": [
-        {
-          lang: "curl",
-          label: "cURL",
-          source: buildCurlSample(
-            docBaseUrl,
-            "POST",
-            "/sholat/kabkota/cari",
-            searchBody,
-          ),
-        },
-      ],
+      "x-codeSamples": buildCodeSamples(
+        docBaseUrl,
+        "POST",
+        "/sholat/kabkota/cari",
+        searchBody,
+      ),
     });
 
   const createJadwalRoute = (path: string) =>
@@ -453,17 +425,11 @@ export const registerSholatRoutes = (
           },
         },
       },
-      "x-codeSamples": [
-        {
-          lang: "curl",
-          label: "cURL",
-          source: buildCurlSample(
-            docBaseUrl,
-            "GET",
-            `/sholat/jadwal/${sampleId}/${samplePeriod}`,
-          ),
-        },
-      ],
+      "x-codeSamples": buildCodeSamples(
+        docBaseUrl,
+        "GET",
+        `/sholat/jadwal/${sampleId}/${samplePeriod}`,
+      ),
     });
 
   const jadwalTodayQuerySchema = z.object({
@@ -517,17 +483,11 @@ export const registerSholatRoutes = (
           },
         },
       },
-      "x-codeSamples": [
-        {
-          lang: "curl",
-          label: "cURL",
-          source: buildCurlSample(
-            docBaseUrl,
-            "GET",
-            `/sholat/jadwal/${sampleId}/today?tz=Asia%2FJakarta`,
-          ),
-        },
-      ],
+      "x-codeSamples": buildCodeSamples(
+        docBaseUrl,
+        "GET",
+        `/sholat/jadwal/${sampleId}/today?tz=Asia%2FJakarta`,
+      ),
     });
 
   app.openapi(createAllRoute(allPath), respondAllLocations);
@@ -537,20 +497,16 @@ export const registerSholatRoutes = (
     const { id } = c.req.valid("param");
     return respondById(c, id);
   });
-  registerAliasRoutes(
-    byIdPath,
-    "get",
-    (c) => respondById(c, c.req.param("id") ?? ""),
+  registerAliasRoutes(byIdPath, "get", (c) =>
+    respondById(c, c.req.param("id") ?? ""),
   );
 
   app.openapi(createSearchRoute(searchPath), (c) => {
     const { keyword } = c.req.valid("param");
     return respondSearch(c, keyword);
   });
-  registerAliasRoutes(
-    searchPath,
-    "get",
-    (c) => respondSearch(c, c.req.param("keyword") ?? ""),
+  registerAliasRoutes(searchPath, "get", (c) =>
+    respondSearch(c, c.req.param("keyword") ?? ""),
   );
 
   app.openapi(createSearchPostRoute(searchPostPath), (c) => {
@@ -615,8 +571,7 @@ export const registerSholatRoutes = (
       }
 
       if (parsedPeriod.type === "daily") {
-        const key =
-          `${parsedPeriod.year}-${parsedPeriod.month}-${parsedPeriod.day}`;
+        const key = `${parsedPeriod.year}-${parsedPeriod.month}-${parsedPeriod.day}`;
         const entry = monthlyData.jadwal[key];
         if (!entry) {
           return c.json(errorResponse(), 404);
