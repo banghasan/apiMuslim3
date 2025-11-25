@@ -43,8 +43,8 @@ const geocodeEntrySchema = z
     display_name: z
       .string()
       .openapi({ example: "Masjid Istiqlal, Jalan KH Hasyim Asyari ..." }),
-    address: z.record(z.string()).optional(),
-    extratags: z.record(z.string()).optional(),
+    address: z.record(z.string(), z.string()).optional(),
+    extratags: z.record(z.string(), z.string()).optional(),
     boundingbox: z
       .object({
         south: z.string(),
@@ -133,9 +133,9 @@ export const registerToolsRoutes = ({
   const geocodeRoute = createRoute({
     method: "post",
     path: "/tools/geocode",
-    summary: "Geocode (maps.co)",
+    summary: "Geocode",
     description:
-      "Mencari koordinat menggunakan layanan maps.co (API ini dibatasi 1 request per detik).",
+      "Mencari koordinat berdasarkan kata kunci, nama kota, tempat atau hal menarik lainnya (API ini dibatasi 1 request per detik).",
     tags: ["Tools"],
     request: {
       body: {
@@ -254,9 +254,8 @@ const normalizeGeocodeEntry = (value: unknown): GeocodeEntry | null => {
   const type = typeof raw.type === "string" ? raw.type : "";
   const lat = typeof raw.lat === "string" ? raw.lat : String(raw.lat ?? "");
   const lon = typeof raw.lon === "string" ? raw.lon : String(raw.lon ?? "");
-  const displayName = typeof raw.display_name === "string"
-    ? raw.display_name
-    : "";
+  const displayName =
+    typeof raw.display_name === "string" ? raw.display_name : "";
   if (
     !Number.isFinite(placeId) ||
     !clazz ||

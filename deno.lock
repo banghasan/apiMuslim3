@@ -10,7 +10,8 @@
     "npm:adhan@*": "4.4.3",
     "npm:adhan@4.4.3": "4.4.3",
     "npm:hono@^4.10.6": "4.10.6",
-    "npm:moment-timezone@*": "0.6.0"
+    "npm:moment-timezone@*": "0.6.0",
+    "npm:zod@*": "4.1.12"
   },
   "jsr": {
     "@std/assert@0.225.3": {
