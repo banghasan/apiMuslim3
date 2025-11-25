@@ -153,9 +153,9 @@ export const registerCalRoutes = (
     "/cal/syamsiah/{date}",
     "/cal/julian/{date}",
   ];
-  const ceAliasDescription = `\nAlias:\n${
-    ceAliases.map((alias) => ` - \`${alias}\``).join("\n")
-  }`;
+  const ceAliasDescription = `\nAlias:\n${ceAliases
+    .map((alias) => ` - \`${alias}\``)
+    .join("\n")}`;
   const toHonoPath = (path: string) => path.replace(/\{([^}]+)\}/g, ":$1");
   const registerAliasRoutes = (
     aliases: string[],
@@ -201,7 +201,7 @@ export const registerCalRoutes = (
   const hijrRoute = createRoute({
     method: "get",
     path: "/cal/hijr/{date}",
-    summary: "Konversi Masehi ke Hijriyah",
+    summary: "Masehi ke Hijriyah",
     description:
       "Konversi tanggal Masehi (`YYYY-MM-DD`) ke Hijriyah. Parameter `adj` hanya mempengaruhi tanggal Hijriyah.",
     tags: ["Kalender"],
@@ -248,9 +248,8 @@ export const registerCalRoutes = (
   const ceRoute = createRoute({
     method: "get",
     path: "/cal/ce/{date}",
-    summary: "Konversi Hijriyah ke Masehi",
-    description:
-      `Konversi tanggal Hijriyah (\`YYYY-MM-DD\`) ke kalender Masehi. Parameter \`adj\` hanya mempengaruhi tanggal Masehi.${ceAliasDescription}`,
+    summary: "Hijriyah ke Masehi",
+    description: `Konversi tanggal Hijriyah (\`YYYY-MM-DD\`) ke kalender Masehi. Parameter \`adj\` hanya mempengaruhi tanggal Masehi.${ceAliasDescription}`,
     tags: ["Kalender"],
     request: {
       params: z.object({
@@ -382,13 +381,7 @@ export const registerCalRoutes = (
     const query = c.req.valid("query");
     return respondCeConversion(c, date, query);
   });
-  registerAliasRoutes(
-    ceAliases,
-    (c) =>
-      respondCeConversion(
-        c,
-        c.req.param("date") ?? "",
-        readQueryFromContext(c),
-      ),
+  registerAliasRoutes(ceAliases, (c) =>
+    respondCeConversion(c, c.req.param("date") ?? "", readQueryFromContext(c)),
   );
 };

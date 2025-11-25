@@ -100,22 +100,38 @@ app.onError((err, c) => {
   return c.json({ status: false, message: "internal server error" }, 500);
 });
 
+const tagDefinitions = [
+  {
+    name: "Sholat",
+    description:
+      "Endpoint terkait sholat: kota-kota yang didukung, jadwal sholat harian, dan lainnya.",
+  },
+  {
+    name: "Kalender",
+    description: `Endpoint konversi kalender CE dan Hijriyah.
+
+CE adalah Common Era. Nama lain dari penanggalan Masehi. Istilah ini adalah alternatif modern dan netral secara agama untuk Anno Domini (AD), digunakan terutama dalam konteks akademik dan ilmu pengetahuan.
+
+Nama lainnya adalah Syamsiah, Syamsiah atau Tahun Matahari. Penamaan ini mengacu pada dasar perhitungannya, yaitu pergerakan bumi mengelilingi matahari (revolusi bumi), berlawanan dengan Kalender Hijriah yang berdasarkan pergerakan bulan (Komariah)`,
+  },
+  { name: "Tools", description: "Beragam alat bantu (IP, dsb)." },
+];
+
 app.doc("/doc/apimuslim", {
   openapi: "3.1.0",
   info: {
     title: "API Muslim",
     version: "v3.0.0",
-    tags: [
-      { name: "Sholat", description: "Endpoint terkait sholat" },
-      {
-        name: "Kalender",
-        description: "Endpoint konversi kalender CE dan Hijriyah",
-      },
-      { name: "Tools", description: "Beragam alat bantu (IP, dsb)." },
-    ],
     description:
       "Endpoint untuk daftar kabupaten/kota beserta pencarian ID yang digunakan untuk jadwal sholat.",
   },
+  tags: tagDefinitions,
+  "x-tagGroups": [
+    {
+      name: "API",
+      tags: ["Sholat", "Kalender", "Tools"],
+    },
+  ],
   servers: [
     {
       url: config.docBaseUrl,
