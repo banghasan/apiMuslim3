@@ -115,6 +115,22 @@ const errorResponse = (message = "Data tidak ditemukan.") => ({
   message,
 });
 
+const normalizeKeyword = (value: string) => {
+  const collapsed = value.replace(/\s+/g, " ").trim();
+  if (!collapsed) {
+    return { ok: false as const, message: "keyword is required" };
+  }
+  if (!/^[a-zA-Z]/.test(collapsed)) {
+    return { ok: false as const, message: "Keyword harus diawali huruf." };
+  }
+  const replaced = collapsed.replace(/\bkabupaten\b/gi, "kab.");
+  const letterCount = replaced.replace(/[^a-zA-Z]/g, "").length;
+  if (letterCount < 3) {
+    return { ok: false as const, message: "Keyword minimal 3 huruf." };
+  }
+  return { ok: true as const, value: replaced.toLowerCase() };
+};
+
 export const loadSholatData = async (): Promise<SholatData> => {
   const kabKotaFile = new URL(
     "../../data/sholat/kabkota.json",
@@ -150,11 +166,7 @@ export const registerSholatRoutes = (
   const allPath = "/sholat/kabkota/semua";
   const byIdPath = "/sholat/kabkota/{id}";
   const searchPath = "/sholat/kabkota/cari/{keyword}";
-  const searchAliases = [
-    "/sholat/kabkota/find/{keyword}",
-    "/sholat/kota/cari/{keyword}",
-    "/sholat/kota/find/{keyword}",
-  ];
+  const searchPostPath = "/sholat/kabkota/cari";
   const routeAliases: Record<string, string[]> = {
     [allPath]: [
       "/sholat/kabkota/all",
@@ -162,16 +174,35 @@ export const registerSholatRoutes = (
       "/sholat/kota/all",
     ],
     [byIdPath]: ["/sholat/kota/{id}"],
-    [searchPath]: searchAliases,
+    [searchPath]: [
+      "/sholat/kabkota/find/{keyword}",
+      "/sholat/kota/cari/{keyword}",
+      "/sholat/kota/find/{keyword}",
+    ],
+    [searchPostPath]: [
+      "/sholat/kabkota/find",
+      "/sholat/kota/cari",
+      "/sholat/kota/find",
+    ],
   };
 
   type RouteHandler = (c: Context<AppEnv>) => Promise<Response> | Response;
+  type RouteMethod = "get" | "post";
   const toHonoPath = (path: string) =>
     path.replace(/\{([^}]+)\}/g, ":$1");
-  const registerAliasRoutes = (path: string, handler: RouteHandler) => {
+  const registerAliasRoutes = (
+    path: string,
+    method: RouteMethod,
+    handler: RouteHandler,
+  ) => {
     const aliases = routeAliases[path] ?? [];
     for (const alias of aliases) {
-      app.get(toHonoPath(alias), handler);
+      const honoPath = toHonoPath(alias);
+      if (method === "post") {
+        app.post(honoPath, handler);
+      } else {
+        app.get(honoPath, handler);
+      }
     }
   };
   const aliasDescription = (path: string) => {
@@ -194,12 +225,13 @@ export const registerSholatRoutes = (
     return c.json(successResponse([location]), 200);
   };
   const respondSearch = (c: Context<AppEnv>, keyword: string) => {
-    const normalized = keyword.trim().toLowerCase();
-    if (!normalized) {
-      return c.json(errorResponse("keyword is required"), 400);
+    const normalized = normalizeKeyword(keyword);
+    if (!normalized.ok) {
+      return c.json(errorResponse(normalized.message), 400);
     }
+    const needle = normalized.value;
     const result = locations.filter((loc) =>
-      loc.lokasi.toLowerCase().includes(normalized),
+      loc.lokasi.toLowerCase().includes(needle),
     );
 
     if (result.length === 0) {
@@ -285,6 +317,58 @@ export const registerSholatRoutes = (
         params: z.object({
           keyword: z.string().min(1).openapi({ example: "kediri" }),
         }),
+      },
+      responses: {
+        200: {
+          description: "Pencarian berhasil.",
+          content: {
+            "application/json": {
+              schema: successSchema,
+            },
+          },
+        },
+        400: {
+          description: "Keyword tidak valid.",
+          content: {
+            "application/json": {
+              schema: errorSchema,
+            },
+          },
+        },
+        404: {
+          description: "Tidak ada data yang cocok.",
+          content: {
+            "application/json": {
+              schema: errorSchema,
+            },
+          },
+        },
+      },
+    });
+
+  const searchBodySchema = z.object({
+    keyword: z.string().min(1).openapi({ example: "kediri" }),
+  });
+
+  const createSearchPostRoute = (path: string) =>
+    createRoute({
+      method: "post",
+      path,
+      summary: "Kab/kota Pencarian (POST)",
+      description:
+        `Pencarian Kabupaten atau Kota melalui body JSON.${aliasDescription(
+          path,
+        )}`,
+      tags: ["Sholat"],
+      request: {
+        body: {
+          content: {
+            "application/json": {
+              schema: searchBodySchema,
+            },
+          },
+          required: true,
+        },
       },
       responses: {
         200: {
@@ -416,21 +500,40 @@ export const registerSholatRoutes = (
     });
 
   app.openapi(createAllRoute(allPath), respondAllLocations);
-  registerAliasRoutes(allPath, respondAllLocations);
+  registerAliasRoutes(allPath, "get", respondAllLocations);
 
   app.openapi(createByIdRoute(byIdPath), (c) => {
     const { id } = c.req.valid("param");
     return respondById(c, id);
   });
-  registerAliasRoutes(byIdPath, (c) => respondById(c, c.req.param("id")));
+  registerAliasRoutes(byIdPath, "get", (c) =>
+    respondById(c, c.req.param("id") ?? ""),
+  );
 
   app.openapi(createSearchRoute(searchPath), (c) => {
     const { keyword } = c.req.valid("param");
     return respondSearch(c, keyword);
   });
-  registerAliasRoutes(searchPath, (c) =>
-    respondSearch(c, c.req.param("keyword")),
+  registerAliasRoutes(searchPath, "get", (c) =>
+    respondSearch(c, c.req.param("keyword") ?? ""),
   );
+
+  app.openapi(createSearchPostRoute(searchPostPath), (c) => {
+    const { keyword } = c.req.valid("json");
+    return respondSearch(c, keyword);
+  });
+  registerAliasRoutes(searchPostPath, "post", async (c) => {
+    let keyword = "";
+    try {
+      const body = await c.req.json();
+      if (body && typeof body.keyword === "string") {
+        keyword = body.keyword;
+      }
+    } catch {
+      keyword = "";
+    }
+    return respondSearch(c, keyword);
+  });
 
   for (const path of jadwalTodayPaths) {
     app.openapi(createJadwalTodayRoute(path), async (c) => {
