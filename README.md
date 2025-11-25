@@ -14,6 +14,7 @@ memenuhi kebutuhan dan aktivitas muslim indonesia sehari-hari.
   dari koordinat tertentu.
 - Endpoint tools utilitas seperti `/tools/ip` untuk mendeteksi IP & user-agent
   pengguna.
+- Endpoint health check (`/health`) untuk mengetahui apakah API siap digunakan.
 - Response konsisten dengan struktur `status`, `message`, dan `data`.
 - Middleware logger akses.
 - Dokumentasi OpenAPI otomatis pada `/doc/sholat` menggunakan
@@ -83,6 +84,7 @@ Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada
 | Kalender | Konversi tanggal Masehi ↔ Hijriyah, opsi metode perhitungan. | `/doc#/tag/Kalender`                |
 | Qibla    | Hitung arah kiblat berdasarkan koordinat.                    | `/doc#/tag/Qibla`                   |
 | Tools    | Utilitas seperti `/tools/ip` & `/tools/geocode`.             | `/doc#/tag/Tools`                   |
+| Health   | Health check sederhana memastikan API hidup.                 | `/doc#/tag/Health`                  |
 
 Contoh: untuk melihat dokumentasi endpoint qibla secara cepat, buka
 `http://localhost:8000/doc#/tag/Qibla` setelah server menyala. README ini juga
@@ -127,6 +129,8 @@ deno test --allow-env --allow-read
   koordinat derajat desimal.
 - `GET /tools/ip` – deteksi IP pengguna (memperhatikan proxy/Cloudflare) beserta
   user agent.
+- `GET /health` – health check sederhana yang mengembalikan waktu server,
+  uptime, timezone, dan environment.
 
 Contoh respons sukses:
 

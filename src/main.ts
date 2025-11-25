@@ -9,6 +9,7 @@ import { createGeocodeService } from "~/services/geocode.ts";
 import { createJadwalService } from "~/services/jadwal.ts";
 import { createSholatService, loadSholatData } from "~/services/sholat.ts";
 import type { AppEnv } from "~/types.ts";
+import { registerHealthRoutes } from "~/routes/health.ts";
 
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
@@ -33,6 +34,7 @@ const docTemplateFile = new URL("./static/doc.html", import.meta.url);
 const docTemplateBytes = await Deno.readFile(docTemplateFile);
 const redocPage = new TextDecoder().decode(docTemplateBytes);
 
+const startedAt = new Date();
 const app = new OpenAPIHono<AppEnv>();
 app.use("*", createAccessLogger(config));
 app.get(
@@ -71,6 +73,12 @@ registerToolsRoutes({
   docBaseUrl: config.docBaseUrl,
   geocodeService,
 });
+registerHealthRoutes({
+  app,
+  docBaseUrl: config.docBaseUrl,
+  startedAt,
+  config,
+});
 
 app.notFound((c) =>
   c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
@@ -100,6 +108,11 @@ Nama lainnya adalah Syamsiah, Syamsiah atau Tahun Matahari. Penamaan ini mengacu
       "Endpoint perhitungan arah kiblat berdasarkan koordinat latitude/longitude.",
   },
   { name: "Tools", description: "Beragam alat bantu (IP, dsb)." },
+  {
+    name: "Health",
+    description:
+      "Endpoint pemantauan sederhana untuk memastikan API siap digunakan.",
+  },
 ];
 
 app.doc("/doc/apimuslim", {
@@ -119,7 +132,7 @@ app.doc("/doc/apimuslim", {
   "x-tagGroups": [
     {
       name: "API Muslim Indonesia",
-      tags: ["Sholat", "Kalender", "Qibla", "Tools"],
+      tags: ["Sholat", "Kalender", "Qibla", "Tools", "Health"],
     },
   ],
   servers: [
