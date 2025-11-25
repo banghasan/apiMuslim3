@@ -1,14 +1,17 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { config } from "~/config.ts";
 import { createAccessLogger } from "~/middleware/logger.ts";
+import { createStatsRecorder } from "~/middleware/stats_logger.ts";
 import { registerCalRoutes } from "~/routes/cal.ts";
 import { rateLimitConfig } from "~/config/rate_limit.ts";
 import { registerQiblaRoutes } from "~/routes/qibla.ts";
 import { registerToolsRoutes } from "~/routes/tools.ts";
 import { registerSholatRoutes } from "~/routes/sholat.ts";
+import { registerStatsRoutes } from "~/routes/stats.ts";
 import { createGeocodeService } from "~/services/geocode.ts";
 import { createJadwalService } from "~/services/jadwal.ts";
 import { createSholatService, loadSholatData } from "~/services/sholat.ts";
+import { createStatsService } from "~/services/stats.ts";
 import type { AppEnv } from "~/types.ts";
 import { registerHealthRoutes } from "~/routes/health.ts";
 import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
@@ -43,6 +46,11 @@ const jadwalService = createJadwalService(config);
 const geocodeService = config.mapsCoApiKey
   ? createGeocodeService(config.mapsCoApiKey)
   : null;
+const statsDir = new URL("../data", import.meta.url);
+await Deno.mkdir(statsDir, { recursive: true });
+const statsDbFile = new URL("../data/stats.db", import.meta.url);
+const statsDbPath = decodeURIComponent(statsDbFile.pathname);
+const statsService = createStatsService(statsDbPath);
 
 // Load documentation HTML template
 const docTemplateFile = new URL("./static/doc.html", import.meta.url);
@@ -51,6 +59,7 @@ const redocPage = new TextDecoder().decode(docTemplateBytes);
 
 const startedAt = new Date();
 const app = new OpenAPIHono<AppEnv>();
+app.use("*", createStatsRecorder(statsService));
 app.use("*", createAccessLogger(config));
 app.use("*", createRateLimitMiddleware(rateLimitConfig));
 app.get(
@@ -149,6 +158,11 @@ registerToolsRoutes({
   docBaseUrl: config.docBaseUrl,
   geocodeService,
 });
+registerStatsRoutes({
+  app,
+  docBaseUrl: config.docBaseUrl,
+  statsService,
+});
 registerHealthRoutes({
   app,
   docBaseUrl: config.docBaseUrl,
@@ -198,6 +212,10 @@ Pilihan metode yang dapat dipilih:
     description:
       "Beragam alat bantu seperti deteksi IP, geocode, dan health check API.",
   },
+  {
+    name: "Stats",
+    description: "Statistik pemakaian API berdasarkan tahun dan bulan.",
+  },
 ];
 
 app.doc("/doc/apimuslim", {
@@ -222,7 +240,7 @@ Saran, ide, diskusi dan komunikasi dapat melalui:
   "x-tagGroups": [
     {
       name: "API Muslim Indonesia",
-      tags: ["Sholat", "Kalender", "Qibla", "Tools"],
+      tags: ["Sholat", "Kalender", "Qibla", "Tools", "Stats"],
     },
   ],
   servers: [
