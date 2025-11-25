@@ -117,15 +117,28 @@ const errorResponse = (message: string) => ({
   message,
 });
 
-const getCommonParams = (c: Context<AppEnv>) => {
-  const queryMethod = c.req.query("method") ?? c.req.query("m");
-  const queryTz = c.req.query("utc") ?? c.req.query("tz");
-  const adjParam = c.req.query("adj");
-  const selection = parseCalendarMethod(queryMethod);
-  const timeZone = safeCalendarTimeZone(queryTz);
-  const adjustment = parseAdjustment(adjParam);
+type CalendarQueryInput = {
+  adj?: string;
+  method?: string;
+  m?: string;
+  utc?: string;
+  tz?: string;
+};
+
+const getCommonParams = (query: CalendarQueryInput = {}) => {
+  const selection = parseCalendarMethod(query.method ?? query.m);
+  const timeZone = safeCalendarTimeZone(query.utc ?? query.tz);
+  const adjustment = parseAdjustment(query.adj);
   return { selection, timeZone, adjustment };
 };
+
+const readQueryFromContext = (c: Context<AppEnv>): CalendarQueryInput => ({
+  adj: c.req.query("adj") ?? undefined,
+  method: c.req.query("method") ?? undefined,
+  m: c.req.query("m") ?? undefined,
+  utc: c.req.query("utc") ?? undefined,
+  tz: c.req.query("tz") ?? undefined,
+});
 
 export const registerCalRoutes = (
   app: OpenAPIHono<AppEnv>,
@@ -140,7 +153,9 @@ export const registerCalRoutes = (
     "/cal/syamsiah/{date}",
     "/cal/julian/{date}",
   ];
-  const ceAliasDescription = `\nAlias:\n${ceAliases.map((alias) => ` - \`${alias}\``).join("\n")}`;
+  const ceAliasDescription = `\nAlias:\n${
+    ceAliases.map((alias) => ` - \`${alias}\``).join("\n")
+  }`;
   const toHonoPath = (path: string) => path.replace(/\{([^}]+)\}/g, ":$1");
   const registerAliasRoutes = (
     aliases: string[],
@@ -234,7 +249,8 @@ export const registerCalRoutes = (
     method: "get",
     path: "/cal/ce/{date}",
     summary: "Konversi Hijriyah ke Masehi",
-    description: `Konversi tanggal Hijriyah (\`YYYY-MM-DD\`) ke kalender Masehi. Parameter \`adj\` hanya mempengaruhi tanggal Masehi.${ceAliasDescription}`,
+    description:
+      `Konversi tanggal Hijriyah (\`YYYY-MM-DD\`) ke kalender Masehi. Parameter \`adj\` hanya mempengaruhi tanggal Masehi.${ceAliasDescription}`,
     tags: ["Kalender"],
     request: {
       params: z.object({
@@ -276,7 +292,11 @@ export const registerCalRoutes = (
     ],
   });
 
-  const respondCeConversion = (c: Context<AppEnv>, rawDate: string) => {
+  const respondCeConversion = (
+    c: Context<AppEnv>,
+    rawDate: string,
+    query: CalendarQueryInput,
+  ) => {
     const hijriDate = parseHijriDate(rawDate);
     if (!hijriDate) {
       return c.json(
@@ -286,7 +306,7 @@ export const registerCalRoutes = (
         400,
       );
     }
-    const { selection, timeZone, adjustment } = getCommonParams(c);
+    const { selection, timeZone, adjustment } = getCommonParams(query);
     const baseDate = convertHijriToGregorian(
       hijriDate,
       selection.calendar,
@@ -314,7 +334,8 @@ export const registerCalRoutes = (
   };
 
   app.openapi(todayRoute, (c) => {
-    const { selection, timeZone, adjustment } = getCommonParams(c);
+    const query = c.req.valid("query");
+    const { selection, timeZone, adjustment } = getCommonParams(query);
     const now = new Date();
     const todayParts = getGregorianParts(now, timeZone);
     const todayDate = createZonedDate(todayParts, timeZone);
@@ -333,6 +354,7 @@ export const registerCalRoutes = (
 
   app.openapi(hijrRoute, (c) => {
     const { date } = c.req.valid("param");
+    const query = c.req.valid("query");
     const ceDate = parseGregorianDate(date);
     if (!ceDate) {
       return c.json(
@@ -340,7 +362,7 @@ export const registerCalRoutes = (
         400,
       );
     }
-    const { selection, timeZone, adjustment } = getCommonParams(c);
+    const { selection, timeZone, adjustment } = getCommonParams(query);
     const baseDate = createZonedDate(ceDate, timeZone);
     const hijrDate = shiftZonedDate(baseDate, adjustment, timeZone);
     const ce = buildCeInfo(baseDate, timeZone);
@@ -357,9 +379,16 @@ export const registerCalRoutes = (
 
   app.openapi(ceRoute, (c) => {
     const { date } = c.req.valid("param");
-    return respondCeConversion(c, date);
+    const query = c.req.valid("query");
+    return respondCeConversion(c, date, query);
   });
-  registerAliasRoutes(ceAliases, (c) =>
-    respondCeConversion(c, c.req.param("date") ?? ""),
+  registerAliasRoutes(
+    ceAliases,
+    (c) =>
+      respondCeConversion(
+        c,
+        c.req.param("date") ?? "",
+        readQueryFromContext(c),
+      ),
   );
 };

@@ -1,15 +1,26 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@std/assert@~0.225.3": "0.225.3",
     "jsr:@std/dotenv@*": "0.225.5",
     "jsr:@std/dotenv@~0.225.2": "0.225.5",
+    "jsr:@std/internal@1": "1.0.12",
     "npm:@hono/zod-openapi@*": "1.1.5_hono@4.10.6_zod@4.1.12",
     "npm:@hono/zod-openapi@^1.1.5": "1.1.5_hono@4.10.6_zod@4.1.12",
     "npm:hono@^4.10.6": "4.10.6"
   },
   "jsr": {
+    "@std/assert@0.225.3": {
+      "integrity": "b3c2847aecf6955b50644cdb9cf072004ea3d1998dd7579fc0acb99dbb23bd4f",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
     "@std/dotenv@0.225.5": {
       "integrity": "9ce6f9d0ec3311f74a32535aa1b8c62ed88b1ab91b7f0815797d77a6f60c922f"
+    },
+    "@std/internal@1.0.12": {
+      "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
     }
   },
   "npm": {
@@ -56,6 +67,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@std/assert@~0.225.3",
       "jsr:@std/dotenv@~0.225.2",
       "npm:@hono/zod-openapi@^1.1.5",
       "npm:hono@^4.10.6"

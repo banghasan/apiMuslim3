@@ -30,8 +30,8 @@ export type JadwalResponseData = {
 const appEnv = (Deno.env.get("APP_ENV") ?? "development").toLowerCase();
 const isProdEnv = appEnv === "production";
 
-export const DEFAULT_JADWAL_TIMEZONE =
-  Deno.env.get("TIMEZONE") ?? "Asia/Jakarta";
+export const DEFAULT_JADWAL_TIMEZONE = Deno.env.get("TIMEZONE") ??
+  "Asia/Jakarta";
 
 export const safeJadwalTimeZone = (value?: string | null) => {
   const input = (value ?? "").trim();

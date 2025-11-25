@@ -84,8 +84,8 @@ const enqueueAccessLog = (line: string, stamp: Date) => {
 const accessLogger: MiddlewareHandler<AppEnv> = async (c, next) => {
   const start = performance.now();
   await next();
-  const forwarded =
-    c.req.header("x-forwarded-for") ?? c.req.header("x-real-ip");
+  const forwarded = c.req.header("x-forwarded-for") ??
+    c.req.header("x-real-ip");
   let ip = forwarded?.split(",")[0].trim();
   if (!ip) {
     const addr = c.env?.connInfo?.remoteAddr as
@@ -99,9 +99,11 @@ const accessLogger: MiddlewareHandler<AppEnv> = async (c, next) => {
   if (!ip) ip = "unknown";
   const rt = (performance.now() - start).toFixed(2);
   const logTime = new Date();
-  const line = `[${formatTimestamp(
-    logTime,
-  )}] ${ip} ${c.req.method} ${c.req.path} ${c.res.status} ${rt}ms`;
+  const line = `[${
+    formatTimestamp(
+      logTime,
+    )
+  }] ${ip} ${c.req.method} ${c.req.path} ${c.res.status} ${rt}ms`;
   if (logVerbose) {
     console.log(line);
   }
@@ -181,7 +183,7 @@ registerSholatRoutes(app, sholatData, docBaseUrl, { enableCache });
 registerCalRoutes(app, docBaseUrl);
 
 app.notFound((c) =>
-  c.json({ status: false, message: "Data tidak ditemukan .." }, 404),
+  c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
 );
 app.onError((err, c) => {
   console.error(err);
@@ -215,6 +217,7 @@ app.doc("/doc/apimuslim", {
 });
 
 console.log(`Listening on http://${docHost}:${port}`);
-Deno.serve({ hostname: host, port }, (request, connInfo) =>
-  app.fetch(request, { connInfo }),
+Deno.serve(
+  { hostname: host, port },
+  (request, connInfo) => app.fetch(request, { connInfo }),
 );
