@@ -49,14 +49,36 @@ const formatLogDate = (value: Date) =>
     "",
   );
 
-const appendAccessLog = async (line: string, stamp: Date) => {
-  if (!logWrite) return;
-  const fileUrl = new URL(`${formatLogDate(stamp)}.log`, logDir);
-  try {
-    await Deno.writeTextFile(fileUrl, `${line}\n`, { append: true });
-  } catch (error) {
-    console.error("Failed to write access log", error);
+type AccessLogEntry = { line: string; stamp: Date };
+const logQueue: AccessLogEntry[] = [];
+let logFlushScheduled = false;
+const flushAccessLogs = async () => {
+  while (logQueue.length) {
+    const entry = logQueue.shift()!;
+    const fileUrl = new URL(`${formatLogDate(entry.stamp)}.log`, logDir);
+    try {
+      await Deno.writeTextFile(fileUrl, `${entry.line}\n`, { append: true });
+    } catch (error) {
+      console.error("Failed to write access log", error);
+    }
   }
+};
+const scheduleLogFlush = () => {
+  if (!logWrite || logFlushScheduled) return;
+  logFlushScheduled = true;
+  setTimeout(async () => {
+    try {
+      await flushAccessLogs();
+    } finally {
+      logFlushScheduled = false;
+      if (logQueue.length) scheduleLogFlush();
+    }
+  }, 0);
+};
+const enqueueAccessLog = (line: string, stamp: Date) => {
+  if (!logWrite) return;
+  logQueue.push({ line, stamp });
+  scheduleLogFlush();
 };
 
 const accessLogger: MiddlewareHandler<AppEnv> = async (c, next) => {
@@ -83,7 +105,7 @@ const accessLogger: MiddlewareHandler<AppEnv> = async (c, next) => {
   if (logVerbose) {
     console.log(line);
   }
-  await appendAccessLog(line, logTime);
+  enqueueAccessLog(line, logTime);
 };
 
 const redocPage = `<!doctype html>
@@ -152,8 +174,10 @@ const port = Number(Deno.env.get("PORT") ?? "8000");
 const docHost = host === "0.0.0.0" ? "localhost" : host;
 const defaultBaseUrl = `http://${docHost}:${port}`;
 const docBaseUrl = Deno.env.get("DOC_BASE_URL") ?? defaultBaseUrl;
+const appEnv = (Deno.env.get("APP_ENV") ?? "development").toLowerCase();
+const enableCache = appEnv === "production";
 
-registerSholatRoutes(app, sholatData, docBaseUrl);
+registerSholatRoutes(app, sholatData, docBaseUrl, { enableCache });
 registerCalRoutes(app, docBaseUrl);
 
 app.notFound((c) =>

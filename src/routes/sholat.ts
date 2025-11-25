@@ -160,11 +160,17 @@ export const loadSholatData = async (): Promise<SholatData> => {
   return { locations, idIndex };
 };
 
+type SholatRouteOptions = {
+  enableCache?: boolean;
+};
+
 export const registerSholatRoutes = (
   app: OpenAPIHono<AppEnv>,
   { locations, idIndex }: SholatData,
   docBaseUrl: string,
+  options?: SholatRouteOptions,
 ) => {
+  const enableCache = options?.enableCache ?? false;
   const allPath = "/sholat/kabkota/semua";
   const byIdPath = "/sholat/kabkota/{id}";
   const searchPath = "/sholat/kabkota/cari/{keyword}";
@@ -217,6 +223,23 @@ export const registerSholatRoutes = (
   const sampleKeyword = "kediri";
   const samplePeriod = "2026-06-23";
   const searchBody = JSON.stringify({ keyword: sampleKeyword });
+  type SearchCacheValue = { data: Location[]; storedAt: number };
+  const searchCache = enableCache ? new Map<string, SearchCacheValue>() : null;
+  const searchCacheTtl = 10 * 60 * 1000;
+  const getCachedSearch = (needle: string): Location[] | null => {
+    if (!searchCache) return null;
+    const cached = searchCache.get(needle);
+    if (!cached) return null;
+    if (Date.now() - cached.storedAt > searchCacheTtl) {
+      searchCache.delete(needle);
+      return null;
+    }
+    return cached.data;
+  };
+  const setSearchCache = (needle: string, data: Location[]) => {
+    if (!searchCache) return;
+    searchCache.set(needle, { data, storedAt: Date.now() });
+  };
 
   const respondAllLocations: RouteHandler = (c) =>
     c.json(successResponse(locations));
@@ -237,12 +260,21 @@ export const registerSholatRoutes = (
       return c.json(errorResponse(normalized.message), 400);
     }
     const needle = normalized.value;
+    const cached = getCachedSearch(needle);
+    if (cached) {
+      return c.json(successResponse(cached), 200);
+    }
+
     const result = locations.filter((loc) =>
       loc.lokasi.toLowerCase().includes(needle),
     );
 
     if (result.length === 0) {
       return c.json(errorResponse(), 404);
+    }
+
+    if (enableCache) {
+      setSearchCache(needle, result);
     }
 
     return c.json(successResponse(result), 200);

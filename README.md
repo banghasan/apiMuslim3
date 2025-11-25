@@ -20,6 +20,8 @@ REST API sederhana untuk menampilkan jadwal sholat dan kalender Hijriyah, untuk 
    TIMEZONE=Asia/Jakarta
    LOG_VERBOSE=false
    LOG_WRITE=false
+   APP_ENV=development
+   DOC_BASE_URL=http://localhost:8000
    ```
 
 ## Menjalankan Server
@@ -39,7 +41,13 @@ Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada `.
 - `TIMEZONE` menentukan waktu pada log dan response logger.
 - Set `LOG_VERBOSE=true` untuk menampilkan log akses yang sama di console; default `false`.
 - Set `LOG_WRITE=true` untuk menyalakan penulisan log ke file harian; default `false`.
+- Logger berjalan non-blok: request tidak lagi menunggu proses penulisan log ke disk.
 - Dokumen OpenAPI dalam format JSON tersedia di `/doc/sholat`, dan halaman ReDoc siap pakai berada di `/doc`.
+- `DOC_BASE_URL` menentukan basis URL yang dipakai pada daftar server OpenAPI dan contoh `curl` otomatis di ReDoc.
+
+## Cache & Lingkungan
+- `APP_ENV` menentukan perilaku cache; nilai default `development` menonaktifkan cache untuk mempermudah debugging.
+- Atur `APP_ENV=production` untuk mengaktifkan cache in-memory pada pencarian sholat dan jadwal bulanan, sehingga respon lebih cepat pada lingkungan produksi.
 
 ## Endpoint Utama
 - `GET /sholat/kota/all`, `/sholat/kota/semua`, `/sholat/kabkota/all`, `/sholat/kabkota/semua` – daftar seluruh lokasi.
