@@ -126,6 +126,12 @@ app.get(
       },
     }),
 );
+app.get("/", (c) =>
+  c.json({
+    status: true,
+    message: "Selamat datang di api.myquran.com versi 3",
+    data: ["baca /doc untuk mendapatkan cara penggunaannya"],
+  }));
 
 registerSholatRoutes(app, {
   sholatService,
