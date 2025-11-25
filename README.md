@@ -116,7 +116,7 @@ Jika data tidak ditemukan akan mengembalikan:
 ```json
 {
   "status": false,
-  "message": "not found or anything .."
+  "message": "Data tidak ditemukan."
 }
 ```
 
@@ -163,10 +163,10 @@ Contoh respons `/cal/today`:
 Dokumentasi tersedia:
 
 - Akses `/doc` untuk informasi web base API Muslim v3 ini.
-- Akses `GET /doc/apimuslim` untuk mendapatkan spesifikasi OpenAPI (JSON) yang
-  dapat diimpor ke Postman/Insomnia atau generator klien lainnya.
+- Akses `GET /doc/apimuslim` untuk mendapatkan spesifikasi OpenAPI (`JSON`) yang
+  dapat diimpor ke [Postman](https://www.postman.com)/[Insomnia](https://insomnia.rest/) atau generator klien lainnya.
 
 ## Kontak
-
+Saran ide dan pertanyaan dapat melalui kontak:
 - Email: banghasan@gmail.com
 - Telegram: [bangHasan](https://t.me/hasanudinhs)
