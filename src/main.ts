@@ -15,17 +15,11 @@ import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
 
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
-const redocScriptFile = new URL(
-  "./static/redoc.standalone.js",
-  import.meta.url,
-);
+const redocScriptFile = new URL("./static/redoc.standalone.js", import.meta.url);
 const redocScriptBytes = await Deno.readFile(redocScriptFile);
 const myQuranLogoFile = new URL("./static/api-myquran.png", import.meta.url);
 const myQuranLogoBytes = await Deno.readFile(myQuranLogoFile);
-const appleTouchIconFile = new URL(
-  "./static/apple-touch-icon.png",
-  import.meta.url,
-);
+const appleTouchIconFile = new URL("./static/apple-touch-icon.png", import.meta.url);
 const appleTouchIconBytes = await Deno.readFile(appleTouchIconFile);
 const favicon32File = new URL("./static/favicon-32x32.png", import.meta.url);
 const favicon32Bytes = await Deno.readFile(favicon32File);
@@ -40,9 +34,7 @@ const sholatService = createSholatService({
   data: sholatData,
 });
 const jadwalService = createJadwalService(config);
-const geocodeService = config.mapsCoApiKey
-  ? createGeocodeService(config.mapsCoApiKey)
-  : null;
+const geocodeService = config.mapsCoApiKey ? createGeocodeService(config.mapsCoApiKey) : null;
 
 // Load documentation HTML template
 const docTemplateFile = new URL("./static/doc.html", import.meta.url);
@@ -131,7 +123,8 @@ app.get("/", (c) =>
     status: true,
     message: "Selamat datang di api.myquran.com versi 3",
     data: ["baca /doc untuk mendapatkan cara penggunaannya"],
-  }));
+  }),
+);
 
 registerSholatRoutes(app, {
   sholatService,
@@ -152,9 +145,7 @@ registerHealthRoutes({
   config,
 });
 
-app.notFound((c) =>
-  c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
-);
+app.notFound((c) => c.json({ status: false, message: "Data tidak ditemukan .." }, 404));
 app.onError((err, c) => {
   console.error(err);
   return c.json({ status: false, message: "internal server error" }, 500);
@@ -170,9 +161,14 @@ const tagDefinitions = [
     name: "Kalender",
     description: `Endpoint konversi kalender CE dan Hijriyah.
 
-CE adalah Common Era. Nama lain dari penanggalan Masehi. Istilah ini adalah alternatif modern dan netral secara agama untuk Anno Domini (AD), digunakan terutama dalam konteks akademik dan ilmu pengetahuan.
-
-Nama lainnya adalah Syamsiah, Syamsiah atau Tahun Matahari. Penamaan ini mengacu pada dasar perhitungannya, yaitu pergerakan bumi mengelilingi matahari (revolusi bumi), berlawanan dengan Kalender Hijriah yang berdasarkan pergerakan bulan (Komariah)`,
+**CE** adalah *Common Era*. Nama lain dari penanggalan Masehi. Istilah ini adalah alternatif modern dan netral secara agama untuk **Anno Domini** (AD), digunakan terutama dalam konteks akademik dan ilmu pengetahuan.
+ ‎
+Nama lainnya adalah **Syamsiah**, *Syamsiah* atau *Tahun Matahari*. Penamaan ini mengacu pada dasar perhitungannya, yaitu pada matahari, berlawanan dengan Kalender Hijriah yang berdasarkan pergerakan bulan (Komariah)
+ ‎
+Pilihan metode yang dapat dipilih:
+- \`standar\` (default)
+- \`islamic-umalqura\`
+- \`islamic-civil\``,
   },
   {
     name: "Qibla",
@@ -181,8 +177,7 @@ Nama lainnya adalah Syamsiah, Syamsiah atau Tahun Matahari. Penamaan ini mengacu
   },
   {
     name: "Tools",
-    description:
-      "Beragam alat bantu seperti deteksi IP, geocode, dan health check API.",
+    description: "Beragam alat bantu seperti deteksi IP, geocode, dan health check API.",
   },
 ];
 
@@ -216,7 +211,6 @@ app.doc("/doc/apimuslim", {
 
 const docHost = config.host === "0.0.0.0" ? "localhost" : config.host;
 console.log(`Listening on http://${docHost}:${config.port}`);
-Deno.serve(
-  { hostname: config.host, port: config.port },
-  (request, connInfo) => app.fetch(request, { connInfo }),
+Deno.serve({ hostname: config.host, port: config.port }, (request, connInfo) =>
+  app.fetch(request, { connInfo }),
 );
