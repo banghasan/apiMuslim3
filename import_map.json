@@ -6,6 +6,7 @@
     "@hono/zod-openapi": "npm:@hono/zod-openapi@^1.1.5",
     "hono": "npm:hono@^4.10.6",
     "hono/logger": "npm:hono@^4.10.6/logger",
+    "adhan": "npm:adhan@4.4.3",
     "~/": "./src/"
   }
 }

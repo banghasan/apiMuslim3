@@ -58,7 +58,7 @@ Deno.test("geocode requests are processed sequentially", async () => {
 });
 
 Deno.test("geocode service rejects when queue limit is exceeded", async () => {
-  const fetchImpl: typeof fetch = async () => createJsonResponse({});
+  const fetchImpl: typeof fetch = () => createJsonResponse({});
   const service = createGeocodeService("queue-key", {
     fetchImpl,
     maxQueue: 0,

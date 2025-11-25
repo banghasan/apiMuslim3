@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertMatch } from "@std/assert";
+import { assert, assertEquals } from "@std/assert";
 import {
   buildCeInfo,
   convertHijriToGregorian,

@@ -101,7 +101,7 @@ registerToolsRoutes({
 });
 
 app.notFound((c) =>
-  c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
+  c.json({ status: false, message: "Data tidak ditemukan .." }, 404),
 );
 app.onError((err, c) => {
   console.error(err);
@@ -122,6 +122,11 @@ CE adalah Common Era. Nama lain dari penanggalan Masehi. Istilah ini adalah alte
 
 Nama lainnya adalah Syamsiah, Syamsiah atau Tahun Matahari. Penamaan ini mengacu pada dasar perhitungannya, yaitu pergerakan bumi mengelilingi matahari (revolusi bumi), berlawanan dengan Kalender Hijriah yang berdasarkan pergerakan bulan (Komariah)`,
   },
+  {
+    name: "Qibla",
+    description:
+      "Endpoint perhitungan arah kiblat berdasarkan koordinat latitude/longitude.",
+  },
   { name: "Tools", description: "Beragam alat bantu (IP, dsb)." },
 ];
 
@@ -137,7 +142,7 @@ app.doc("/doc/apimuslim", {
   "x-tagGroups": [
     {
       name: "API Muslim Indonesia",
-      tags: ["Sholat", "Kalender", "Tools"],
+      tags: ["Sholat", "Kalender", "Qibla", "Tools"],
     },
   ],
   servers: [
@@ -150,7 +155,6 @@ app.doc("/doc/apimuslim", {
 
 const docHost = config.host === "0.0.0.0" ? "localhost" : config.host;
 console.log(`Listening on http://${docHost}:${config.port}`);
-Deno.serve(
-  { hostname: config.host, port: config.port },
-  (request, connInfo) => app.fetch(request, { connInfo }),
+Deno.serve({ hostname: config.host, port: config.port }, (request, connInfo) =>
+  app.fetch(request, { connInfo }),
 );

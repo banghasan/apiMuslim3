@@ -3,7 +3,6 @@ import type { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { buildCodeSamples } from "~/lib/docs.ts";
 import type {
-  JadwalEntry,
   JadwalResponseData,
   JadwalService,
 } from "~/services/jadwal.ts";
@@ -121,8 +120,6 @@ export const registerSholatRoutes = (
   app: OpenAPIHono<AppEnv>,
   { sholatService, jadwalService, docBaseUrl }: SholatRouteDeps,
 ) => {
-  const locations = sholatService.locations;
-  const idIndex = sholatService.idIndex;
   const { safeJadwalTimeZone, getTodayPeriod, loadScheduleFile } =
     jadwalService;
   const allPath = "/sholat/kabkota/semua";

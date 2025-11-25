@@ -1,4 +1,4 @@
-import { Qibla } from "npm:adhan@4.4.3";
+import { Qibla } from "adhan";
 
 export type Coordinate = {
   latitude: number;
