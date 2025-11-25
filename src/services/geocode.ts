@@ -9,9 +9,27 @@ type GeocodeJob = {
 
 export type GeocodeService = ReturnType<typeof createGeocodeService>;
 
-export const createGeocodeService = (apiKey: string) => {
+type GeocodeOptions = {
+  fetchImpl?: typeof fetch;
+  maxQueue?: number;
+  rateDelayMs?: number;
+  scheduleFn?: (cb: () => void, delay: number) => unknown;
+  immediateFlush?: boolean;
+};
+
+export const createGeocodeService = (
+  apiKey: string,
+  options: GeocodeOptions = {},
+) => {
   const queue: GeocodeJob[] = [];
   let active = false;
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const maxQueue = options.maxQueue ?? MAX_QUEUE;
+  const rateDelay = options.rateDelayMs ?? RATE_DELAY_MS;
+  const schedule =
+    options.scheduleFn ??
+    ((cb: () => void, delay: number) => setTimeout(cb, delay));
+  const immediateFlush = options.immediateFlush ?? false;
 
   const fetchGeocode = async (query: string) => {
     const url = new URL("https://geocode.maps.co/search");
@@ -19,8 +37,8 @@ export const createGeocodeService = (apiKey: string) => {
     if (apiKey) {
       url.searchParams.set("api_key", apiKey);
     }
-    const response = await fetch(url, {
-      headers: { "accept": "application/json" },
+    const response = await fetchImpl(url, {
+      headers: { accept: "application/json" },
     });
     if (!response.ok) {
       throw new Error(`Geocode request failed (${response.status})`);
@@ -37,10 +55,15 @@ export const createGeocodeService = (apiKey: string) => {
       .then(job.resolve)
       .catch(job.reject)
       .finally(() => {
-        setTimeout(() => {
+        const release = () => {
           active = false;
           scheduleNext();
-        }, RATE_DELAY_MS);
+        };
+        if (immediateFlush) {
+          release();
+        } else {
+          schedule(release, rateDelay);
+        }
       });
   };
 
@@ -48,7 +71,7 @@ export const createGeocodeService = (apiKey: string) => {
     if (!apiKey) {
       return Promise.reject(new Error("MAPSCO_API_KEY missing"));
     }
-    if (queue.length >= MAX_QUEUE) {
+    if (queue.length >= maxQueue) {
       return Promise.reject(new Error("QUEUE_OVERFLOW"));
     }
     return new Promise((resolve, reject) => {
