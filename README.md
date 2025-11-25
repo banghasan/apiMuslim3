@@ -211,6 +211,29 @@ Contoh respons `/cal/today`:
 }
 ```
 
+## Stuktur Data
+
+Sesuaikan struktur data (tidak termasuk dalam repo ini).
+
+```sh
+data/
+├── log
+├── sholat
+│   └── jadwal
+│       ├── 2025
+│       ├── 2026
+│       ├── 2027
+│       ├── 2028
+│       ├── 2029
+│       ├── 2030
+│       └── ...dst
+├── quran
+├── hadis
+└── etc
+```
+
+Data sholat ada pada repository lain, bisa menggunakan docker.
+
 ## Dokumentasi
 
 Dokumentasi tersedia:
