@@ -15,11 +15,10 @@ import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
 
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
-const redocScriptFile = new URL(
-  "./static/redoc.standalone.js",
-  import.meta.url,
-);
+const redocScriptFile = new URL("./static/redoc.standalone.js", import.meta.url);
 const redocScriptBytes = await Deno.readFile(redocScriptFile);
+const myQuranLogoFile = new URL("./static/api-myquran.png", import.meta.url);
+const myQuranLogoBytes = await Deno.readFile(myQuranLogoFile);
 
 const sholatData = await loadSholatData();
 const sholatService = createSholatService({
@@ -27,9 +26,7 @@ const sholatService = createSholatService({
   data: sholatData,
 });
 const jadwalService = createJadwalService(config);
-const geocodeService = config.mapsCoApiKey
-  ? createGeocodeService(config.mapsCoApiKey)
-  : null;
+const geocodeService = config.mapsCoApiKey ? createGeocodeService(config.mapsCoApiKey) : null;
 
 // Load documentation HTML template
 const docTemplateFile = new URL("./static/doc.html", import.meta.url);
@@ -63,6 +60,16 @@ app.get(
 app.get("/doc", (c) => c.html(redocPage));
 app.get("/doc/", (c) => c.html(redocPage));
 app.get("/doc/index.html", (c) => c.html(redocPage));
+app.get(
+  "/doc/api-myquran.png",
+  () =>
+    new Response(myQuranLogoBytes, {
+      headers: {
+        "content-type": "image/png",
+        "cache-control": "public, max-age=604800",
+      },
+    }),
+);
 
 registerSholatRoutes(app, {
   sholatService,
@@ -83,9 +90,7 @@ registerHealthRoutes({
   config,
 });
 
-app.notFound((c) =>
-  c.json({ status: false, message: "Data tidak ditemukan .." }, 404)
-);
+app.notFound((c) => c.json({ status: false, message: "Data tidak ditemukan .." }, 404));
 app.onError((err, c) => {
   console.error(err);
   return c.json({ status: false, message: "internal server error" }, 500);
@@ -112,8 +117,7 @@ Nama lainnya adalah Syamsiah, Syamsiah atau Tahun Matahari. Penamaan ini mengacu
   },
   {
     name: "Tools",
-    description:
-      "Beragam alat bantu seperti deteksi IP, geocode, dan health check API.",
+    description: "Beragam alat bantu seperti deteksi IP, geocode, dan health check API.",
   },
 ];
 
@@ -147,7 +151,6 @@ app.doc("/doc/apimuslim", {
 
 const docHost = config.host === "0.0.0.0" ? "localhost" : config.host;
 console.log(`Listening on http://${docHost}:${config.port}`);
-Deno.serve(
-  { hostname: config.host, port: config.port },
-  (request, connInfo) => app.fetch(request, { connInfo }),
+Deno.serve({ hostname: config.host, port: config.port }, (request, connInfo) =>
+  app.fetch(request, { connInfo }),
 );

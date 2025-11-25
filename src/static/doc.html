@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="utf-8" />
@@ -8,12 +8,12 @@
       name="description"
       content="Dokumentasi lengkap API Muslim v3 - Jadwal Sholat, Kalender Hijriah, Arah Kiblat, dan Tools lainnya"
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
-    >
+    />
     <style>
       :root {
         color-scheme: light;
@@ -54,7 +54,11 @@
 
       body {
         font-family:
-          "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Inter",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
           sans-serif;
         background: var(--content-bg);
         color: var(--content-text);
@@ -89,6 +93,25 @@
         display: flex;
         align-items: center;
         gap: 16px;
+      }
+
+      .doc-logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .doc-logo img {
+        max-width: 100%;
+        height: auto;
+        display: block;
       }
 
       .doc-brand h1 {
@@ -233,30 +256,39 @@
     <header class="doc-header">
       <div class="doc-header-content">
         <div class="doc-brand">
-          <h1>API Muslim v3</h1>
-          <span class="version">Dokumentasi API</span>
+          <div class="doc-logo">
+            <img src="/doc/api-myquran.png" alt="Logo myQuran" />
+          </div>
+          <div>
+            <h1>API Muslim Indonesia</h1>
+            <span class="version">Dokumentasi API v3</span>
+          </div>
         </div>
         <nav class="doc-nav" aria-label="Navigasi kategori API">
           <a
             href="#tag/Sholat"
             data-tag-link="Sholat"
             title="Lihat dokumentasi API Jadwal Sholat"
-          >🕌 Sholat</a>
+            >🕌 Sholat</a
+          >
           <a
             href="#tag/Kalender"
             data-tag-link="Kalender"
             title="Lihat dokumentasi API Kalender Hijriah"
-          >📅 Kalender</a>
+            >📅 Kalender</a
+          >
           <a
             href="#tag/Qibla"
             data-tag-link="Qibla"
             title="Lihat dokumentasi API Arah Kiblat"
-          >🧭 Qibla</a>
+            >🧭 Qibla</a
+          >
           <a
             href="#tag/Tools"
             data-tag-link="Tools"
             title="Lihat dokumentasi API Tools"
-          >🛠️ Tools</a>
+            >🛠️ Tools</a
+          >
         </nav>
       </div>
     </header>
@@ -278,24 +310,20 @@
 
         // Fungsi untuk menghubungkan link navigasi dengan tag
         const hookTagLinks = () => {
-          document.querySelectorAll("[data-tag-link]").forEach(
-            (link) => {
-              link.addEventListener("click", (event) => {
-                event.preventDefault();
-                const tagName = link.getAttribute("data-tag-link");
-                if (tagName) {
-                  window.location.hash = "tag/" +
-                    encodeURIComponent(tagName);
-                  setTimeout(() => {
-                    const headerHeight =
-                      document.querySelector(".doc-header")
-                        .offsetHeight;
-                    window.scrollBy(0, -headerHeight - 10);
-                  }, 100);
-                }
-              });
-            },
-          );
+          document.querySelectorAll("[data-tag-link]").forEach((link) => {
+            link.addEventListener("click", (event) => {
+              event.preventDefault();
+              const tagName = link.getAttribute("data-tag-link");
+              if (tagName) {
+                window.location.hash = "tag/" + encodeURIComponent(tagName);
+                setTimeout(() => {
+                  const headerHeight =
+                    document.querySelector(".doc-header").offsetHeight;
+                  window.scrollBy(0, -headerHeight - 10);
+                }, 100);
+              }
+            });
+          });
         };
 
         // Event listener untuk tombol cari
@@ -438,8 +466,7 @@
                   },
                   code: {
                     fontSize: "14px",
-                    fontFamily:
-                      '"Fira Code", "Consolas", "Monaco", monospace',
+                    fontFamily: '"Fira Code", "Consolas", "Monaco", monospace',
                     lineHeight: "1.6",
                     fontWeight: "400",
                     color: "#0f172a",
@@ -465,13 +492,15 @@
               },
             },
             container,
-          ).then(() => {
-            console.log("Dokumentasi API berhasil dimuat");
-          }).catch((error) => {
-            console.error("Gagal memuat dokumentasi:", error);
-            document.getElementById("redoc-container").innerText =
-              "Maaf, dokumentasi gagal dimuat. Silakan refresh halaman atau hubungi administrator.";
-          });
+          )
+            .then(() => {
+              console.log("Dokumentasi API berhasil dimuat");
+            })
+            .catch((error) => {
+              console.error("Gagal memuat dokumentasi:", error);
+              document.getElementById("redoc-container").innerText =
+                "Maaf, dokumentasi gagal dimuat. Silakan refresh halaman atau hubungi administrator.";
+            });
         } else {
           document.getElementById("redoc-container").innerText =
             "Maaf, library dokumentasi tidak tersedia. Silakan hubungi administrator.";
