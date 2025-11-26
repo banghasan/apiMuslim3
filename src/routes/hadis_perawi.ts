@@ -159,7 +159,14 @@ export const registerHadisPerawiRoutes = ({
       last_update: hadisPerawiConfig.lastUpdate,
       sumber: hadisPerawiConfig.sumber,
     };
-    return c.json(successResponse(data, "Daftar Semua Perawi"), 200);
+    return c.json(
+      {
+        status: true as const,
+        message: "Daftar Semua Perawi" as const,
+        data,
+      },
+      200,
+    );
   });
 
   const detailRoute = createRoute({
