@@ -15,6 +15,8 @@ export type AppConfig = {
   logWrite: boolean;
   enableCache: boolean;
   mapsCoApiKey: string;
+  meiliHost: string;
+  meiliApiKey: string;
 };
 
 export const loadConfig = (): AppConfig => {
@@ -29,6 +31,8 @@ export const loadConfig = (): AppConfig => {
   const logWrite = parseBoolean(Deno.env.get("LOG_WRITE"), false);
   const enableCache = env === "production";
   const mapsCoApiKey = Deno.env.get("MAPSCO_API_KEY") ?? "";
+  const meiliHost = Deno.env.get("MEILISEARCH_HOST") ?? "";
+  const meiliApiKey = Deno.env.get("MEILISEARCH_API_KEY") ?? "";
   return {
     env,
     host,
@@ -39,6 +43,8 @@ export const loadConfig = (): AppConfig => {
     logWrite,
     enableCache,
     mapsCoApiKey,
+    meiliHost,
+    meiliApiKey,
   };
 };
 

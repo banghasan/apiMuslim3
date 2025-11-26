@@ -16,6 +16,7 @@ import { createSholatService, loadSholatData } from "~/services/sholat.ts";
 import { createStatsService } from "~/services/stats.ts";
 import { createHadisEncService } from "~/services/hadis_enc.ts";
 import { createHadisPerawiService } from "~/services/hadis_perawi.ts";
+import { createHadisSearchService } from "~/services/hadis_search.ts";
 import type { AppEnv } from "~/types.ts";
 import { registerHealthRoutes } from "~/routes/health.ts";
 import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
@@ -71,6 +72,12 @@ const hadisEncDbFile = new URL(
 );
 const hadisEncDbPath = decodeURIComponent(hadisEncDbFile.pathname);
 const hadisEncService = createHadisEncService(hadisEncDbPath);
+const hadisSearchService = config.meiliHost
+  ? createHadisSearchService({
+    host: config.meiliHost,
+    apiKey: config.meiliApiKey,
+  })
+  : null;
 
 // Load documentation HTML template
 const docTemplateFile = new URL("./static/doc.html", import.meta.url);
@@ -202,6 +209,7 @@ registerHadisEncRoutes({
   app,
   docBaseUrl: config.docBaseUrl,
   hadisEncService,
+  hadisSearchService,
 });
 registerHadisPerawiRoutes({
   app,

@@ -1,16 +1,19 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
+import type { Context } from "hono";
 import { buildCodeSamples } from "~/lib/docs.ts";
 import type {
   HadisEncExploreResult,
   HadisEncService,
 } from "~/services/hadis_enc.ts";
+import type { HadisSearchService } from "~/services/hadis_search.ts";
 import type { AppEnv } from "~/types.ts";
 import { hadisEncConfig } from "~/config/hadis_enc.ts";
 
 type RegisterHadisEncDeps = {
   app: OpenAPIHono<AppEnv>;
   hadisEncService: HadisEncService;
+  hadisSearchService?: HadisSearchService | null;
   docBaseUrl: string;
 };
 
@@ -106,9 +109,76 @@ const exploreQuerySchema = z.object({
   }),
 });
 
+const searchQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1).openapi({
+    example: 1,
+    description: "Nomor halaman (mulai dari 1).",
+  }),
+  limit: z.coerce.number().int().min(1).max(20).default(10).openapi({
+    example: 10,
+    description: "Jumlah hadis per halaman. Maksimal 20.",
+  }),
+});
+
+const hadisEncSearchHitSchema = z
+  .object({
+    id: z.number().int().openapi({ example: 2750 }),
+    text: z.string().openapi({
+      example: "Hadis bahasa Indonesia hasil pencarian.",
+    }),
+  })
+  .openapi("HadisEncSearchHit");
+
+const hadisEncSearchResponseSchema = z
+  .object({
+    status: z.literal(true).openapi({ example: true }),
+    message: z.string().openapi({ example: "success" }),
+    data: z.object({
+      keyword: z.string().openapi({ example: "shalat khusyuk" }),
+      paging: pagingSchema,
+      hadis: z.array(hadisEncSearchHitSchema),
+    }),
+  })
+  .openapi("HadisEncSearchResponse");
+
 const parseHadisId = (value: string): number | null => {
   const parsed = Number.parseInt(value, 10);
   return Number.isNaN(parsed) ? null : parsed;
+};
+
+const normalizeSearchKeyword = (value: string) => {
+  const collapsed = value.replace(/\s+/g, " ").trim();
+  if (!collapsed) {
+    return { ok: false as const, message: "Keyword tidak boleh kosong." };
+  }
+  if (collapsed.length < 4) {
+    return {
+      ok: false as const,
+      message: "Keyword minimal 4 karakter.",
+    };
+  }
+  return { ok: true as const, value: collapsed };
+};
+
+const buildPagingInfo = (total: number, page: number, limit: number) => {
+  const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
+  const normalizedPage = totalPages === 0
+    ? 0
+    : Math.min(Math.max(page, 1), totalPages);
+  return {
+    current: normalizedPage,
+    per_page: limit,
+    total_data: total,
+    total_pages: totalPages,
+    has_prev: normalizedPage > 1,
+    has_next: totalPages > 0 && normalizedPage < totalPages,
+    next_page: totalPages > 0 && normalizedPage < totalPages
+      ? normalizedPage + 1
+      : null,
+    prev_page: normalizedPage > 1 ? normalizedPage - 1 : null,
+    first_page: totalPages > 0 ? 1 : null,
+    last_page: totalPages > 0 ? totalPages : null,
+  };
 };
 
 const successResponse = <T>(data: T) => ({
@@ -151,6 +221,7 @@ const hadisEncMetaResponseSchema = z
 export const registerHadisEncRoutes = ({
   app,
   hadisEncService,
+  hadisSearchService = null,
   docBaseUrl,
 }: RegisterHadisEncDeps) => {
   const metaRoute = createRoute({
@@ -372,5 +443,109 @@ export const registerHadisEncRoutes = ({
     const { page, limit } = c.req.valid("query");
     const data: HadisEncExploreResult = hadisEncService.explore(page, limit);
     return c.json(successResponse(data), 200);
+  });
+
+  const searchRoute = createRoute({
+    method: "get",
+    path: "/hadis/enc/cari/{keyword}",
+    summary: "Pencarian Hadis",
+    description:
+      "Mencari hadis berdasarkan kata kunci menggunakan layanan Meilisearch.",
+    tags: ["Hadis"],
+    request: {
+      params: z.object({
+        keyword: z.string().openapi({
+          example: "shalat khusyuk",
+          description: "Kata kunci minimal 4 karakter.",
+        }),
+      }),
+      query: searchQuerySchema,
+    },
+    responses: {
+      200: {
+        description: "Hasil pencarian tersedia.",
+        content: {
+          "application/json": { schema: hadisEncSearchResponseSchema },
+        },
+      },
+      400: {
+        description: "Keyword tidak valid.",
+        content: { "application/json": { schema: hadisErrorSchema } },
+      },
+      503: {
+        description: "Layanan pencarian tidak tersedia.",
+        content: { "application/json": { schema: hadisErrorSchema } },
+      },
+    },
+    "x-codeSamples": buildCodeSamples(
+      docBaseUrl,
+      "GET",
+      "/hadis/enc/cari/shalat%20khusyuk?page=1&limit=10",
+    ),
+  });
+
+  const executeSearch = async (
+    c: Context<AppEnv>,
+    keyword: string,
+    page: number,
+    limit: number,
+  ) => {
+    if (!hadisSearchService) {
+      return c.json(
+        errorResponse("Layanan pencarian hadis tidak tersedia."),
+        503,
+      );
+    }
+    try {
+      const result = await hadisSearchService.search(keyword, page, limit);
+      const paging = buildPagingInfo(result.total, page, limit);
+      return c.json(
+        successResponse({
+          keyword,
+          paging,
+          hadis: result.hits.map((hit) => ({
+            id: hit.id,
+            text: hit.text,
+          })),
+        }),
+        200,
+      );
+    } catch (error) {
+      console.error("Hadis search error", error);
+      return c.json(errorResponse("Gagal memproses pencarian hadis."), 502);
+    }
+  };
+
+  app.openapi(searchRoute, (c) => {
+    const { keyword } = c.req.valid("param");
+    const { page, limit } = c.req.valid("query");
+    const normalized = normalizeSearchKeyword(keyword);
+    if (!normalized.ok) {
+      return c.json(errorResponse(normalized.message), 400);
+    }
+    return executeSearch(c, normalized.value, page, limit);
+  });
+
+  app.get("/hadis/enc/search/:keyword", (c) => {
+    const rawKeyword = c.req.param("keyword") ?? "";
+    const url = new URL(c.req.url);
+    const queryInput = {
+      page: url.searchParams.get("page") ?? undefined,
+      limit: url.searchParams.get("limit") ?? undefined,
+    };
+    const query = searchQuerySchema.safeParse(queryInput);
+    if (!query.success) {
+      return c.json(errorResponse("Parameter pencarian tidak valid."), 400);
+    }
+    const normalized = normalizeSearchKeyword(rawKeyword);
+    if (!normalized.ok) {
+      return c.json(errorResponse(normalized.message), 400);
+    }
+    return executeSearch(
+      c,
+      normalized.value,
+      query.data.page,
+      query.data.limit,
+    );
   });
 };

@@ -41,5 +41,13 @@ export const rateLimitConfig: RateLimitConfig = {
       methods: ["GET"],
       pathPattern: /^\/hadis\/enc\/explore$/i,
     },
+    {
+      id: "hadis-enc-search",
+      windowMs: 1000,
+      limit: 1,
+      label: "pencarian hadis",
+      methods: ["GET"],
+      pathPattern: /^\/hadis\/enc\/(cari|search)\/[^/]+$/i,
+    },
   ],
 };

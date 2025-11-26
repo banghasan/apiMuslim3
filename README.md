@@ -243,6 +243,17 @@ Dokumentasi tersedia:
   dapat diimpor ke [Postman](https://www.postman.com) atau
   [Insomnia](https://insomnia.rest/) atau generator klien lainnya.
 
+## Konfigurasi Lingkungan
+
+Beberapa fitur membutuhkan konfigurasi tambahan melalui environment variable:
+
+```sh
+# Atur endpoint dan API key Meilisearch agar pencarian hadis (/hadis/enc/cari)
+# dapat terhubung
+export MEILISEARCH_HOST="https://meili.example.com"
+export MEILISEARCH_API_KEY="your_api_key_here"
+```
+
 ## Kontak
 
 Saran, ide dan pertanyaan dapat melalui kontak:
