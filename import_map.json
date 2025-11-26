@@ -6,6 +6,7 @@
     "@std/testing/time": "jsr:@std/testing@^0.225.2/time",
     "@hono/zod-openapi": "npm:@hono/zod-openapi@^1.1.5",
     "hono": "npm:hono@^4.10.6",
+    "hono/cors": "npm:hono@^4.10.6/cors",
     "hono/logger": "npm:hono@^4.10.6/logger",
     "adhan": "npm:adhan@4.4.3",
     "sqlite": "https://deno.land/x/sqlite@v3.9.1/mod.ts",
