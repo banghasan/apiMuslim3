@@ -1,7 +1,10 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { buildCodeSamples } from "~/lib/docs.ts";
-import type { HadisPerawiService, PerawiBrowseResult } from "~/services/hadis_perawi.ts";
+import type {
+  HadisPerawiService,
+  PerawiBrowseResult,
+} from "~/services/hadis_perawi.ts";
 import type { AppEnv } from "~/types.ts";
 import { hadisPerawiConfig } from "~/config/hadis_perawi.ts";
 
@@ -53,7 +56,8 @@ const perawiSummaryResponseSchema = z
       total: z.number().int().openapi({ example: 1234 }),
       last_update: z.string().openapi({ example: "26 November 2025" }),
       sumber: z.string().openapi({
-        example: "https://huggingface.co/datasets/Mahadih534/Islamic-Scholars-data",
+        example:
+          "https://huggingface.co/datasets/Mahadih534/Islamic-Scholars-data",
       }),
     }),
   })
@@ -162,7 +166,8 @@ export const registerHadisPerawiRoutes = ({
     method: "get",
     path: "/hadist/perawi/id/{id}",
     summary: "Perawi Detail",
-    description: "Menampilkan detail perawi dari database rawi berdasarkan `scholar_indx`.",
+    description:
+      "Menampilkan detail perawi dari database rawi berdasarkan `scholar_indx`.",
     tags: ["Hadis"],
     request: {
       params: z.object({
@@ -183,7 +188,11 @@ export const registerHadisPerawiRoutes = ({
         content: { "application/json": { schema: perawiErrorSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadist/perawi/id/101"),
+    "x-codeSamples": buildCodeSamples(
+      docBaseUrl,
+      "GET",
+      "/hadist/perawi/id/101",
+    ),
   });
 
   app.openapi(detailRoute, (c) => {
@@ -215,7 +224,11 @@ export const registerHadisPerawiRoutes = ({
         content: { "application/json": { schema: perawiBrowseResponseSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadist/perawi/browse?page=1&limit=10"),
+    "x-codeSamples": buildCodeSamples(
+      docBaseUrl,
+      "GET",
+      "/hadist/perawi/browse?page=1&limit=10",
+    ),
   });
 
   app.openapi(browseRoute, (c) => {
