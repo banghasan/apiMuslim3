@@ -77,7 +77,28 @@ export const registerStatsRoutes = (
   app.openapi(statsCurrentRoute, (c) => {
     const year = new Date().getFullYear();
     const data = statsService.getYearDetail(year);
-    return c.json({ status: true, message: "success", data });
+    return c.json({ status: true, message: "success", data }, 200);
+  });
+
+  const statsAllRoute = createRoute({
+    method: "get",
+    path: "/stats/all",
+    summary: "Stats Tahunan",
+    description:
+      "Mengembalikan total hit grup berdasarkan tahun untuk seluruh API.",
+    tags: ["Stats"],
+    responses: {
+      200: {
+        description: "Statistik tersedia.",
+        content: { "application/json": { schema: statsListResponseSchema } },
+      },
+    },
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/stats/all"),
+  });
+
+  app.openapi(statsAllRoute, (c) => {
+    const data = statsService.getYearlyStats();
+    return c.json({ status: true, message: "success", data }, 200);
   });
 
   const statsDetailRoute = createRoute({
@@ -115,27 +136,6 @@ export const registerStatsRoutes = (
       return c.json({ status: false, message: "Tahun tidak valid." }, 400);
     }
     const data = statsService.getYearDetail(year);
-    return c.json({ status: true, message: "success", data });
-  });
-
-  const statsAllRoute = createRoute({
-    method: "get",
-    path: "/stats/all",
-    summary: "Stats Tahunan",
-    description:
-      "Mengembalikan total hit grup berdasarkan tahun untuk seluruh API.",
-    tags: ["Stats"],
-    responses: {
-      200: {
-        description: "Statistik tersedia.",
-        content: { "application/json": { schema: statsListResponseSchema } },
-      },
-    },
-    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/stats/all"),
-  });
-
-  app.openapi(statsAllRoute, (c) => {
-    const data = statsService.getYearlyStats();
-    return c.json({ status: true, message: "success", data });
+    return c.json({ status: true, message: "success", data }, 200);
   });
 };

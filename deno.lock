@@ -2,9 +2,12 @@
   "version": "5",
   "specifiers": {
     "jsr:@std/assert@~0.225.3": "0.225.3",
+    "jsr:@std/async@^1.0.0-rc.2": "1.0.15",
+    "jsr:@std/data-structures@^1.0.0-rc.1": "1.0.9",
     "jsr:@std/dotenv@*": "0.225.5",
     "jsr:@std/dotenv@~0.225.2": "0.225.5",
     "jsr:@std/internal@1": "1.0.12",
+    "jsr:@std/testing@~0.225.2": "0.225.3",
     "npm:@hono/zod-openapi@*": "1.1.5_hono@4.10.6_zod@4.1.12",
     "npm:@hono/zod-openapi@^1.1.5": "1.1.5_hono@4.10.6_zod@4.1.12",
     "npm:adhan@*": "4.4.3",
@@ -20,11 +23,24 @@
         "jsr:@std/internal"
       ]
     },
+    "@std/async@1.0.15": {
+      "integrity": "55d1d9d04f99403fe5730ab16bdcc3c47f658a6bf054cafb38a50f046238116e"
+    },
+    "@std/data-structures@1.0.9": {
+      "integrity": "033d6e17e64bf1f84a614e647c1b015fa2576ae3312305821e1a4cb20674bb4d"
+    },
     "@std/dotenv@0.225.5": {
       "integrity": "9ce6f9d0ec3311f74a32535aa1b8c62ed88b1ab91b7f0815797d77a6f60c922f"
     },
     "@std/internal@1.0.12": {
       "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
+    },
+    "@std/testing@0.225.3": {
+      "integrity": "348c24d0479d44ab3dbb4f26170f242e19f24051b45935d4a9e7ca0ab7e37780",
+      "dependencies": [
+        "jsr:@std/async",
+        "jsr:@std/data-structures"
+      ]
     }
   },
   "npm": {
@@ -100,6 +116,7 @@
     "dependencies": [
       "jsr:@std/assert@~0.225.3",
       "jsr:@std/dotenv@~0.225.2",
+      "jsr:@std/testing@~0.225.2",
       "npm:@hono/zod-openapi@^1.1.5",
       "npm:adhan@4.4.3",
       "npm:hono@^4.10.6"
