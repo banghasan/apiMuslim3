@@ -8,10 +8,12 @@ import { registerQiblaRoutes } from "~/routes/qibla.ts";
 import { registerToolsRoutes } from "~/routes/tools.ts";
 import { registerSholatRoutes } from "~/routes/sholat.ts";
 import { registerStatsRoutes } from "~/routes/stats.ts";
+import { registerHadisEncRoutes } from "~/routes/hadis_enc.ts";
 import { createGeocodeService } from "~/services/geocode.ts";
 import { createJadwalService } from "~/services/jadwal.ts";
 import { createSholatService, loadSholatData } from "~/services/sholat.ts";
 import { createStatsService } from "~/services/stats.ts";
+import { createHadisEncService } from "~/services/hadis_enc.ts";
 import type { AppEnv } from "~/types.ts";
 import { registerHealthRoutes } from "~/routes/health.ts";
 import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
@@ -51,6 +53,14 @@ await Deno.mkdir(statsDir, { recursive: true });
 const statsDbFile = new URL("../data/stats.db", import.meta.url);
 const statsDbPath = decodeURIComponent(statsDbFile.pathname);
 const statsService = createStatsService(statsDbPath);
+const hadisEncDir = new URL("../data/hadis/enc", import.meta.url);
+await Deno.mkdir(hadisEncDir, { recursive: true });
+const hadisEncDbFile = new URL(
+  "../data/hadis/enc/data.sqlite",
+  import.meta.url,
+);
+const hadisEncDbPath = decodeURIComponent(hadisEncDbFile.pathname);
+const hadisEncService = createHadisEncService(hadisEncDbPath);
 
 // Load documentation HTML template
 const docTemplateFile = new URL("./static/doc.html", import.meta.url);
@@ -163,6 +173,11 @@ registerStatsRoutes({
   docBaseUrl: config.docBaseUrl,
   statsService,
 });
+registerHadisEncRoutes({
+  app,
+  docBaseUrl: config.docBaseUrl,
+  hadisEncService,
+});
 registerHealthRoutes({
   app,
   docBaseUrl: config.docBaseUrl,
@@ -188,6 +203,11 @@ const tagDefinitions = [
     Terakhir diupdate pada 25 November 2025
 
 Kolom kota dan kabupaten telah disesuaikan sebagaimana sumber.`,
+  },
+  {
+    name: "Hadis",
+    description:
+      "Ensiklopedia Hadis myQuran dengan navigasi berdasarkan ID, akses acak, serta eksplorasi dengan pagination.",
   },
   {
     name: "Kalender",
@@ -240,7 +260,7 @@ Saran, ide, diskusi dan komunikasi dapat melalui:
   "x-tagGroups": [
     {
       name: "API Muslim Indonesia",
-      tags: ["Sholat", "Kalender", "Qibla", "Tools", "Stats"],
+      tags: ["Sholat", "Hadis", "Kalender", "Qibla", "Tools", "Stats"],
     },
   ],
   servers: [

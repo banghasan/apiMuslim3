@@ -33,5 +33,13 @@ export const rateLimitConfig: RateLimitConfig = {
       methods: ["GET"],
       pathPattern: /^\/sholat\/jadwal\/[^/]+\/\d{4}-\d{2}$/i,
     },
+    {
+      id: "hadis-enc-explore",
+      windowMs: ONE_MINUTE,
+      limit: 10,
+      label: "eksplorasi hadis",
+      methods: ["GET"],
+      pathPattern: /^\/hadis\/enc\/explore$/i,
+    },
   ],
 };
