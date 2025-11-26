@@ -3,9 +3,13 @@ export type IpDetectionSource = {
   remoteAddr?: Deno.NetAddr | Deno.UnixAddr;
 };
 
-export type IpDetectionResult = {
+export type IpDetail = {
   ip: string;
   source: string;
+};
+
+export type IpDetectionResult = IpDetail & {
+  details: IpDetail[];
 };
 
 const HEADER_PRIORITY = [
@@ -16,22 +20,30 @@ const HEADER_PRIORITY = [
   "x-forwarded-for",
 ];
 
-export const resolveClientIp = (
-  source: IpDetectionSource,
-): IpDetectionResult | null => {
+export const resolveClientIp = (source: IpDetectionSource): IpDetectionResult | null => {
+  const details: IpDetail[] = [];
+  let primary: IpDetail | null = null;
   for (const header of HEADER_PRIORITY) {
     const value = source.header(header);
     if (!value) continue;
-    const first = header === "x-forwarded-for"
-      ? value.split(",")[0].trim()
-      : value.trim();
-    if (first) {
-      return { ip: first, source: header };
+    const first = header === "x-forwarded-for" ? value.split(",")[0].trim() : value.trim();
+    if (!first) continue;
+    const detail = { ip: first, source: header };
+    details.push(detail);
+    if (!primary) {
+      primary = detail;
     }
   }
   const addr = source.remoteAddr;
   if (addr && typeof addr === "object" && "hostname" in addr && addr.hostname) {
-    return { ip: addr.hostname, source: "remote" };
+    const remoteDetail: IpDetail = { ip: addr.hostname, source: "remote-addr" };
+    details.push(remoteDetail);
+    if (!primary) {
+      primary = remoteDetail;
+    }
   }
-  return null;
+  if (!primary) {
+    return null;
+  }
+  return { ...primary, details };
 };
