@@ -52,7 +52,9 @@ const geocodeEntrySchema = z
     lat: z.string().openapi({ example: "-6.1702779" }),
     lon: z.string().openapi({ example: "106.8310435" }),
     name: z.string().openapi({ example: "Masjid Istiqlal" }).optional(),
-    display_name: z.string().openapi({ example: "Masjid Istiqlal, Jalan KH Hasyim Asyari ..." }),
+    display_name: z.string().openapi({
+      example: "Masjid Istiqlal, Jalan KH Hasyim Asyari ...",
+    }),
     address: z.record(z.string(), z.string()).optional(),
     extratags: z.record(z.string(), z.string()).optional(),
     boundingbox: z
@@ -87,7 +89,9 @@ type RegisterToolsDeps = {
   geocodeService: GeocodeService | null;
 };
 
-export const registerToolsRoutes = ({ app, docBaseUrl, geocodeService }: RegisterToolsDeps) => {
+export const registerToolsRoutes = (
+  { app, docBaseUrl, geocodeService }: RegisterToolsDeps,
+) => {
   const ipRoute = createRoute({
     method: "get",
     path: "/tools/ip",
@@ -111,10 +115,16 @@ export const registerToolsRoutes = ({ app, docBaseUrl, geocodeService }: Registe
   app.openapi(ipRoute, (c) => {
     const info = resolveClientIp({
       header: (name) => c.req.header(name) ?? undefined,
-      remoteAddr: c.env?.connInfo?.remoteAddr as Deno.NetAddr | Deno.UnixAddr | undefined,
+      remoteAddr: c.env?.connInfo?.remoteAddr as
+        | Deno.NetAddr
+        | Deno.UnixAddr
+        | undefined,
     });
     if (!info) {
-      return c.json({ status: false, message: "Tidak dapat menentukan IP." }, 400);
+      return c.json(
+        { status: false, message: "Tidak dapat menentukan IP." },
+        400,
+      );
     }
     const agent = c.req.header("user-agent") ?? "unknown";
     return c.json({
@@ -168,14 +178,20 @@ export const registerToolsRoutes = ({ app, docBaseUrl, geocodeService }: Registe
   app.openapi(geocodeRoute, async (c) => {
     const body = c.req.valid("json");
     if (!geocodeService) {
-      return c.json({ status: false, message: "Layanan geocode tidak tersedia." }, 500);
+      return c.json({
+        status: false,
+        message: "Layanan geocode tidak tersedia.",
+      }, 500);
     }
     try {
       const payload = await geocodeService.enqueue(body.query);
       const results = Array.isArray(payload) ? payload : [];
       const normalized = normalizeGeocodeEntry(results[0]);
       if (!normalized) {
-        return c.json({ status: false, message: "Lokasi tidak ditemukan." }, 400);
+        return c.json(
+          { status: false, message: "Lokasi tidak ditemukan." },
+          400,
+        );
       }
       return c.json({ status: true, message: "success", data: normalized });
     } catch (error) {
@@ -188,17 +204,27 @@ export const registerToolsRoutes = ({ app, docBaseUrl, geocodeService }: Registe
           400,
         );
       }
-      if (error instanceof Error && error.message === "MAPSCO_API_KEY missing") {
-        return c.json({ status: false, message: "MAPSCO_API_KEY tidak tersedia." }, 500);
+      if (
+        error instanceof Error && error.message === "MAPSCO_API_KEY missing"
+      ) {
+        return c.json({
+          status: false,
+          message: "MAPSCO_API_KEY tidak tersedia.",
+        }, 500);
       }
       console.error("Geocode error", error);
-      return c.json({ status: false, message: "Gagal memproses permintaan geocode." }, 400);
+      return c.json({
+        status: false,
+        message: "Gagal memproses permintaan geocode.",
+      }, 400);
     }
   });
 };
 type GeocodeEntry = z.infer<typeof geocodeEntrySchema>;
 
-const normalizeRecord = (value: unknown): Record<string, string> | undefined => {
+const normalizeRecord = (
+  value: unknown,
+): Record<string, string> | undefined => {
   if (!value || typeof value !== "object") return undefined;
   const output: Record<string, string> = {};
   for (const [key, val] of Object.entries(value)) {
@@ -225,8 +251,12 @@ const normalizeGeocodeEntry = (value: unknown): GeocodeEntry | null => {
   const type = typeof raw.type === "string" ? raw.type : "";
   const lat = typeof raw.lat === "string" ? raw.lat : String(raw.lat ?? "");
   const lon = typeof raw.lon === "string" ? raw.lon : String(raw.lon ?? "");
-  const displayName = typeof raw.display_name === "string" ? raw.display_name : "";
-  if (!Number.isFinite(placeId) || !clazz || !type || !lat || !lon || !displayName) {
+  const displayName = typeof raw.display_name === "string"
+    ? raw.display_name
+    : "";
+  if (
+    !Number.isFinite(placeId) || !clazz || !type || !lat || !lon || !displayName
+  ) {
     return null;
   }
   return {

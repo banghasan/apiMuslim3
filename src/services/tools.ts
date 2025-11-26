@@ -20,13 +20,17 @@ const HEADER_PRIORITY = [
   "x-forwarded-for",
 ];
 
-export const resolveClientIp = (source: IpDetectionSource): IpDetectionResult | null => {
+export const resolveClientIp = (
+  source: IpDetectionSource,
+): IpDetectionResult | null => {
   const details: IpDetail[] = [];
   let primary: IpDetail | null = null;
   for (const header of HEADER_PRIORITY) {
     const value = source.header(header);
     if (!value) continue;
-    const first = header === "x-forwarded-for" ? value.split(",")[0].trim() : value.trim();
+    const first = header === "x-forwarded-for"
+      ? value.split(",")[0].trim()
+      : value.trim();
     if (!first) continue;
     const detail = { ip: first, source: header };
     details.push(detail);
