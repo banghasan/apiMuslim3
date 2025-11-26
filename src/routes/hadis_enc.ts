@@ -1,10 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { buildCodeSamples } from "~/lib/docs.ts";
-import type {
-  HadisEncExploreResult,
-  HadisEncService,
-} from "~/services/hadis_enc.ts";
+import type { HadisEncExploreResult, HadisEncService } from "~/services/hadis_enc.ts";
 import type { AppEnv } from "~/types.ts";
 import { hadisEncConfig } from "~/config/hadis_enc.ts";
 
@@ -111,11 +108,16 @@ const parseHadisId = (value: string): number | null => {
   return Number.isNaN(parsed) ? null : parsed;
 };
 
-const successResponse = (data: unknown) =>
-  ({ status: true, message: "success", data }) as const;
+const successResponse = <T>(data: T) => ({
+  status: true as const,
+  message: "success",
+  data,
+});
 
-const errorResponse = (message: string) =>
-  ({ status: false, message }) as const;
+const errorResponse = (message: string) => ({
+  status: false as const,
+  message,
+});
 
 const hadisEncMetaSchema = z
   .object({
@@ -201,11 +203,7 @@ export const registerHadisEncRoutes = ({
         content: { "application/json": { schema: hadisErrorSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(
-      docBaseUrl,
-      "GET",
-      "/hadis/enc/show/2750",
-    ),
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadis/enc/show/2750"),
   });
 
   app.openapi(showRoute, (c) => {
@@ -225,8 +223,7 @@ export const registerHadisEncRoutes = ({
     method: "get",
     path: "/hadis/enc/next/{id}",
     summary: "Hadis Berikutnya",
-    description:
-      "Menampilkan hadis setelah ID tertentu berdasarkan urutan angka.",
+    description: "Menampilkan hadis setelah ID tertentu berdasarkan urutan angka.",
     tags: ["Hadis"],
     request: {
       params: z.object({
@@ -247,11 +244,7 @@ export const registerHadisEncRoutes = ({
         content: { "application/json": { schema: hadisErrorSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(
-      docBaseUrl,
-      "GET",
-      "/hadis/enc/next/2750",
-    ),
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadis/enc/next/2750"),
   });
 
   app.openapi(nextRoute, (c) => {
@@ -271,8 +264,7 @@ export const registerHadisEncRoutes = ({
     method: "get",
     path: "/hadis/enc/prev/{id}",
     summary: "Hadis Sebelumnya",
-    description:
-      "Menampilkan hadis sebelum ID tertentu berdasarkan urutan angka.",
+    description: "Menampilkan hadis sebelum ID tertentu berdasarkan urutan angka.",
     tags: ["Hadis"],
     request: {
       params: z.object({
@@ -293,11 +285,7 @@ export const registerHadisEncRoutes = ({
         content: { "application/json": { schema: hadisErrorSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(
-      docBaseUrl,
-      "GET",
-      "/hadis/enc/prev/2750",
-    ),
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadis/enc/prev/2750"),
   });
 
   app.openapi(prevRoute, (c) => {
@@ -344,8 +332,7 @@ export const registerHadisEncRoutes = ({
     method: "get",
     path: "/hadis/enc/explore",
     summary: "Eksplorasi Hadis",
-    description:
-      "Menampilkan daftar hadis dengan dukungan pagination (limit maksimal 10).",
+    description: "Menampilkan daftar hadis dengan dukungan pagination (limit maksimal 10).",
     tags: ["Hadis"],
     request: {
       query: exploreQuerySchema,
@@ -356,11 +343,7 @@ export const registerHadisEncRoutes = ({
         content: { "application/json": { schema: hadisExploreResponseSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(
-      docBaseUrl,
-      "GET",
-      "/hadis/enc/explore?page=1&limit=5",
-    ),
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadis/enc/explore?page=1&limit=5"),
   });
 
   app.openapi(exploreRoute, (c) => {
