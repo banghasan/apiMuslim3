@@ -9,11 +9,13 @@ import { registerToolsRoutes } from "~/routes/tools.ts";
 import { registerSholatRoutes } from "~/routes/sholat.ts";
 import { registerStatsRoutes } from "~/routes/stats.ts";
 import { registerHadisEncRoutes } from "~/routes/hadis_enc.ts";
+import { registerHadisPerawiRoutes } from "~/routes/hadis_perawi.ts";
 import { createGeocodeService } from "~/services/geocode.ts";
 import { createJadwalService } from "~/services/jadwal.ts";
 import { createSholatService, loadSholatData } from "~/services/sholat.ts";
 import { createStatsService } from "~/services/stats.ts";
 import { createHadisEncService } from "~/services/hadis_enc.ts";
+import { createHadisPerawiService } from "~/services/hadis_perawi.ts";
 import type { AppEnv } from "~/types.ts";
 import { registerHealthRoutes } from "~/routes/health.ts";
 import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
@@ -40,6 +42,12 @@ const manifestFile = new URL("./static/site.webmanifest", import.meta.url);
 const manifestBytes = await Deno.readFile(manifestFile);
 const docBackgroundFile = new URL("./static/bg.jpg", import.meta.url);
 const docBackgroundBytes = await Deno.readFile(docBackgroundFile);
+const perawiDbFile = new URL(
+  "../data/hadis/rawi/perawi.sqlite",
+  import.meta.url,
+);
+const perawiDbPath = decodeURIComponent(perawiDbFile.pathname);
+const hadisPerawiService = createHadisPerawiService(perawiDbPath);
 
 const sholatData = await loadSholatData();
 const sholatService = createSholatService({
@@ -194,6 +202,11 @@ registerHadisEncRoutes({
   app,
   docBaseUrl: config.docBaseUrl,
   hadisEncService,
+});
+registerHadisPerawiRoutes({
+  app,
+  docBaseUrl: config.docBaseUrl,
+  hadisPerawiService,
 });
 registerHealthRoutes({
   app,
