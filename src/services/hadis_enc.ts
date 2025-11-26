@@ -152,13 +152,9 @@ export const createHadisEncService = (dbPath: string): HadisEncService => {
     const perPage = Math.min(Math.max(limit, 1), 10);
     const requestedPage = page >= 1 ? page : 1;
     const totalData = db.query<[number]>("SELECT COUNT(*) FROM enc")[0][0] ?? 0;
-    const totalPages = totalData === 0
-      ? 0
-      : Math.ceil(totalData / perPage);
+    const totalPages = totalData === 0 ? 0 : Math.ceil(totalData / perPage);
     const maxPage = totalPages === 0 ? 1 : totalPages;
-    const current = totalPages === 0
-      ? 0
-      : Math.min(requestedPage, maxPage);
+    const current = totalPages === 0 ? 0 : Math.min(requestedPage, maxPage);
     const offset = current <= 1 ? 0 : (current - 1) * perPage;
     const rows = db.queryEntries<ListRow>(
       `SELECT
