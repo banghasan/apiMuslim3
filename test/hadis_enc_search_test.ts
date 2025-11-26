@@ -64,7 +64,13 @@ Deno.test("hadis search returns normalized keyword and paging info", async () =>
       calls.push({ keyword, page, limit });
       return Promise.resolve({
         total: 23,
-        hits: [{ id: 2750, text: "Hadis hasil pencarian" }],
+        hits: [
+          {
+            id: 2750,
+            text:
+              "Sholat khusyuk membawa ketenangan hati. Apabila sholat khusyuk dilakukan dengan ikhlas, kiamat terasa dekat.",
+          },
+        ],
       });
     },
   };
@@ -80,6 +86,9 @@ Deno.test("hadis search returns normalized keyword and paging info", async () =>
   assertEquals(body.data.paging.per_page, 5);
   assertEquals(body.data.paging.total_pages, 5);
   assertEquals(body.data.hadis[0].id, 2750);
+  assertEquals(body.data.hadis[0].focus.length > 0, true);
+  const firstFocus = (body.data.hadis[0].focus[0] ?? "").toLowerCase();
+  assertEquals(firstFocus.includes("sholat khusyuk"), true);
   assertEquals(calls, [{ keyword: "sholat khusyuk", page: 2, limit: 5 }]);
 });
 

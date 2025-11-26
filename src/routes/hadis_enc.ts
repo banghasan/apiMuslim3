@@ -2,10 +2,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import type { Context } from "hono";
 import { buildCodeSamples } from "~/lib/docs.ts";
-import type {
-  HadisEncExploreResult,
-  HadisEncService,
-} from "~/services/hadis_enc.ts";
+import type { HadisEncExploreResult, HadisEncService } from "~/services/hadis_enc.ts";
 import type { HadisSearchService } from "~/services/hadis_search.ts";
 import type { AppEnv } from "~/types.ts";
 import { hadisEncConfig } from "~/config/hadis_enc.ts";
@@ -126,6 +123,12 @@ const hadisEncSearchHitSchema = z
     text: z.string().openapi({
       example: "Hadis bahasa Indonesia hasil pencarian.",
     }),
+    focus: z.array(z.string()).openapi({
+      example: [
+        "...Apabila telah dekat waktunya (kiamat), hampir tidak ada mimpi seorang mukmin yang dusta...",
+      ],
+      description: "Potongan kalimat yang memuat kata kunci.",
+    }),
   })
   .openapi("HadisEncSearchHit");
 
@@ -146,6 +149,12 @@ const parseHadisId = (value: string): number | null => {
   return Number.isNaN(parsed) ? null : parsed;
 };
 
+const splitSentences = (text: string) =>
+  text
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+
 const normalizeSearchKeyword = (value: string) => {
   const collapsed = value.replace(/\s+/g, " ").trim();
   if (!collapsed) {
@@ -162,9 +171,7 @@ const normalizeSearchKeyword = (value: string) => {
 
 const buildPagingInfo = (total: number, page: number, limit: number) => {
   const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
-  const normalizedPage = totalPages === 0
-    ? 0
-    : Math.min(Math.max(page, 1), totalPages);
+  const normalizedPage = totalPages === 0 ? 0 : Math.min(Math.max(page, 1), totalPages);
   return {
     current: normalizedPage,
     per_page: limit,
@@ -172,13 +179,47 @@ const buildPagingInfo = (total: number, page: number, limit: number) => {
     total_pages: totalPages,
     has_prev: normalizedPage > 1,
     has_next: totalPages > 0 && normalizedPage < totalPages,
-    next_page: totalPages > 0 && normalizedPage < totalPages
-      ? normalizedPage + 1
-      : null,
+    next_page: totalPages > 0 && normalizedPage < totalPages ? normalizedPage + 1 : null,
     prev_page: normalizedPage > 1 ? normalizedPage - 1 : null,
     first_page: totalPages > 0 ? 1 : null,
     last_page: totalPages > 0 ? totalPages : null,
   };
+};
+
+const buildFocusSnippets = (text: string, keyword: string) => {
+  const normalizedKeyword = keyword.toLowerCase();
+  const sentences = splitSentences(text);
+  const snippets: string[] = [];
+  for (const sentence of sentences) {
+    if (!sentence.toLowerCase().includes(normalizedKeyword)) continue;
+    const words = sentence.split(/\s+/);
+    if (words.length <= 15) {
+      snippets.push(sentence);
+      continue;
+    }
+    const idx = words.findIndex((word) => word.toLowerCase().includes(normalizedKeyword));
+    const center = idx === -1 ? Math.floor(words.length / 2) : idx;
+    const start = Math.max(0, center - 7);
+    const end = Math.min(words.length, center + 7);
+    const snippet = `${start > 0 ? "..." : ""}${words
+      .slice(start, end)
+      .join(" ")}${end < words.length ? "..." : ""}`;
+    snippets.push(snippet);
+  }
+  if (snippets.length === 0 && text.toLowerCase().includes(normalizedKeyword)) {
+    const words = text.split(/\s+/);
+    const idx = words.findIndex((word) => word.toLowerCase().includes(normalizedKeyword));
+    if (idx >= 0) {
+      const start = Math.max(0, idx - 10);
+      const end = Math.min(words.length, idx + 10);
+      snippets.push(
+        `${start > 0 ? "..." : ""}${words
+          .slice(start, end)
+          .join(" ")}${end < words.length ? "..." : ""}`,
+      );
+    }
+  }
+  return snippets.slice(0, 3);
 };
 
 const successResponse = <T>(data: T) => ({
@@ -277,11 +318,7 @@ export const registerHadisEncRoutes = ({
         content: { "application/json": { schema: hadisErrorSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(
-      docBaseUrl,
-      "GET",
-      "/hadis/enc/show/2750",
-    ),
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadis/enc/show/2750"),
   });
 
   app.openapi(showRoute, (c) => {
@@ -301,8 +338,7 @@ export const registerHadisEncRoutes = ({
     method: "get",
     path: "/hadis/enc/next/{id}",
     summary: "Hadis Berikutnya",
-    description:
-      "Menampilkan hadis setelah ID tertentu berdasarkan urutan angka.",
+    description: "Menampilkan hadis setelah ID tertentu berdasarkan urutan angka.",
     tags: ["Hadis"],
     request: {
       params: z.object({
@@ -323,11 +359,7 @@ export const registerHadisEncRoutes = ({
         content: { "application/json": { schema: hadisErrorSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(
-      docBaseUrl,
-      "GET",
-      "/hadis/enc/next/2750",
-    ),
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadis/enc/next/2750"),
   });
 
   app.openapi(nextRoute, (c) => {
@@ -347,8 +379,7 @@ export const registerHadisEncRoutes = ({
     method: "get",
     path: "/hadis/enc/prev/{id}",
     summary: "Hadis Sebelumnya",
-    description:
-      "Menampilkan hadis sebelum ID tertentu berdasarkan urutan angka.",
+    description: "Menampilkan hadis sebelum ID tertentu berdasarkan urutan angka.",
     tags: ["Hadis"],
     request: {
       params: z.object({
@@ -369,11 +400,7 @@ export const registerHadisEncRoutes = ({
         content: { "application/json": { schema: hadisErrorSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(
-      docBaseUrl,
-      "GET",
-      "/hadis/enc/prev/2750",
-    ),
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadis/enc/prev/2750"),
   });
 
   app.openapi(prevRoute, (c) => {
@@ -420,8 +447,7 @@ export const registerHadisEncRoutes = ({
     method: "get",
     path: "/hadis/enc/explore",
     summary: "Hadis Eksplorasi",
-    description:
-      "Menampilkan daftar hadis dengan dukungan pagination (limit maksimal 10).",
+    description: "Menampilkan daftar hadis dengan dukungan pagination (limit maksimal 10).",
     tags: ["Hadis"],
     request: {
       query: exploreQuerySchema,
@@ -432,11 +458,7 @@ export const registerHadisEncRoutes = ({
         content: { "application/json": { schema: hadisExploreResponseSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(
-      docBaseUrl,
-      "GET",
-      "/hadis/enc/explore?page=1&limit=5",
-    ),
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadis/enc/explore?page=1&limit=5"),
   });
 
   app.openapi(exploreRoute, (c) => {
@@ -476,11 +498,7 @@ export const registerHadisEncRoutes = ({
         content: { "application/json": { schema: hadisErrorSchema } },
       },
     },
-    "x-codeSamples": buildCodeSamples(
-      docBaseUrl,
-      "GET",
-      "/hadis/enc/cari/kiamat?page=1&limit=10",
-    ),
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/hadis/enc/cari/kiamat?page=1&limit=10"),
   });
 
   const executeSearch = async (
@@ -490,10 +508,7 @@ export const registerHadisEncRoutes = ({
     limit: number,
   ) => {
     if (!hadisSearchService) {
-      return c.json(
-        errorResponse("Layanan pencarian hadis tidak tersedia."),
-        503,
-      );
+      return c.json(errorResponse("Layanan pencarian hadis tidak tersedia."), 503);
     }
     try {
       const result = await hadisSearchService.search(keyword, page, limit);
@@ -505,6 +520,7 @@ export const registerHadisEncRoutes = ({
           hadis: result.hits.map((hit) => ({
             id: hit.id,
             text: hit.text,
+            focus: buildFocusSnippets(hit.text, keyword),
           })),
         }),
         200,
@@ -540,11 +556,6 @@ export const registerHadisEncRoutes = ({
     if (!normalized.ok) {
       return c.json(errorResponse(normalized.message), 400);
     }
-    return executeSearch(
-      c,
-      normalized.value,
-      query.data.page,
-      query.data.limit,
-    );
+    return executeSearch(c, normalized.value, query.data.page, query.data.limit);
   });
 };
