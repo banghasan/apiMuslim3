@@ -38,6 +38,8 @@ const favicon16File = new URL("./static/favicon-16x16.png", import.meta.url);
 const favicon16Bytes = await Deno.readFile(favicon16File);
 const manifestFile = new URL("./static/site.webmanifest", import.meta.url);
 const manifestBytes = await Deno.readFile(manifestFile);
+const docBackgroundFile = new URL("./static/bg.jpg", import.meta.url);
+const docBackgroundBytes = await Deno.readFile(docBackgroundFile);
 
 const sholatData = await loadSholatData();
 const sholatService = createSholatService({
@@ -101,6 +103,16 @@ app.get(
     new Response(myQuranLogoBytes, {
       headers: {
         "content-type": "image/png",
+        "cache-control": "public, max-age=604800",
+      },
+    }),
+);
+app.get(
+  "/doc/bg.jpg",
+  () =>
+    new Response(docBackgroundBytes, {
+      headers: {
+        "content-type": "image/jpeg",
         "cache-control": "public, max-age=604800",
       },
     }),
