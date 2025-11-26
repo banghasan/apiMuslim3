@@ -5,7 +5,10 @@ const parseBoolean = (value: string | undefined, fallback: boolean) => {
   return value.toLowerCase() === "true";
 };
 
+export const APP_VERSION = "v3.0.0";
+
 export type AppConfig = {
+  version: string;
   env: string;
   host: string;
   port: number;
@@ -23,6 +26,7 @@ export const loadConfig = (): AppConfig => {
   const env = (Deno.env.get("APP_ENV") ?? "development").toLowerCase();
   const host = Deno.env.get("HOST") ?? "127.0.0.1";
   const port = Number(Deno.env.get("PORT") ?? "8000");
+  const version = Deno.env.get("APP_VERSION") ?? APP_VERSION;
   const docHost = host === "0.0.0.0" ? "localhost" : host;
   const defaultBaseUrl = `http://${docHost}:${port}`;
   const docBaseUrl = Deno.env.get("DOC_BASE_URL") ?? defaultBaseUrl;
@@ -34,6 +38,7 @@ export const loadConfig = (): AppConfig => {
   const meiliHost = Deno.env.get("MEILISEARCH_HOST") ?? "";
   const meiliApiKey = Deno.env.get("MEILISEARCH_API_KEY") ?? "";
   return {
+    version,
     env,
     host,
     port,
