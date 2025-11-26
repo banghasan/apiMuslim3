@@ -2,6 +2,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { config } from "~/config.ts";
 import { createAccessLogger } from "~/middleware/logger.ts";
 import { createStatsRecorder } from "~/middleware/stats_logger.ts";
+import { createHadisCacheMiddleware } from "~/middleware/hadis_cache.ts";
 import { registerCalRoutes } from "~/routes/cal.ts";
 import { rateLimitConfig } from "~/config/rate_limit.ts";
 import { registerQiblaRoutes } from "~/routes/qibla.ts";
@@ -89,6 +90,7 @@ const app = new OpenAPIHono<AppEnv>();
 app.use("*", createStatsRecorder(statsService));
 app.use("*", createAccessLogger(config));
 app.use("*", createRateLimitMiddleware(rateLimitConfig));
+app.use("/hadis/*", createHadisCacheMiddleware(60_000));
 app.get(
   "/favicon.ico",
   () =>
