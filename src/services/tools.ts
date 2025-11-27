@@ -106,3 +106,31 @@ export const getSystemUptime = (): SystemUptimeInfo => {
     humanReadable,
   };
 };
+
+const uptimeDecoder = new TextDecoder();
+
+const extractLinuxUptimeSummary = (value: string): string | null => {
+  const normalized = value.trim();
+  if (!normalized) return null;
+  const match = normalized.match(/^([^,]+)/);
+  if (!match) return null;
+  return match[1].trim();
+};
+
+export const readLinuxUptimeCommand = async (): Promise<string | null> => {
+  if (Deno.build.os !== "linux") {
+    return null;
+  }
+  try {
+    const command = new Deno.Command("uptime", {
+      stdout: "piped",
+      stderr: "piped",
+    });
+    const { stdout } = await command.output();
+    const text = uptimeDecoder.decode(stdout).trim();
+    return extractLinuxUptimeSummary(text);
+  } catch (error) {
+    console.error("Failed to read uptime command", error);
+    return null;
+  }
+};

@@ -1,0 +1,43 @@
+{
+  // ... pengaturan lainnya
+  "languages": {
+    "JavaScript": {
+      "formatter": {
+        "external": {
+          "command": "deno",
+          "arguments": ["fmt", "-"]
+        }
+      },
+      "format_on_save": "on"
+    },
+    "TypeScript": {
+      "formatter": {
+        "external": {
+          "command": "deno",
+          "arguments": ["fmt", "-"]
+        }
+      },
+      "format_on_save": "on"
+    },
+    // Ulangi untuk "TSX", "JSONC", atau bahasa lain yang ingin Anda format dengan Deno fmt
+    "TSX": {
+      "formatter": {
+        "external": {
+          "command": "deno",
+          "arguments": ["fmt", "-"]
+        }
+      },
+      "format_on_save": "on"
+    }
+  },
+  // Pastikan Deno LSP diaktifkan jika Anda ingin fitur Deno lainnya
+  "lsp": {
+    "deno": {
+      "settings": {
+        "deno": {
+          "enable": true 
+        }
+      }
+    }
+  }
+}

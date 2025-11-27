@@ -135,7 +135,8 @@ deno test --allow-env --allow-read
 - `GET /tools/ip` – deteksi IP pengguna (memperhatikan proxy/Cloudflare) beserta
   user agent.
 - `GET /tools/uptime` – mengetahui uptime VPS (lama server berjalan), waktu
-  booting dan representasi yang mudah dibaca manusia.
+  booting, representasi yang mudah dibaca manusia, dan ringkasan `uptime` native
+  Linux.
 - `GET /health` – health check sederhana yang mengembalikan waktu server,
   uptime, timezone, dan environment.
 

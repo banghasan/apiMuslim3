@@ -2,7 +2,11 @@ import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { buildCodeSamples } from "~/lib/docs.ts";
 import type { GeocodeService } from "~/services/geocode.ts";
-import { getSystemUptime, resolveClientIp } from "~/services/tools.ts";
+import {
+  getSystemUptime,
+  readLinuxUptimeCommand,
+  resolveClientIp,
+} from "~/services/tools.ts";
 import type { AppEnv } from "~/types.ts";
 
 const ipDetailSchema = z
@@ -65,6 +69,9 @@ const uptimeSuccessSchema = z
         example: "5 jam, 45 menit",
       }),
       breakdown: uptimeBreakdownSchema,
+      linux: z.string().openapi({
+        example: "11:03:12 up 10 days, 12:48",
+      }).optional(),
     }),
   })
   .openapi("UptimeResponse");
@@ -150,9 +157,10 @@ export const registerToolsRoutes = (
     "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/tools/uptime"),
   });
 
-  app.openapi(uptimeRoute, (c) => {
+  app.openapi(uptimeRoute, async (c) => {
     try {
       const uptime = getSystemUptime();
+      const linuxUptime = await readLinuxUptimeCommand();
       return c.json({
         status: true,
         message: "success",
@@ -162,6 +170,7 @@ export const registerToolsRoutes = (
           uptimeSeconds: uptime.uptimeSeconds,
           humanReadable: uptime.humanReadable,
           breakdown: uptime.breakdown,
+          linux: linuxUptime ?? undefined,
         },
       });
     } catch (error) {
