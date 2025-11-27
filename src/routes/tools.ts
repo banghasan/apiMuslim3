@@ -133,7 +133,7 @@ export const registerToolsRoutes = (
   const uptimeRoute = createRoute({
     method: "get",
     path: "/tools/uptime",
-    summary: "Uptime Server",
+    summary: "Server Uptime",
     description:
       "Menampilkan lamanya server berjalan sejak boot (uptime) lengkap dengan waktu booting dan representasi manusiawi.",
     tags: ["Tools"],
@@ -166,10 +166,13 @@ export const registerToolsRoutes = (
       });
     } catch (error) {
       console.error("Uptime error", error);
-      return c.json({
-        status: false,
-        message: "Tidak dapat membaca uptime server.",
-      }, 500);
+      return c.json(
+        {
+          status: false,
+          message: "Tidak dapat membaca uptime server.",
+        },
+        500,
+      );
     }
   });
 
