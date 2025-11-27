@@ -18,7 +18,7 @@ Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi
 - Endpoint arah kiblat (`/qibla/{lat,lng}`) untuk mendapatkan derajat kiblat
   dari koordinat tertentu.
 - Endpoint tools utilitas seperti `/tools/ip` untuk mendeteksi IP & user-agent
-  pengguna.
+  pengguna dan `/tools/uptime` untuk memantau lama server berjalan.
 - Endpoint health check (`/health`) untuk mengetahui apakah API siap digunakan.
 - Rate limiting Per menit per IP
 - Response konsisten dengan struktur `status`, `message`, dan `data`.
@@ -84,12 +84,12 @@ Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada
    melompat ke bagian terkait. Hash yang dipakai ReDoc dapat dirujuk langsung
    seperti contoh berikut.
 
-| Kategori | Penjelasan Singkat                                             | Tautan (akses setelah server jalan) |
-| -------- | -------------------------------------------------------------- | ----------------------------------- |
-| Sholat   | Daftar lokasi, pencarian, jadwal sholat harian/bulanan.        | `/doc#/tag/Sholat`                  |
-| Kalender | Konversi tanggal Masehi ↔ Hijriyah, opsi metode perhitungan.   | `/doc#/tag/Kalender`                |
-| Qibla    | Hitung arah kiblat berdasarkan koordinat.                      | `/doc#/tag/Qibla`                   |
-| Tools    | Utilitas seperti `/tools/ip`, `/tools/geocode`, dan `/health`. | `/doc#/tag/Tools`                   |
+| Kategori | Penjelasan Singkat                                                              | Tautan (akses setelah server jalan) |
+| -------- | ------------------------------------------------------------------------------- | ----------------------------------- |
+| Sholat   | Daftar lokasi, pencarian, jadwal sholat harian/bulanan.                         | `/doc#/tag/Sholat`                  |
+| Kalender | Konversi tanggal Masehi ↔ Hijriyah, opsi metode perhitungan.                    | `/doc#/tag/Kalender`                |
+| Qibla    | Hitung arah kiblat berdasarkan koordinat.                                       | `/doc#/tag/Qibla`                   |
+| Tools    | Utilitas seperti `/tools/ip`, `/tools/uptime`, `/tools/geocode`, dan `/health`. | `/doc#/tag/Tools`                   |
 
 Contoh: untuk melihat dokumentasi endpoint qibla secara cepat, buka
 `http://localhost:8000/doc#/tag/Qibla` setelah server menyala. README ini juga
@@ -134,6 +134,8 @@ deno test --allow-env --allow-read
   koordinat derajat desimal.
 - `GET /tools/ip` – deteksi IP pengguna (memperhatikan proxy/Cloudflare) beserta
   user agent.
+- `GET /tools/uptime` – mengetahui uptime VPS (lama server berjalan), waktu
+  booting dan representasi yang mudah dibaca manusia.
 - `GET /health` – health check sederhana yang mengembalikan waktu server,
   uptime, timezone, dan environment.
 

@@ -2,7 +2,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { buildCodeSamples } from "~/lib/docs.ts";
 import type { GeocodeService } from "~/services/geocode.ts";
-import { resolveClientIp } from "~/services/tools.ts";
+import { getSystemUptime, resolveClientIp } from "~/services/tools.ts";
 import type { AppEnv } from "~/types.ts";
 
 const ipDetailSchema = z
@@ -39,6 +39,44 @@ const ipErrorSchema = z
     message: z.string().openapi({ example: "Tidak dapat menentukan IP." }),
   })
   .openapi("IpError");
+
+const uptimeBreakdownSchema = z.object({
+  days: z.number().int().nonnegative().openapi({ example: 1 }),
+  hours: z.number().int().min(0).max(23).openapi({ example: 2 }),
+  minutes: z.number().int().min(0).max(59).openapi({ example: 45 }),
+  seconds: z.number().int().min(0).max(59).openapi({ example: 30 }),
+});
+
+const uptimeSuccessSchema = z
+  .object({
+    status: z.literal(true).openapi({ example: true }),
+    message: z.string().openapi({ example: "success" }),
+    data: z.object({
+      serverTime: z.string().datetime().openapi({
+        example: "2025-01-01T12:00:00.000Z",
+      }),
+      startedAt: z.string().datetime().openapi({
+        example: "2025-01-01T06:15:00.000Z",
+      }),
+      uptimeSeconds: z.number().int().nonnegative().openapi({
+        example: 20700,
+      }),
+      humanReadable: z.string().openapi({
+        example: "5 jam, 45 menit",
+      }),
+      breakdown: uptimeBreakdownSchema,
+    }),
+  })
+  .openapi("UptimeResponse");
+
+const uptimeErrorSchema = z
+  .object({
+    status: z.literal(false).openapi({ example: false }),
+    message: z.string().openapi({
+      example: "Tidak dapat membaca uptime server.",
+    }),
+  })
+  .openapi("UptimeError");
 
 const geocodeBodySchema = z.object({
   query: z.string().min(1).openapi({ example: "Masjid Istiqlal Jakarta" }),
@@ -92,6 +130,49 @@ type RegisterToolsDeps = {
 export const registerToolsRoutes = (
   { app, docBaseUrl, geocodeService }: RegisterToolsDeps,
 ) => {
+  const uptimeRoute = createRoute({
+    method: "get",
+    path: "/tools/uptime",
+    summary: "Uptime Server",
+    description:
+      "Menampilkan lamanya server berjalan sejak boot (uptime) lengkap dengan waktu booting dan representasi manusiawi.",
+    tags: ["Tools"],
+    responses: {
+      200: {
+        description: "Informasi uptime berhasil diambil.",
+        content: { "application/json": { schema: uptimeSuccessSchema } },
+      },
+      500: {
+        description: "Server gagal membaca uptime.",
+        content: { "application/json": { schema: uptimeErrorSchema } },
+      },
+    },
+    "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/tools/uptime"),
+  });
+
+  app.openapi(uptimeRoute, (c) => {
+    try {
+      const uptime = getSystemUptime();
+      return c.json({
+        status: true,
+        message: "success",
+        data: {
+          serverTime: uptime.serverTime.toISOString(),
+          startedAt: uptime.startedAt.toISOString(),
+          uptimeSeconds: uptime.uptimeSeconds,
+          humanReadable: uptime.humanReadable,
+          breakdown: uptime.breakdown,
+        },
+      });
+    } catch (error) {
+      console.error("Uptime error", error);
+      return c.json({
+        status: false,
+        message: "Tidak dapat membaca uptime server.",
+      }, 500);
+    }
+  });
+
   const ipRoute = createRoute({
     method: "get",
     path: "/tools/ip",
@@ -178,10 +259,13 @@ export const registerToolsRoutes = (
   app.openapi(geocodeRoute, async (c) => {
     const body = c.req.valid("json");
     if (!geocodeService) {
-      return c.json({
-        status: false,
-        message: "Layanan geocode tidak tersedia.",
-      }, 500);
+      return c.json(
+        {
+          status: false,
+          message: "Layanan geocode tidak tersedia.",
+        },
+        500,
+      );
     }
     try {
       const payload = await geocodeService.enqueue(body.query);
@@ -207,16 +291,22 @@ export const registerToolsRoutes = (
       if (
         error instanceof Error && error.message === "MAPSCO_API_KEY missing"
       ) {
-        return c.json({
-          status: false,
-          message: "MAPSCO_API_KEY tidak tersedia.",
-        }, 500);
+        return c.json(
+          {
+            status: false,
+            message: "MAPSCO_API_KEY tidak tersedia.",
+          },
+          500,
+        );
       }
       console.error("Geocode error", error);
-      return c.json({
-        status: false,
-        message: "Gagal memproses permintaan geocode.",
-      }, 400);
+      return c.json(
+        {
+          status: false,
+          message: "Gagal memproses permintaan geocode.",
+        },
+        400,
+      );
     }
   });
 };
