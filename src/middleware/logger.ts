@@ -5,6 +5,42 @@ import type { AppEnv } from "~/types.ts";
 const logDir = new URL("../../data/log/", import.meta.url);
 await Deno.mkdir(logDir, { recursive: true });
 
+const logRetentionDays = 30;
+const logRetentionMs = logRetentionDays * 24 * 60 * 60 * 1000;
+let logCleanupStarted = false;
+
+const cleanupExpiredLogs = async () => {
+  const now = Date.now();
+  for await (const entry of Deno.readDir(logDir)) {
+    if (!entry.isFile) continue;
+    const match = /^([0-9]{4})([0-9]{2})([0-9]{2})\.log$/.exec(entry.name);
+    if (!match) continue;
+    const [, year, month, day] = match;
+    const logDate = new Date(`${year}-${month}-${day}T00:00:00Z`);
+    if (Number.isNaN(logDate.getTime())) continue;
+    if (now - logDate.getTime() <= logRetentionMs) continue;
+    try {
+      await Deno.remove(new URL(entry.name, logDir));
+    } catch (error) {
+      console.warn(`Failed to delete expired log ${entry.name}`, error);
+    }
+  }
+};
+
+const startLogCleanup = () => {
+  if (logCleanupStarted) return;
+  logCleanupStarted = true;
+  const runCleanup = async () => {
+    try {
+      await cleanupExpiredLogs();
+    } catch (error) {
+      console.error("Failed to cleanup log files", error);
+    }
+  };
+  runCleanup();
+  setInterval(runCleanup, 24 * 60 * 60 * 1000);
+};
+
 type AccessLogEntry = { line: string; stamp: Date };
 
 const createFormatters = (timezone: string) => {
@@ -34,6 +70,7 @@ const createFormatters = (timezone: string) => {
 export const createAccessLogger = (
   config: AppConfig,
 ): MiddlewareHandler<AppEnv> => {
+  if (config.logWrite) startLogCleanup();
   const { timeFormatter, dateFormatter } = createFormatters(config.timezone);
   const formatTimestamp = (value = new Date()) =>
     timeFormatter?.format(value) ?? value.toISOString();
