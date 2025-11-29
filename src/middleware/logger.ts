@@ -5,8 +5,8 @@ import type { AppEnv } from "~/types.ts";
 const logDir = new URL("../../data/log/", import.meta.url);
 await Deno.mkdir(logDir, { recursive: true });
 
-const logRetentionDays = 30;
-const logRetentionMs = logRetentionDays * 24 * 60 * 60 * 1000;
+const defaultLogRetentionDays = 30;
+let logRetentionMs = defaultLogRetentionDays * 24 * 60 * 60 * 1000;
 let logCleanupStarted = false;
 
 const cleanupExpiredLogs = async () => {
@@ -27,9 +27,13 @@ const cleanupExpiredLogs = async () => {
   }
 };
 
-const startLogCleanup = () => {
+const startLogCleanup = (retentionDays: number) => {
   if (logCleanupStarted) return;
   logCleanupStarted = true;
+  const normalizedDays = Number.isFinite(retentionDays) && retentionDays > 0
+    ? Math.floor(retentionDays)
+    : defaultLogRetentionDays;
+  logRetentionMs = normalizedDays * 24 * 60 * 60 * 1000;
   const runCleanup = async () => {
     try {
       await cleanupExpiredLogs();
@@ -70,7 +74,7 @@ const createFormatters = (timezone: string) => {
 export const createAccessLogger = (
   config: AppConfig,
 ): MiddlewareHandler<AppEnv> => {
-  if (config.logWrite) startLogCleanup();
+  if (config.logWrite) startLogCleanup(config.logRetentionDays);
   const { timeFormatter, dateFormatter } = createFormatters(config.timezone);
   const formatTimestamp = (value = new Date()) =>
     timeFormatter?.format(value) ?? value.toISOString();

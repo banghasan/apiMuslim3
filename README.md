@@ -37,6 +37,7 @@ Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi
    TIMEZONE=Asia/Jakarta
    LOG_VERBOSE=false
    LOG_WRITE=false
+   LOG_RETENTION_DAYS=30
    APP_ENV=development
    DOC_BASE_URL=http://localhost:8000
    MAPSCO_API_KEY=
@@ -67,6 +68,9 @@ Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada
   default `false`.
 - Set `LOG_WRITE=true` untuk menyalakan penulisan log ke file harian; default
   `false`.
+- `LOG_RETENTION_DAYS` menentukan berapa lama file log disimpan (default 30
+  hari); file yang lebih lama akan dihapus otomatis tiap hari saat log file
+  aktif (`LOG_WRITE=true`).
 - Logger berjalan non-blok: request tidak lagi menunggu proses penulisan log ke
   disk.
 - Dokumen OpenAPI dalam format JSON tersedia di `/doc/sholat`, dan halaman ReDoc

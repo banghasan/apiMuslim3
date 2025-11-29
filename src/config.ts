@@ -5,6 +5,14 @@ const parseBoolean = (value: string | undefined, fallback: boolean) => {
   return value.toLowerCase() === "true";
 };
 
+const parsePositiveInt = (value: string | undefined, fallback: number) => {
+  if (value === undefined) return fallback;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  const normalized = Math.floor(parsed);
+  return normalized > 0 ? normalized : fallback;
+};
+
 export const APP_VERSION = "v3.0.0";
 
 export type AppConfig = {
@@ -16,6 +24,7 @@ export type AppConfig = {
   docBaseUrl: string;
   logVerbose: boolean;
   logWrite: boolean;
+  logRetentionDays: number;
   enableCache: boolean;
   mapsCoApiKey: string;
   meiliHost: string;
@@ -33,6 +42,10 @@ export const loadConfig = (): AppConfig => {
   const timezone = Deno.env.get("TIMEZONE") ?? "Asia/Jakarta";
   const logVerbose = parseBoolean(Deno.env.get("LOG_VERBOSE"), false);
   const logWrite = parseBoolean(Deno.env.get("LOG_WRITE"), false);
+  const logRetentionDays = parsePositiveInt(
+    Deno.env.get("LOG_RETENTION_DAYS"),
+    30,
+  );
   const enableCache = env === "production";
   const mapsCoApiKey = Deno.env.get("MAPSCO_API_KEY") ?? "";
   const meiliHost = Deno.env.get("MEILISEARCH_HOST") ?? "";
@@ -46,6 +59,7 @@ export const loadConfig = (): AppConfig => {
     docBaseUrl,
     logVerbose,
     logWrite,
+    logRetentionDays,
     enableCache,
     mapsCoApiKey,
     meiliHost,
