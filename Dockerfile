@@ -1,13 +1,16 @@
-# Use Alpine as the base image
+# Stage 1: Get the Deno binary from the official image
+# The user requested version 2.6.1, which is not a standard Deno version.
+# Using a recent official version instead.
+FROM denoland/deno:2.6.1 as deno_bin
+
+# Stage 2: Build the final image
 FROM alpine:latest
 
-# Install procps for uptime and other dependencies for Deno
-RUN apk --no-cache add procps curl unzip
+# Install procps for uptime command
+RUN apk --no-cache add procps
 
-# Install Deno
-ENV DENO_INSTALL=/opt/deno
-ENV PATH="$DENO_INSTALL/bin:$PATH"
-RUN curl -fsSL https://deno.land/x/install/install.sh | sh
+# Copy the Deno binary from the first stage to a directory in the PATH
+COPY --from=deno_bin /deno /usr/local/bin/deno
 
 # Create a non-root user 'deno' for security
 RUN addgroup -S deno && adduser -S deno -G deno
@@ -15,9 +18,9 @@ RUN addgroup -S deno && adduser -S deno -G deno
 # Port yang akan di-ekspos oleh aplikasi Anda
 EXPOSE 8000
 
-# Healthcheck to ensure the API is running, using absolute path for deno
+# Healthcheck to ensure the API is running
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD /opt/deno/bin/deno eval "fetch('http://localhost:8000/health').then(r => { if (!r.ok) throw new Error('Health check failed') })"
+  CMD deno eval "fetch('http://localhost:8000/health').then(r => { if (!r.ok) throw new Error('Health check failed') })"
 
 # Set the working directory
 WORKDIR /app
@@ -28,8 +31,8 @@ COPY --chown=deno:deno . .
 # Switch to the non-root user
 USER deno
 
-# Cache dependencies, using absolute path for deno
-RUN /opt/deno/bin/deno cache --config deno.json src/main.ts
+# Cache dependencies
+RUN deno cache --config deno.json src/main.ts
 
-# Command to run the application, using absolute path for deno
-CMD ["/opt/deno/bin/deno", "task", "start"]
+# Command to run the application
+CMD ["deno", "task", "start"]
