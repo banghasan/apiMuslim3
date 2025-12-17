@@ -1,4 +1,4 @@
-name: Docker Publish Base Image
+name: GHCR - Docker Base Image
 
 on:
   workflow_dispatch:

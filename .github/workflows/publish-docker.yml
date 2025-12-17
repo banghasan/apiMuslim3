@@ -1,4 +1,4 @@
-name: Docker Publish ApiMuslim3
+name: GHCR - Docker ApiMuslim3
 
 on:
   workflow_dispatch:
