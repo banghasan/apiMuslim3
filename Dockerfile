@@ -16,7 +16,7 @@ RUN addgroup -S deno && adduser -S deno -G deno
 EXPOSE 8000
 
 # Healthcheck to ensure the API is running, using absolute path for deno
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD /opt/deno/bin/deno eval "fetch('http://localhost:8000/health').then(r => { if (!r.ok) throw new Error('Health check failed') })"
 
 # Set the working directory
