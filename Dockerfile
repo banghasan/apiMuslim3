@@ -12,11 +12,11 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 WORKDIR /app
 
 # Install procps for uptime command
-USER root
-RUN apt-get update && \
-    apt-get install -y procps && \
-    rm -rf /var/lib/apt/lists/*
-USER deno
+#USER root
+#RUN apt-get update && \
+#    apt-get install -y procps && \
+#    rm -rf /var/lib/apt/lists/*
+#USER deno
 
 # Menyalin seluruh file proyek ke dalam direktori kerja
 COPY . .
