@@ -65,8 +65,8 @@ yang sudah tersedia di GitHub Container Registry (GHCR).
 
 1. Pastikan file `docker-compose.yml` tersedia
 
-2. Pastikan memiliki file `.env` di direktori yang sama. Kamu bisa
-   menyalinnya dari `.env.example`.
+2. Pastikan memiliki file `.env` di direktori yang sama. Kamu bisa menyalinnya
+   dari `.env.example`.
 
 3. Jalankan container dengan perintah:
 
