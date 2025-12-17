@@ -4,6 +4,10 @@ FROM denoland/deno:2.6.1
 # Port yang akan di-ekspos oleh aplikasi Anda
 EXPOSE 8000
 
+# Healthcheck untuk memastikan API berjalan menggunakan Deno
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD deno eval "fetch('http://localhost:8000/health').then(r => { if (!r.ok) throw new Error('Health check failed') })"
+
 # Menentukan direktori kerja di dalam container
 WORKDIR /app
 
