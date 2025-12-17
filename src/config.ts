@@ -33,7 +33,7 @@ export type AppConfig = {
 
 export const loadConfig = (): AppConfig => {
   const env = (Deno.env.get("APP_ENV") ?? "development").toLowerCase();
-  const host = Deno.env.get("HOST") ?? "127.0.0.1";
+  const host = Deno.env.get("HOST") ?? "0.0.0.0";
   const port = Number(Deno.env.get("PORT") ?? "8000");
   const version = Deno.env.get("APP_VERSION") ?? APP_VERSION;
   const docHost = host === "0.0.0.0" ? "localhost" : host;
