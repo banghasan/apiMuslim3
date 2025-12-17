@@ -131,6 +131,9 @@ export const createAccessLogger = (
       }
     }
     if (!ip) ip = "unknown";
+
+    if (ip === "127.0.0.1") return;
+
     const rt = (performance.now() - start).toFixed(2);
     const logTime = new Date();
     const line = `[${
