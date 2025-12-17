@@ -1,19 +1,19 @@
-# Stage 1: Get the Deno binary from the official image
-# The user requested version 2.6.1, which is not a standard Deno version.
-# Using a recent official version instead.
-FROM denoland/deno:2.6.1 as deno_bin
+FROM debian:bookworm-slim
 
-# Stage 2: Build the final image
-FROM alpine:latest
+# Gunakan satu layer RUN untuk efisiensi
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    procps \
+    curl \
+    unzip \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install procps for uptime command
-RUN apk --no-cache add procps
+# Instal Deno
+ENV DENO_INSTALL=/root/.deno
+ENV PATH="$DENO_INSTALL/bin:$PATH"
 
-# Copy the Deno binary from the first stage to a directory in the PATH
-COPY --from=deno_bin /deno /usr/local/bin/deno
-
-# Create a non-root user 'deno' for security
-RUN addgroup -S deno && adduser -S deno -G deno
+# Jalankan installasi dan pastikan binary ada
+RUN curl -fsSL https://deno.land/install.sh | sh
 
 # Port yang akan di-ekspos oleh aplikasi Anda
 EXPOSE 8000
@@ -25,11 +25,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Set the working directory
 WORKDIR /app
 
-# Copy project files with correct ownership
-COPY --chown=deno:deno . .
-
-# Switch to the non-root user
-USER deno
+# Menyalin seluruh file proyek ke dalam direktori kerja
+COPY . .
 
 # Cache dependencies
 RUN deno cache --config deno.json src/main.ts
