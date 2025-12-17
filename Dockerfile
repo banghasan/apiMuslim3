@@ -1,4 +1,5 @@
-FROM ghcr.io/banghasan/apimuslim3:debian-deno
+ARG BASE_IMAGE=ghcr.io/banghasan/apimuslim3:debian-deno
+FROM ${BASE_IMAGE}
 
 # Port yang akan di-ekspos oleh aplikasi Anda
 EXPOSE 8000
