@@ -1,6 +1,10 @@
 ARG BASE_IMAGE=ghcr.io/banghasan/apimuslim3:debian-deno
 FROM ${BASE_IMAGE}
 
+# Set environment variables to prevent debconf errors
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TERM=dumb
+
 # Port yang akan di-ekspos oleh aplikasi Anda
 EXPOSE 8000
 
