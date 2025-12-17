@@ -58,6 +58,25 @@ deno task start
 Server akan berjalan di `http://localhost:8000` (atau sesuai konfigurasi pada
 `.env`).
 
+### Menjalankan dengan Docker Compose
+
+Kamu juga dapat menjalankan aplikasi ini menggunakan Docker Compose dengan image
+yang sudah tersedia di GitHub Container Registry (GHCR).
+
+1. Pastikan file `docker-compose.yml` tersedia
+
+2. Pastikan memiliki file `.env` di direktori yang sama. Kamu bisa
+   menyalinnya dari `.env.example`.
+
+3. Jalankan container dengan perintah:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+   Kamu dapat mengganti `latest` pada nama image dengan tag spesifik yang kamu
+   inginkan.
+
 ## Dokumentasi & Logging
 
 - Setiap akses dapat disimpan ke file harian di `data/log/YYYYMMDD.log`

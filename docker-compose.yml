@@ -1,0 +1,13 @@
+services:
+  apimuslim:
+    image: ghcr.io/banghasan/apimuslim3:latest
+    container_name: apimuslim
+    ports:
+      # Memetakan port 8000 di host ke port 8000 di container
+      - "8800:8000"
+    volumes:
+      # Memetakan direktori './data' di host ke '/app/data' di container
+      - ./data:/app/data
+      # Memetakan file .env di host ke /app/.env di container
+      - ./.env:/app/.env
+    restart: unless-stopped
