@@ -1,15 +1,15 @@
-name: Docker Publish ApiMuslim3
+name: Docker Publish Base Image
 
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Docker tag for main image"
+        description: "Docker tag for base image"
         required: true
-        default: "latest"
+        default: "debian-deno"
 
 jobs:
-  build-and-push-main:
+  build-and-push-base:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -40,11 +40,11 @@ jobs:
           tags: |
             type=raw,value=${{ github.event.inputs.tag }}
 
-      - name: Build and push Docker main image
+      - name: Build and push Docker base image
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./Dockerfile.deno
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}

@@ -1,0 +1,17 @@
+FROM debian:bookworm-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    procps \
+    curl \
+    unzip \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Deno
+ENV DENO_INSTALL=/root/.deno
+ENV PATH="$DENO_INSTALL/bin:$PATH"
+RUN curl -fsSL https://deno.land/install.sh | sh
+
+# Verify Deno installation
+RUN deno --version
