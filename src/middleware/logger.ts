@@ -138,7 +138,7 @@ export const createAccessLogger = (
     const logTime = new Date();
     const line = `[${
       formatTimestamp(logTime)
-    }] ${ip} [${c.res.status}] ${c.req.method} ${c.req.path} ${rt}ms`;
+    }] [${c.res.status}] ${ip} ${c.req.method} ${c.req.path} ${rt}ms`;
     if (config.logVerbose) {
       console.log(line);
     }
