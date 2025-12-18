@@ -132,7 +132,7 @@ export const createAccessLogger = (
     }
     if (!ip) ip = "unknown";
 
-    if (ip === "127.0.0.1") return;
+    // if (ip === "127.0.0.1") return;
 
     const rt = (performance.now() - start).toFixed(2);
     const logTime = new Date();
@@ -143,7 +143,7 @@ export const createAccessLogger = (
     // Warna berdasarkan status respons
     const getColorCode = (status: number): string => {
       if (status >= 200 && status < 300) {
-        return "\x1b[92m"; // Hijau untuk 2xx
+        return "\x1b[0m"; // kasih normal aja // 37 Putih untuk 2xx
       } else if (status >= 300 && status < 400) {
         return "\x1b[33m"; // Kuning untuk 3xx
       } else if (status >= 400 && status < 500) {
@@ -151,7 +151,7 @@ export const createAccessLogger = (
       } else if (status >= 500) {
         return "\x1b[35m"; // Magenta untuk 5xx
       }
-      return "\x1b[37m"; // Putih untuk status lain
+      return "\x1b[36m"; // Cyan untuk status lain
     };
 
     const resetColor = "\x1b[0m"; // Reset warna
