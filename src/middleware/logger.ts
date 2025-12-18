@@ -132,15 +132,33 @@ export const createAccessLogger = (
     }
     if (!ip) ip = "unknown";
 
-    if (ip === "127.0.0.1") return;
+    //if (ip === "127.0.0.1") return;
 
     const rt = (performance.now() - start).toFixed(2);
     const logTime = new Date();
-    const line = `[${
+    const line = `${
       formatTimestamp(logTime)
-    }] [${c.res.status}] ${ip} ${c.req.method} ${c.req.path} ${rt}ms`;
+    } [${c.res.status}] ${ip} ${c.req.method} ${c.req.path} ${rt}ms`;
+
+    // Warna berdasarkan status respons
+    const getColorCode = (status: number): string => {
+      if (status >= 200 && status < 300) {
+        return "\x1b[32m"; // Hijau untuk 2xx
+      } else if (status >= 300 && status < 400) {
+        return "\x1b[33m"; // Kuning untuk 3xx
+      } else if (status >= 400 && status < 500) {
+        return "\x1b[31m"; // Merah untuk 4xx
+      } else if (status >= 500) {
+        return "\x1b[35m"; // Magenta untuk 5xx
+      }
+      return "\x1b[37m"; // Putih untuk status lain
+    };
+
+    const resetColor = "\x1b[0m"; // Reset warna
+    const coloredLine = `${getColorCode(c.res.status)}${line}${resetColor}`;
+
     if (config.logVerbose) {
-      console.log(line);
+      console.log(coloredLine);
     }
     enqueueAccessLog(line, logTime);
   };
