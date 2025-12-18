@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="utf-8" />
@@ -58,7 +58,11 @@
 
       body {
         font-family:
-          "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Inter",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
           sans-serif;
         background: var(--content-bg) url("./bg.jpg") center center / cover
           no-repeat fixed;
@@ -73,11 +77,12 @@
         position: sticky;
         top: 0;
         z-index: 100;
-        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-        color: var(--header-text);
+        background: linear-gradient(135deg, #37b597 0%, #004232 100%);
+        /* color: var(--header-text); */
+        color: #ffea77;
         padding: 16px 24px;
         box-shadow: var(--shadow-lg);
-        border-bottom: 2px solid rgba(79, 70, 229, 0.3);
+        border-bottom: 2px solid rgba(0, 210, 112, 0.3);
       }
 
       .doc-header-content {
@@ -128,7 +133,7 @@
 
       .doc-brand .version {
         font-size: 0.75rem;
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(2, 2, 2, 0.3);
         padding: 4px 10px;
         border-radius: 12px;
         font-weight: 600;
@@ -270,27 +275,32 @@
             href="#tag/Sholat"
             data-tag-link="Sholat"
             title="Lihat dokumentasi API Jadwal Sholat"
-          >🕌 Sholat</a>
+            >🕌 Sholat</a
+          >
           <a
             href="#tag/Hadis"
             data-tag-link="Hadis"
             title="Lihat dokumentasi API Ensiklopedia Hadis"
-          >📚 Hadis</a>
+            >📚 Hadis</a
+          >
           <a
             href="#tag/Kalender"
             data-tag-link="Kalender"
             title="Lihat dokumentasi API Kalender Hijriah"
-          >📅 Kalender</a>
+            >📅 Kalender</a
+          >
           <a
             href="#tag/Qibla"
             data-tag-link="Qibla"
             title="Lihat dokumentasi API Arah Kiblat"
-          >🧭 Qibla</a>
+            >🧭 Qibla</a
+          >
           <a
             href="#tag/Tools"
             data-tag-link="Tools"
             title="Lihat dokumentasi API Tools"
-          >🛠️ Tools</a>
+            >🛠️ Tools</a
+          >
         </nav>
       </div>
     </header>
@@ -314,17 +324,14 @@
           window.location.origin,
         ).toString();
         const buildDocUrl = (relativePath) =>
-          new URL(relativePath.replace(/^\/+/, ""), docBaseUrl)
-            .toString();
+          new URL(relativePath.replace(/^\/+/, ""), docBaseUrl).toString();
 
-        document.querySelectorAll("[data-doc-asset]").forEach(
-          (element) => {
-            const assetName = element.getAttribute("data-doc-asset");
-            if (assetName) {
-              element.setAttribute("src", buildDocUrl(assetName));
-            }
-          },
-        );
+        document.querySelectorAll("[data-doc-asset]").forEach((element) => {
+          const assetName = element.getAttribute("data-doc-asset");
+          if (assetName) {
+            element.setAttribute("src", buildDocUrl(assetName));
+          }
+        });
 
         const loadRedocScript = () =>
           new Promise((resolve, reject) => {
@@ -347,24 +354,20 @@
 
         // Fungsi untuk menghubungkan link navigasi dengan tag
         const hookTagLinks = () => {
-          document.querySelectorAll("[data-tag-link]").forEach(
-            (link) => {
-              link.addEventListener("click", (event) => {
-                event.preventDefault();
-                const tagName = link.getAttribute("data-tag-link");
-                if (tagName) {
-                  window.location.hash = "tag/" +
-                    encodeURIComponent(tagName);
-                  setTimeout(() => {
-                    const headerHeight =
-                      document.querySelector(".doc-header")
-                        .offsetHeight;
-                    window.scrollBy(0, -headerHeight - 10);
-                  }, 100);
-                }
-              });
-            },
-          );
+          document.querySelectorAll("[data-tag-link]").forEach((link) => {
+            link.addEventListener("click", (event) => {
+              event.preventDefault();
+              const tagName = link.getAttribute("data-tag-link");
+              if (tagName) {
+                window.location.hash = "tag/" + encodeURIComponent(tagName);
+                setTimeout(() => {
+                  const headerHeight =
+                    document.querySelector(".doc-header").offsetHeight;
+                  window.scrollBy(0, -headerHeight - 10);
+                }, 100);
+              }
+            });
+          });
         };
 
         // Event listener untuk tombol cari
@@ -511,8 +514,7 @@
                   },
                   code: {
                     fontSize: "14px",
-                    fontFamily:
-                      '"Fira Code", "Consolas", "Monaco", monospace',
+                    fontFamily: '"Fira Code", "Consolas", "Monaco", monospace',
                     lineHeight: "1.6",
                     fontWeight: "400",
                     color: "#0f172a",

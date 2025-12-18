@@ -45,6 +45,8 @@ const manifestFile = new URL("./static/site.webmanifest", import.meta.url);
 const manifestBytes = await Deno.readFile(manifestFile);
 const docBackgroundFile = new URL("./static/bg.jpg", import.meta.url);
 const docBackgroundBytes = await Deno.readFile(docBackgroundFile);
+const sholatImageFile = new URL("./static/sholat.webp", import.meta.url);
+const sholatImageBytes = await Deno.readFile(sholatImageFile);
 const perawiDbFile = new URL(
   "../data/hadis/rawi/perawi.sqlite",
   import.meta.url,
@@ -142,6 +144,16 @@ app.get(
     new Response(docBackgroundBytes, {
       headers: {
         "content-type": "image/jpeg",
+        "cache-control": "public, max-age=604800",
+      },
+    }),
+);
+app.get(
+  "/doc/sholat.webp",
+  () =>
+    new Response(sholatImageBytes, {
+      headers: {
+        "content-type": "image/webp",
         "cache-control": "public, max-age=604800",
       },
     }),
@@ -249,7 +261,14 @@ const tagDefinitions = [
   {
     name: "Sholat",
     description:
-      `Kamu dapat mengakses endpoint salat yang mencakup detail penting seperti cakupan kota-kota yang tersedia, jadwal salat harian yang akurat, dan informasi teknis relevan lainnya. Silakan gunakan data ini sesuai kebutuhan integrasi Anda
+      `<img src="sholat.webp" style="float: left; margin-right: 20px" />
+
+Endpoint salat yang mencakup detail penting seperti cakupan kota-kota yang tersedia, jadwal salat harian yang akurat, dan informasi teknis relevan lainnya.
+
+Silakan gunakan data ini sesuai kebutuhan
+
+ &nbsp;-
+
 > Sumber data dari situs [kemenag bimaislam](https://bimasislam.kemenag.go.id/web/jadwalshalat)
 Kolom kota dan kabupaten telah disesuaikan sebagaimana sumber.`,
   },
@@ -292,10 +311,11 @@ app.doc("/doc/apimuslim", {
   info: {
     title: "API Muslim",
     version: config.version,
-    description:
-      `![](https://raw.githubusercontent.com/banghasan/apiMuslim3/main/src/static/api-myquran_text.png)
-\
-> API Komprehensif untuk kebutuhan Muslim di Indonesia, menyediakan data jadwal sholat, arah kiblat, konversi kalender Hijriah, dan berbagai alat bantu lainnya. Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi
+    description: `<div style="text-align: center;">
+      <img src="https://raw.githubusercontent.com/banghasan/apiMuslim3/main/src/static/api-myquran_text.png" />
+      </div>
+
+API Komprehensif untuk kebutuhan Muslim di Indonesia, menyediakan data jadwal sholat, arah kiblat, konversi kalender Hijriah, dan berbagai alat bantu lainnya. Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi
 
 alQuran dan lainnya, *insyaAllah*, segera.
 
