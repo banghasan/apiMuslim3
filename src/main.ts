@@ -261,7 +261,7 @@ const tagDefinitions = [
   {
     name: "Sholat",
     description:
-      `<img src="sholat.webp" style="float: left; margin-right: 20px" />
+      `<img src="${config.docBaseUrl}/doc/sholat.webp" style="float: left; margin-right: 20px" />
 
 Endpoint salat yang mencakup detail penting seperti cakupan kota-kota yang tersedia, jadwal salat harian yang akurat, dan informasi teknis relevan lainnya.
 
