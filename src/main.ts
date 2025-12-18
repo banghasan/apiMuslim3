@@ -261,7 +261,7 @@ const tagDefinitions = [
   {
     name: "Sholat",
     description:
-      `<img src="${config.docBaseUrl}/doc/sholat.webp" style="float: left; margin-right: 20px" />
+      `<img src="${config.docBaseUrl}/doc/sholat.webp" title="endpoint sholat" style="float: right; margin-right: 20px" />
 
 Endpoint salat yang mencakup detail penting seperti cakupan kota-kota yang tersedia, jadwal salat harian yang akurat, dan informasi teknis relevan lainnya.
 
@@ -312,17 +312,17 @@ app.doc("/doc/apimuslim", {
     title: "API Muslim",
     version: config.version,
     description: `<div style="text-align: center;">
-      <img src="https://raw.githubusercontent.com/banghasan/apiMuslim3/main/src/static/api-myquran_text.png" />
+      <img src="https://raw.githubusercontent.com/banghasan/apiMuslim3/main/src/static/api-myquran_text.png" title="api myQuran.com" />
       </div>
 
 API Komprehensif untuk kebutuhan Muslim di Indonesia, menyediakan data jadwal sholat, arah kiblat, konversi kalender Hijriah, dan berbagai alat bantu lainnya. Semua endpoint dirancang untuk kemudahan penggunaan dan integrasi
 
 alQuran dan lainnya, *insyaAllah*, segera.
 
-## Kontak
+## 📬 Kontak
 Saran, ide, diskusi dan komunikasi dapat melalui:
-- Grup Telegram [@ApiMuslim](https://t.me/apimuslim)
-- Email: banghasan@myquran.com
+- 👥 Telegram [@ApiMuslim](https://t.me/apimuslim)
+- ✉️ Email banghasan@gmail.com
 `,
   },
   tags: tagDefinitions,

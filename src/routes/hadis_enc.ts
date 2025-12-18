@@ -448,7 +448,7 @@ export const registerHadisEncRoutes = ({
   const randomRoute = createRoute({
     method: "get",
     path: "/hadis/enc/random",
-    summary: "Hadis Acak",
+    summary: "❤️ Hadis Acak",
     description: "Mengambil satu hadis secara acak dari Ensiklopedia.",
     tags: ["Hadis"],
     responses: {
@@ -504,7 +504,7 @@ export const registerHadisEncRoutes = ({
   const searchRoute = createRoute({
     method: "get",
     path: "/hadis/enc/cari/{keyword}",
-    summary: "Hadis Pencarian",
+    summary: "❤️ Hadis Pencarian",
     description: "Mencari hadis berdasarkan kata kunci",
     tags: ["Hadis"],
     request: {

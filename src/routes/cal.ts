@@ -170,7 +170,7 @@ export const registerCalRoutes = (
   const todayRoute = createRoute({
     method: "get",
     path: "/cal/today",
-    summary: "Kalender Hari Ini",
+    summary: "❤️ Kalender Hari Ini",
     description:
       "Menampilkan tanggal hari ini dalam kalender Masehi (CE) dan Hijriyah secara bersamaan. Parameter `adj` hanya mempengaruhi bagian Hijriyah.",
     tags: ["Kalender"],

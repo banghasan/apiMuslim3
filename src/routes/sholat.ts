@@ -495,7 +495,7 @@ export const registerSholatRoutes = (
     createRoute({
       method: "get",
       path,
-      summary: "Jadwal Sholat Hari Ini",
+      summary: "❤️ Jadwal Sholat Hari Ini",
       description:
         "Menampilkan jadwal sholat kab/kota untuk tanggal hari ini berdasarkan zona waktu pilihan.",
       tags: ["Sholat"],
