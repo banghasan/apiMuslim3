@@ -9,23 +9,12 @@ import {
 } from "~/services/tools.ts";
 import type { AppEnv } from "~/types.ts";
 
-const ipDetailSchema = z
-  .object({
-    ip: z.string().openapi({ example: "203.0.113.10" }),
-    source: z.string().openapi({ example: "x-forwarded-for" }),
-  })
-  .openapi("IpDetail");
+
 
 const ipDataSchema = z
   .object({
     ip: z.string().openapi({ example: "203.0.113.10" }),
     agent: z.string().openapi({ example: "Mozilla/5.0" }),
-    detail: z.array(ipDetailSchema).openapi({
-      example: [
-        { ip: "203.0.113.10", source: "cf-connecting-ip" },
-        { ip: "198.51.100.1", source: "x-real-ip" },
-      ],
-    }),
   })
   .openapi("IpInfo");
 
@@ -162,7 +151,7 @@ export const registerToolsRoutes = (
       const uptime = getSystemUptime();
       const linuxUptime = await readLinuxUptimeCommand();
       return c.json({
-        status: true,
+        status: true as const,
         message: "success",
         data: {
           serverTime: uptime.serverTime.toISOString(),
@@ -177,7 +166,7 @@ export const registerToolsRoutes = (
       console.error("Uptime error", error);
       return c.json(
         {
-          status: false,
+          status: false as const,
           message: "Tidak dapat membaca uptime server.",
         },
         500,
@@ -215,15 +204,15 @@ export const registerToolsRoutes = (
     });
     if (!info) {
       return c.json(
-        { status: false, message: "Tidak dapat menentukan IP." },
+        { status: false as const, message: "Tidak dapat menentukan IP." },
         400,
       );
     }
     const agent = c.req.header("user-agent") ?? "unknown";
     return c.json({
-      status: true,
+      status: true as const,
       message: "success",
-      data: { ip: info.ip, agent, detail: info.details },
+      data: { ip: info.ip, agent },
     });
   });
 
@@ -273,7 +262,7 @@ export const registerToolsRoutes = (
     if (!geocodeService) {
       return c.json(
         {
-          status: false,
+          status: false as const,
           message: "Layanan geocode tidak tersedia.",
         },
         500,
@@ -285,16 +274,16 @@ export const registerToolsRoutes = (
       const normalized = normalizeGeocodeEntry(results[0]);
       if (!normalized) {
         return c.json(
-          { status: false, message: "Lokasi tidak ditemukan." },
+          { status: false as const, message: "Lokasi tidak ditemukan." },
           400,
         );
       }
-      return c.json({ status: true, message: "success", data: normalized });
+      return c.json({ status: true as const, message: "success", data: normalized });
     } catch (error) {
       if (error instanceof Error && error.message === "QUEUE_OVERFLOW") {
         return c.json(
           {
-            status: false,
+            status: false as const,
             message: "Permintaan sedang padat, coba lagi beberapa saat lagi.",
           },
           400,
@@ -305,7 +294,7 @@ export const registerToolsRoutes = (
       ) {
         return c.json(
           {
-            status: false,
+            status: false as const,
             message: "MAPSCO_API_KEY tidak tersedia.",
           },
           500,
@@ -314,7 +303,7 @@ export const registerToolsRoutes = (
       console.error("Geocode error", error);
       return c.json(
         {
-          status: false,
+          status: false as const,
           message: "Gagal memproses permintaan geocode.",
         },
         400,
