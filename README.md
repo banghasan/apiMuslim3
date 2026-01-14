@@ -157,22 +157,26 @@ deno test --allow-env --allow-read
 **Endpoint hari libur berikut disediakan oleh layanan eksternal lainnya:**
 
 **Semua Libur Tahun Ini**
-- `GET /cal/holidays`
-Contoh hasil: `[{"date":"2026-01-01","name":"Tahun Baru 2026 Masehi"},{"date":"2026-01-16","name":"Isra Mikraj Nabi Muhammad S.A.W."},...]`
+
+- `GET /cal/holidays` Contoh hasil:
+  `[{"date":"2026-01-01","name":"Tahun Baru 2026 Masehi"},{"date":"2026-01-16","name":"Isra Mikraj Nabi Muhammad S.A.W."},...]`
 
 **Libur Waktu Tertentu**
+
 - `GET /cal/holidays?year=:tahun`
 - `GET /cal/holidays?month=:bulan`
 - `GET /cal/holidays?year=:tahun&month=:bulan`
 - `GET /cal/holidays?year=:tahun&month=:bulan&day=:hari`
 
 **Cek Hari Ini**
-- `GET /cal/holidays/today`
-hasil: `{"date":"2026-01-14","is_holiday":false,"holiday_list":[]}`
+
+- `GET /cal/holidays/today` hasil:
+  `{"date":"2026-01-14","is_holiday":false,"holiday_list":[]}`
 
 **Cek Besok**
-- `GET /cal/holidays/tomorrow`
-hasil: `{"date":"2026-01-15","is_holiday":false,"holiday_list":[]}`
+
+- `GET /cal/holidays/tomorrow` hasil:
+  `{"date":"2026-01-15","is_holiday":false,"holiday_list":[]}`
 
 - `GET /qibla/{lat,lng}` – arah kiblat (derajat dari utara) berdasarkan
   koordinat derajat desimal.
