@@ -9,8 +9,6 @@ import {
 } from "~/services/tools.ts";
 import type { AppEnv } from "~/types.ts";
 
-
-
 const ipDataSchema = z
   .object({
     ip: z.string().openapi({ example: "203.0.113.10" }),
@@ -161,7 +159,7 @@ export const registerToolsRoutes = (
           breakdown: uptime.breakdown,
           linux: linuxUptime ?? undefined,
         },
-      });
+      }, 200);
     } catch (error) {
       console.error("Uptime error", error);
       return c.json(
@@ -213,7 +211,7 @@ export const registerToolsRoutes = (
       status: true as const,
       message: "success",
       data: { ip: info.ip, agent },
-    });
+    }, 200);
   });
 
   const geocodeRoute = createRoute({
@@ -278,7 +276,11 @@ export const registerToolsRoutes = (
           400,
         );
       }
-      return c.json({ status: true as const, message: "success", data: normalized });
+      return c.json({
+        status: true as const,
+        message: "success",
+        data: normalized,
+      }, 200);
     } catch (error) {
       if (error instanceof Error && error.message === "QUEUE_OVERFLOW") {
         return c.json(

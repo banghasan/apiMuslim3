@@ -220,8 +220,8 @@ export const registerSholatRoutes = (
   const samplePeriod = "2026-06-23";
   const searchBody = JSON.stringify({ keyword: sampleKeyword });
 
-  const respondAllLocations: RouteHandler = (c) =>
-    c.json(successResponse(sholatService.getAllLocations()));
+  const respondAllLocations = (c: Context<AppEnv>) =>
+    c.json(successResponse(sholatService.getAllLocations()), 200);
   const respondById = (c: Context<AppEnv>, rawId: string) => {
     const id = rawId.trim();
     if (!id) {

@@ -38,9 +38,10 @@ export const createHadisCacheMiddleware = (
       return createResponseFromCache(cached);
     }
 
-    const res = await next();
+    await next();
+    const res = c.res;
     if (!res || !shouldCacheResponse(res)) {
-      return res;
+      return;
     }
 
     const buffer = new Uint8Array(await res.clone().arrayBuffer());

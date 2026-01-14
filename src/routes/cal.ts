@@ -65,14 +65,14 @@ const calendarErrorSchema = z
   })
   .openapi("CalendarError");
 
-const holidayErrorSchema = z
+const holidayResponseSchema = z
   .object({
-    status: z.literal(false).openapi({ example: true }),
+    status: z.literal(true).openapi({ example: true }),
     message: z.string().openapi({
       example: "silakan periksa langsung hasilnya",
     }),
   })
-  .openapi("HolidayError");
+  .openapi("HolidayResponse");
 
 const calendarQuerySchema = z.object({
   adj: z
@@ -248,7 +248,7 @@ export const registerCalRoutes = (
         description: "Daftar hari libur (dihandle oleh microservice lain).",
         content: {
           "application/json": {
-            schema: holidayErrorSchema,
+            schema: holidayResponseSchema,
           },
         },
       },
@@ -267,7 +267,7 @@ export const registerCalRoutes = (
         description: "Status hari ini (dihandle oleh microservice lain).",
         content: {
           "application/json": {
-            schema: holidayErrorSchema,
+            schema: holidayResponseSchema,
           },
         },
       },
@@ -286,7 +286,7 @@ export const registerCalRoutes = (
         description: "Status besok (dihandle oleh microservice lain).",
         content: {
           "application/json": {
-            schema: holidayErrorSchema,
+            schema: holidayResponseSchema,
           },
         },
       },
@@ -413,6 +413,7 @@ export const registerCalRoutes = (
         ce,
         hijr,
       }),
+      200,
     );
   };
 
@@ -432,6 +433,7 @@ export const registerCalRoutes = (
         ce,
         hijr,
       }),
+      200,
     );
   });
 
@@ -457,6 +459,7 @@ export const registerCalRoutes = (
         ce,
         hijr,
       }),
+      200,
     );
   });
 
@@ -477,22 +480,22 @@ export const registerCalRoutes = (
 
   app.openapi(holidaysRoute, (c) => {
     return c.json({
-      status: true,
+      status: true as const,
       message: "ok",
-    });
+    }, 200);
   });
 
   app.openapi(holidaysTodayRoute, (c) => {
     return c.json({
-      status: true,
+      status: true as const,
       message: "ok",
-    });
+    }, 200);
   });
 
   app.openapi(holidaysTomorrowRoute, (c) => {
     return c.json({
-      status: true,
+      status: true as const,
       message: "ok",
-    });
+    }, 200);
   });
 };
