@@ -293,7 +293,7 @@ daftar semua hari libur tahun ini; parameter \`year\`, \`month\`, dan \`day\` te
   const holidaysTomorrowRoute = createRoute({
     method: "get",
     path: "/cal/holidays/tomorrow",
-    summary: "Liburkan Besok",
+    summary: "Liburkah Besok",
     description:
       "Mengecek apakah besok adalah hari libur atau tidak. Endpoint ini dihandle oleh microservice lain.",
     tags: ["Kalender"],
