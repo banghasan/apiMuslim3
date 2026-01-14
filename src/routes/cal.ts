@@ -67,8 +67,10 @@ const calendarErrorSchema = z
 
 const holidayErrorSchema = z
   .object({
-    status: z.literal(false).openapi({ example: false }),
-    message: z.string().openapi({ example: "dihandle microservice lain" }),
+    status: z.literal(false).openapi({ example: true }),
+    message: z.string().openapi({
+      example: "silakan periksa langsung hasilnya",
+    }),
   })
   .openapi("HolidayError");
 
