@@ -209,7 +209,23 @@ export const registerCalRoutes = (
     path: "/cal/holidays",
     summary: "Liburan",
     description:
-      "Menampilkan semua hari libur dalam tahun tertentu. Endpoint ini dihandle oleh microservice lain.",
+      `Menampilkan semua hari libur dalam tahun tertentu.
+      
+#### GET /cal/holidays 
+daftar semua hari libur tahun ini; parameter \`year\`, \`month\`, dan \`day\` tersedia untuk filter.  
+
+- \`GET /cal/holidays?year=:tahun\` 
+  daftar hari libur untuk tahun tertentu. 
+ 
+- \`GET /cal/holidays?month=:bulan\` 
+  daftar hari libur untuk bulan tertentu. 
+ 
+- \`GET /cal/holidays?year=:tahun&month=:bulan\` 
+  daftar hari libur untuk tahun dan bulan tertentu. 
+ 
+- \`GET /cal/holidays?year=:tahun&month=:bulan&day=:hari\` 
+  daftar hari libur untuk tahun, bulan, dan hari tertentu. 
+ `,
     tags: ["Kalender"],
     request: {
       query: z.object({

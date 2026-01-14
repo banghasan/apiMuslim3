@@ -1,4 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import type { Hook } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { config } from "~/config.ts";
 import { createAccessLogger } from "~/middleware/logger.ts";
@@ -89,7 +90,35 @@ const docTemplateBytes = await Deno.readFile(docTemplateFile);
 const redocPage = new TextDecoder().decode(docTemplateBytes);
 
 const startedAt = new Date();
-const app = new OpenAPIHono<AppEnv>();
+
+const defaultHook: Hook<any, any, any, any> = (result, c) => {
+  if (!result.success) {
+    const issues = (result.error as any).issues || (result.error as any).errors;
+    let message = "Validation Error";
+    if (issues && Array.isArray(issues)) {
+      message = issues
+        .map((e: any) => `${e.path.join(".")}: ${e.message}`)
+        .join(", ");
+    } else if (result.error instanceof Error) {
+      try {
+        const parsed = JSON.parse(result.error.message);
+        if (Array.isArray(parsed)) {
+          message = parsed
+            .map((e: any) => `${(e.path || []).join(".")}: ${e.message}`)
+            .join(", ");
+        } else {
+          message = result.error.message;
+        }
+      } catch {
+        message = result.error.message;
+      }
+    }
+
+    return c.json({ status: false, message }, 400);
+  }
+};
+
+export const app = new OpenAPIHono<AppEnv>({ defaultHook });
 app.use(
   "*",
   cors({
@@ -340,9 +369,11 @@ Saran, ide, diskusi dan komunikasi dapat melalui:
   ],
 });
 
-const docHost = config.host === "0.0.0.0" ? "localhost" : config.host;
-console.log(`Listening on http://${docHost}:${config.port}`);
-Deno.serve(
-  { hostname: config.host, port: config.port },
-  (request, connInfo) => app.fetch(request, { connInfo }),
-);
+if (import.meta.main) {
+  const docHost = config.host === "0.0.0.0" ? "localhost" : config.host;
+  console.log(`Listening on http://${docHost}:${config.port}`);
+  Deno.serve(
+    { hostname: config.host, port: config.port },
+    (request, connInfo) => app.fetch(request, { connInfo }),
+  );
+}
