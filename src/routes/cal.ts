@@ -475,22 +475,22 @@ export const registerCalRoutes = (
 
   app.openapi(holidaysRoute, (c) => {
     return c.json({
-      status: false,
-      message: "dihandle microservice lain",
+      status: true,
+      message: "ok",
     });
   });
 
   app.openapi(holidaysTodayRoute, (c) => {
     return c.json({
-      status: false,
-      message: "dihandle microservice lain",
+      status: true,
+      message: "ok",
     });
   });
 
   app.openapi(holidaysTomorrowRoute, (c) => {
     return c.json({
-      status: false,
-      message: "dihandle microservice lain",
+      status: true,
+      message: "ok",
     });
   });
 };
