@@ -205,7 +205,7 @@ export const registerCalRoutes = (
   const holidaysRoute = createRoute({
     method: "get",
     path: "/cal/holidays",
-    summary: "❤️ Semua Libur Tahun Ini",
+    summary: "Liburan",
     description:
       "Menampilkan semua hari libur dalam tahun tertentu. Endpoint ini dihandle oleh microservice lain.",
     tags: ["Kalender"],
@@ -256,7 +256,7 @@ export const registerCalRoutes = (
   const holidaysTodayRoute = createRoute({
     method: "get",
     path: "/cal/holidays/today",
-    summary: "Cek Hari Ini Libur?",
+    summary: "Liburkah Hari Ini",
     description:
       "Mengecek apakah hari ini adalah hari libur atau tidak. Endpoint ini dihandle oleh microservice lain.",
     tags: ["Kalender"],
@@ -275,7 +275,7 @@ export const registerCalRoutes = (
   const holidaysTomorrowRoute = createRoute({
     method: "get",
     path: "/cal/holidays/tomorrow",
-    summary: "Cek Besok Libur?",
+    summary: "Liburkan Besok",
     description:
       "Mengecek apakah besok adalah hari libur atau tidak. Endpoint ini dihandle oleh microservice lain.",
     tags: ["Kalender"],
