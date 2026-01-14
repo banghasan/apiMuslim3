@@ -153,6 +153,27 @@ deno test --allow-env --allow-read
   ke Hijriyah; `adj` hanya mempengaruhi Hijriyah.
 - `GET /cal/ce/{YYYY-MM-DD}` – konversi tanggal Hijriyah ke tanggal Masehi;
   `adj` hanya mempengaruhi Masehi.
+
+**Endpoint hari libur berikut disediakan oleh layanan eksternal lainnya:**
+
+**Semua Libur Tahun Ini**
+- `GET /cal/holidays`
+Contoh hasil: `[{"date":"2026-01-01","name":"Tahun Baru 2026 Masehi"},{"date":"2026-01-16","name":"Isra Mikraj Nabi Muhammad S.A.W."},{"date":"2026-02-16","name":"Tahun Baru Imlek 2577 Kongzili"},{"date":"2026-02-17","name":"Tahun Baru Imlek 2577 Kongzili"},{"date":"2026-03-18","name":"Hari Suci Nyepi (Tahun Baru Saka 1948)"},{"date":"2026-03-19","name":"Hari Suci Nyepi (Tahun Baru Saka 1948)"},{"date":"2026-03-20","name":"Idul Fitri 1447 Hijriah"},{"date":"2026-03-21","name":"Idul Fitri 1447 Hijriah"},{"date":"2026-03-23","name":"Idul Fitri 1447 Hijriah"},{"date":"2026-04-03","name":"Wafat Yesus Kristus"},{"date":"2026-04-05","name":"Kebangkitan Yesus Kristus (Paskah)"},{"date":"2026-05-01","name":"Hari Buruh Internasional"},{"date":"2026-05-14","name":"Kenaikan Yesus Kristus"},{"date":"2026-05-15","name":"Kenaikan Yesus Kristus"},{"date":"2026-05-27","name":"Idul Adha 1447 Hijriah"},{"date":"2026-05-28","name":"Idul Adha 1447 Hijriah"},{"date":"2026-05-31","name":"Hari Raya Waisak 2570 BE"},{"date":"2026-06-01","name":"Hari Lahir Pancasila"},{"date":"2026-06-16","name":"1 Muharam Tahun Baru Islam 1448 Hijriah"},{"date":"2026-08-17","name":"Proklamasi Kemerdekaan"},{"date":"2026-08-25","name":"Maulid Nabi Muhammad S.A.W."},{"date":"2026-12-25","name":"Kelahiran Yesus Kristus"}]`
+
+**Libur Waktu Tertentu**
+- `GET /cal/holidays?year=:tahun`
+- `GET /cal/holidays?month=:bulan`
+- `GET /cal/holidays?year=:tahun&month=:bulan`
+- `GET /cal/holidays?year=:tahun&month=:bulan&day=:hari`
+
+**Cek Hari Ini**
+- `GET /cal/holidays/today`
+hasil: `{"date":"2026-01-14","is_holiday":false,"holiday_list":[]}`
+
+**Cek Besok**
+- `GET /cal/holidays/tomorrow`
+hasil: `{"date":"2026-01-15","is_holiday":false,"holiday_list":[]}`
+
 - `GET /qibla/{lat,lng}` – arah kiblat (derajat dari utara) berdasarkan
   koordinat derajat desimal.
 - `GET /tools/ip` – deteksi IP pengguna (memperhatikan proxy/Cloudflare) beserta

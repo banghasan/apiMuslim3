@@ -65,6 +65,13 @@ const calendarErrorSchema = z
   })
   .openapi("CalendarError");
 
+const holidayErrorSchema = z
+  .object({
+    status: z.literal(false).openapi({ example: false }),
+    message: z.string().openapi({ example: "dihandle microservice lain" }),
+  })
+  .openapi("HolidayError");
+
 const calendarQuerySchema = z.object({
   adj: z
     .string()
@@ -192,6 +199,96 @@ export const registerCalRoutes = (
       "GET",
       "/cal/today?adj=0&tz=Asia%2FJakarta",
     ),
+  });
+
+  // Holiday Routes (handled by external microservice)
+  const holidaysRoute = createRoute({
+    method: "get",
+    path: "/cal/holidays",
+    summary: "❤️ Semua Libur Tahun Ini",
+    description:
+      "Menampilkan semua hari libur dalam tahun tertentu. Endpoint ini dihandle oleh microservice lain.",
+    tags: ["Kalender"],
+    request: {
+      query: z.object({
+        year: z
+          .string()
+          .regex(/^\d{4}$/)
+          .openapi({
+            example: "2026",
+            description: "Tahun dalam format YYYY",
+          })
+          .optional(),
+        month: z
+          .string()
+          .regex(/^\d{1,2}$/)
+          .min(1)
+          .max(12)
+          .openapi({
+            example: "1",
+            description: "Bulan dalam angka (1-12)",
+          })
+          .optional(),
+        day: z
+          .string()
+          .regex(/^\d{1,2}$/)
+          .min(1)
+          .max(31)
+          .openapi({
+            example: "1",
+            description: "Hari dalam angka (1-31)",
+          })
+          .optional(),
+      }),
+    },
+    responses: {
+      200: {
+        description: "Daftar hari libur (dihandle oleh microservice lain).",
+        content: {
+          "application/json": {
+            schema: holidayErrorSchema,
+          },
+        },
+      },
+    },
+  });
+
+  const holidaysTodayRoute = createRoute({
+    method: "get",
+    path: "/cal/holidays/today",
+    summary: "Cek Hari Ini Libur?",
+    description:
+      "Mengecek apakah hari ini adalah hari libur atau tidak. Endpoint ini dihandle oleh microservice lain.",
+    tags: ["Kalender"],
+    responses: {
+      200: {
+        description: "Status hari ini (dihandle oleh microservice lain).",
+        content: {
+          "application/json": {
+            schema: holidayErrorSchema,
+          },
+        },
+      },
+    },
+  });
+
+  const holidaysTomorrowRoute = createRoute({
+    method: "get",
+    path: "/cal/holidays/tomorrow",
+    summary: "Cek Besok Libur?",
+    description:
+      "Mengecek apakah besok adalah hari libur atau tidak. Endpoint ini dihandle oleh microservice lain.",
+    tags: ["Kalender"],
+    responses: {
+      200: {
+        description: "Status besok (dihandle oleh microservice lain).",
+        content: {
+          "application/json": {
+            schema: holidayErrorSchema,
+          },
+        },
+      },
+    },
   });
 
   const hijrRoute = createRoute({
@@ -375,4 +472,25 @@ export const registerCalRoutes = (
         readQueryFromContext(c),
       ),
   );
+
+  app.openapi(holidaysRoute, (c) => {
+    return c.json({
+      status: false,
+      message: "dihandle microservice lain",
+    });
+  });
+
+  app.openapi(holidaysTodayRoute, (c) => {
+    return c.json({
+      status: false,
+      message: "dihandle microservice lain",
+    });
+  });
+
+  app.openapi(holidaysTomorrowRoute, (c) => {
+    return c.json({
+      status: false,
+      message: "dihandle microservice lain",
+    });
+  });
 };
