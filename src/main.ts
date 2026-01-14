@@ -91,12 +91,15 @@ const redocPage = new TextDecoder().decode(docTemplateBytes);
 
 const startedAt = new Date();
 
+// deno-lint-ignore no-explicit-any
 const defaultHook: Hook<any, any, any, any> = (result, c) => {
   if (!result.success) {
+    // deno-lint-ignore no-explicit-any
     const issues = (result.error as any).issues || (result.error as any).errors;
     let message = "Validation Error";
     if (issues && Array.isArray(issues)) {
       message = issues
+        // deno-lint-ignore no-explicit-any
         .map((e: any) => `${e.path.join(".")}: ${e.message}`)
         .join(", ");
     } else if (result.error instanceof Error) {
@@ -104,6 +107,7 @@ const defaultHook: Hook<any, any, any, any> = (result, c) => {
         const parsed = JSON.parse(result.error.message);
         if (Array.isArray(parsed)) {
           message = parsed
+            // deno-lint-ignore no-explicit-any
             .map((e: any) => `${(e.path || []).join(".")}: ${e.message}`)
             .join(", ");
         } else {
