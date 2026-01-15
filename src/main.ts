@@ -26,11 +26,7 @@ import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
 
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
-const redocScriptFile = new URL(
-  "./static/redoc.standalone.js",
-  import.meta.url,
-);
-const redocScriptBytes = await Deno.readFile(redocScriptFile);
+
 const myQuranLogoFile = new URL("./static/api-myquran.png", import.meta.url);
 const myQuranLogoBytes = await Deno.readFile(myQuranLogoFile);
 const appleTouchIconFile = new URL(
@@ -148,16 +144,7 @@ app.get(
       },
     }),
 );
-app.get(
-  "/doc/redoc.standalone.js",
-  () =>
-    new Response(redocScriptBytes, {
-      headers: {
-        "content-type": "application/javascript",
-        "cache-control": "public, max-age=604800",
-      },
-    }),
-);
+
 app.get("/doc", (c) => c.html(redocPage));
 app.get("/doc/", (c) => c.html(redocPage));
 app.get("/doc/index.html", (c) => c.html(redocPage));

@@ -330,7 +330,8 @@
         const loadRedocScript = () =>
           new Promise((resolve, reject) => {
             const script = document.createElement("script");
-            script.src = buildDocUrl("redoc.standalone.js");
+            script.src =
+              "https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js";
             script.onload = resolve;
             script.onerror = reject;
             document.head.appendChild(script);
