@@ -1,6 +1,8 @@
 export const DAY_MS = 24 * 60 * 60 * 1000;
 export const DEFAULT_CALENDAR_TIMEZONE = "Asia/Jakarta";
 
+const pad2 = (value: string | number) => String(value).trim().padStart(2, "0");
+
 export type CalendarMethod = "standar" | "islamic-umalqura" | "islamic-civil";
 export type CalendarId = "islamic" | "islamic-umalqura" | "islamic-civil";
 
@@ -301,4 +303,88 @@ export const parseCalendarMethod = (
   if (!value) return methodMap.standar;
   const key = value.trim().toLowerCase();
   return methodMap[key] ?? methodMap.standar;
+};
+
+/**
+ * Get the current Hijri year based on the given timezone
+ */
+export const getCurrentHijriYear = (
+  timeZone: string = DEFAULT_CALENDAR_TIMEZONE,
+  calendar: CalendarId = "islamic",
+): number => {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    calendar,
+    numberingSystem: "latn",
+    year: "numeric",
+  });
+  const parts = formatter.formatToParts(now);
+  const year = parts.find((part) => part.type === "year")?.value;
+  return year ? Number(year) : 1446; // fallback to a reasonable default
+};
+
+/**
+ * Get Ramadan periods (month 9) that fall within a given CE year
+ * Returns array of {year, month} for Gregorian calendar
+ * A CE year can contain 1 or 2 Ramadan months
+ */
+export const getRamadanMonthsForCeYear = (
+  ceYear: number,
+  calendar: CalendarId = "islamic",
+  timeZone: string = DEFAULT_CALENDAR_TIMEZONE,
+): Array<{ year: string; month: string }> => {
+  const results: Array<{ year: string; month: string }> = [];
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    calendar,
+    numberingSystem: "latn",
+    year: "numeric",
+    month: "numeric",
+  });
+
+  // Check each month of the CE year
+  for (let month = 1; month <= 12; month++) {
+    // Check beginning and end of each month
+    for (let day = 1; day <= 28; day += 14) {
+      const date = createZonedDate({ year: ceYear, month, day }, timeZone);
+      const parts = extractParts(formatter.formatToParts(date));
+      
+      // Month 9 is Ramadan in Islamic calendar
+      if (parts.month === 9) {
+        // Avoid duplicates
+        if (!results.some((r) => r.year === String(ceYear) && r.month === pad2(month))) {
+          results.push({ year: String(ceYear), month: pad2(month) });
+        }
+      }
+
+    }
+  }
+
+  return results;
+};
+
+/**
+ * Convert Hijri year to CE year/month for Ramadan (month 9)
+ * Returns the CE year and month when Ramadan 1st falls
+ */
+export const convertRamadanHijriToCe = (
+  hijriYear: number,
+  calendar: CalendarId = "islamic",
+  timeZone: string = DEFAULT_CALENDAR_TIMEZONE,
+): { year: string; month: string } | null => {
+  // Ramadan is month 9, day 1
+  const ramadanStart = convertHijriToGregorian(
+    { year: hijriYear, month: 9, day: 1 },
+    calendar,
+    timeZone,
+  );
+  
+  if (!ramadanStart) return null;
+  
+  const parts = getGregorianParts(ramadanStart, timeZone);
+  return {
+    year: String(parts.year),
+    month: pad2(parts.month),
+  };
 };
