@@ -1,5 +1,6 @@
 import type { AppEnv } from "~/types.ts";
 import type { QuranService } from "~/services/quran.ts";
+import type { QuranSearchService } from "~/services/quran_search.ts";
 import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 
@@ -7,12 +8,14 @@ export type RegisterQuranRoutesOptions = {
   app: OpenAPIHono<AppEnv>;
   docBaseUrl: string;
   quranService: QuranService;
+  quranSearchService?: QuranSearchService | null;
 };
 
 export const registerQuranRoutes = ({
   app,
   // docBaseUrl,
   quranService,
+  quranSearchService,
 }: RegisterQuranRoutesOptions) => {
   const surahSchema = z.object({
     number: z.number().openapi({ example: 1 }),
@@ -805,4 +808,122 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
       return c.json({ status: true, data: formattedAyah }, 200);
     },
   );
+
+  // POST /quran/search - Search ayahs
+  const searchRoute = createRoute({
+    method: "post",
+    path: "/quran/search",
+    tags: ["Quran"],
+    summary: "Pencarian Ayat",
+    description: "Mencari ayat Al-Quran berdasarkan kata kunci.",
+    request: {
+      body: {
+        content: {
+          "application/json": {
+            schema: z.object({
+              keyword: z.string().min(3).openapi({ example: "pujian" }),
+              page: z.number().int().min(1).default(1).openapi({ example: 1 }),
+              limit: z.number().int().min(1).max(100).default(10).openapi({ example: 10 }),
+            }),
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: "Hasil Pencarian",
+        content: {
+          "application/json": {
+            schema: z.object({
+              status: z.boolean(),
+              message: z.string(),
+              data: z.array(ayahSchema.extend({
+                surah: z.object({
+                  number: z.number(),
+                  name: z.string(),
+                  name_latin: z.string(),
+                  number_of_ayahs: z.number(),
+                  translation: z.string(),
+                  revelation: z.string(),
+                }),
+              })),
+              pagination: paginationMetaSchema,
+            }),
+          },
+        },
+      },
+      503: {
+        description: "Service unavailable",
+        content: {
+          "application/json": {
+            schema: z.object({
+              status: z.boolean(),
+              message: z.string(),
+            }),
+          },
+        },
+      },
+      500: {
+        description: "Internal Server Error",
+        content: {
+          "application/json": {
+            schema: z.object({
+              status: z.boolean(),
+              message: z.string(),
+            }),
+          },
+        },
+      },
+    },
+  });
+
+  app.openapi(searchRoute, async (c) => {
+    if (!quranSearchService) {
+      return c.json({ status: false, message: "Layanan pencarian belum tersedia" }, 503);
+    }
+    const { keyword, page, limit } = c.req.valid("json");
+    try {
+      const { total, hits } = await quranSearchService.search(keyword, page, limit);
+      
+      const formattedData = hits.map((ayahData) => ({
+        id: ayahData.id,
+        surah_number: ayahData.surah_number,
+        ayah_number: ayahData.ayah_number,
+        arab: ayahData.arab,
+        translation: ayahData.translation,
+        audio_url: ayahData.audio_url,
+        image_url: ayahData.image_url,
+        tafsir: {
+          kemenag: {
+            short: ayahData.tafsir_kemenag_short,
+            long: ayahData.tafsir_kemenag_long,
+          },
+          quraish: ayahData.tafsir_quraish,
+          jalalayn: ayahData.tafsir_jalalayn,
+        },
+        meta: {
+          juz: ayahData.meta_juz,
+          page: ayahData.meta_page,
+          manzil: ayahData.meta_manzil,
+          ruku: ayahData.meta_ruku,
+          hizb_quarter: ayahData.meta_hizb_quarter,
+          sajda: {
+            recommended: ayahData.meta_sajda_recommended,
+            obligatory: ayahData.meta_sajda_obligatory,
+          },
+        },
+        surah: ayahData.surah,
+      }));
+
+      return c.json({
+        status: true,
+        message: "success",
+        data: formattedData,
+        pagination: { page, limit, total },
+      }, 200);
+    } catch (error) {
+      console.error(error);
+      return c.json({ status: false, message: "Gagal memproses pencarian" }, 500);
+    }
+  });
 };

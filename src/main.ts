@@ -25,6 +25,7 @@ import { registerHealthRoutes } from "~/routes/health.ts";
 import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
 import { registerQuranRoutes } from "~/routes/quran.ts";
 import { createQuranService } from "~/services/quran.ts";
+import { createQuranSearchService } from "~/services/quran_search.ts";
 
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
@@ -267,10 +268,18 @@ registerHadisPerawiRoutes({
   docBaseUrl: config.docBaseUrl,
   hadisPerawiService,
 });
+const quranSearchService = config.meiliHost
+  ? createQuranSearchService({
+    host: config.meiliHost,
+    apiKey: config.meiliApiKey,
+  })
+  : null;
+
 registerQuranRoutes({
   app,
   docBaseUrl: config.docBaseUrl,
   quranService,
+  quranSearchService,
 });
 registerHealthRoutes({
   app,

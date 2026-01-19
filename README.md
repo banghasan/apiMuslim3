@@ -146,6 +146,7 @@ deno test --allow-env --allow-read
 - `GET /quran/{number}/{ayah}` – Detail ayat spesifik.
 - `GET /quran/random` – Satu ayat acak.
 - `GET /quran/sajda` – Daftar ayat-ayat sajadah.
+- `POST /quran/search` – Pencarian ayat berdasarkan keyword.
 - `GET /quran/juz/{number}` – Daftar ayat dalam Juz (1-30).
 - `GET /quran/page/{number}` – Daftar ayat dalam Halaman (1-604).
 - `GET /quran/manzil/{number}` – Daftar ayat dalam Manzil (1-7).
