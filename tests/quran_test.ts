@@ -1,8 +1,5 @@
 import { createQuranService } from "../src/services/quran.ts";
-import {
-  assert,
-  assertEquals,
-} from "https://deno.land/std@0.224.0/assert/mod.ts";
+import { assert, assertEquals } from "@std/assert";
 
 const dbPath = new URL("../data/quran/quran.db", import.meta.url).pathname;
 const service = createQuranService(decodeURIComponent(dbPath));
@@ -11,7 +8,7 @@ Deno.test("Quran Service - Get All Surahs", () => {
   const surahs = service.getAllSurahs();
   assertEquals(surahs.length, 114);
   assertEquals(surahs[0].name_latin, "Al-Fatihah");
-  assertEquals(surahs[113].name_latin, "An-Naas");
+  assertEquals(surahs[113].name_latin, "An-Nas");
 });
 
 Deno.test("Quran Service - Get Specific Surah", () => {

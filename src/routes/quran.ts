@@ -1,16 +1,17 @@
-import type { App, AppEnv } from "~/types.ts";
+import type { AppEnv } from "~/types.ts";
 import type { QuranService } from "~/services/quran.ts";
 import { createRoute, z } from "@hono/zod-openapi";
+import type { OpenAPIHono } from "@hono/zod-openapi";
 
 export type RegisterQuranRoutesOptions = {
-  app: App;
+  app: OpenAPIHono<AppEnv>;
   docBaseUrl: string;
   quranService: QuranService;
 };
 
 export const registerQuranRoutes = ({
   app,
-  docBaseUrl,
+  // docBaseUrl,
   quranService,
 }: RegisterQuranRoutesOptions) => {
   const surahSchema = z.object({
@@ -75,7 +76,7 @@ export const registerQuranRoutes = ({
     }),
     (c) => {
       const data = quranService.getAllSurahs();
-      return c.json({ status: true, data });
+      return c.json({ status: true, data }, 200);
     },
   );
 
@@ -163,7 +164,7 @@ export const registerQuranRoutes = ({
       return c.json({
         status: true,
         data: { ...surahData, ayahs: formattedAyahs },
-      });
+      }, 200);
     },
   );
 
@@ -245,7 +246,7 @@ export const registerQuranRoutes = ({
         },
       };
 
-      return c.json({ status: true, data: formattedAyah });
+      return c.json({ status: true, data: formattedAyah }, 200);
     },
   );
 };
