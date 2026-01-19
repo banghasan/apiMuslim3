@@ -231,6 +231,376 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
     },
   );
 
+  // GET /quran/juz/:number - Get ayahs by Juz
+  app.openapi(
+    createRoute({
+      method: "get",
+      path: "/quran/juz/{number}",
+      tags: ["Quran"],
+      summary: "Ayat per Juz",
+      description: `Mendapatkan semua ayat dalam Juz tertentu. Al-Quran dibagi menjadi 30 Juz.`,
+      request: {
+        params: z.object({
+          number: z.string().transform((v) => parseInt(v, 10)).pipe(
+            z.number().min(1).max(30),
+          ),
+        }),
+      },
+      responses: {
+        200: {
+          description: "Daftar Ayat dalam Juz",
+          content: {
+            "application/json": {
+              schema: z.object({
+                status: z.boolean(),
+                data: z.array(ayahSchema.extend({
+                  surah: z.object({
+                    number: z.number(),
+                    name: z.string(),
+                    name_latin: z.string(),
+                    number_of_ayahs: z.number(),
+                    translation: z.string(),
+                    revelation: z.string(),
+                  }),
+                })),
+              }),
+            },
+          },
+        },
+      },
+    }),
+    (c) => {
+      const { number } = c.req.valid("param");
+      const data = quranService.getAyahsByJuz(number);
+      const formattedData = data.map((ayahData) => ({
+        id: ayahData.id,
+        surah_number: ayahData.surah_number,
+        ayah_number: ayahData.ayah_number,
+        arab: ayahData.arab,
+        translation: ayahData.translation,
+        audio_url: ayahData.audio_url,
+        image_url: ayahData.image_url,
+        tafsir: {
+          kemenag: {
+            short: ayahData.tafsir_kemenag_short,
+            long: ayahData.tafsir_kemenag_long,
+          },
+          quraish: ayahData.tafsir_quraish,
+          jalalayn: ayahData.tafsir_jalalayn,
+        },
+        meta: {
+          juz: ayahData.meta_juz,
+          page: ayahData.meta_page,
+          manzil: ayahData.meta_manzil,
+          ruku: ayahData.meta_ruku,
+          hizb_quarter: ayahData.meta_hizb_quarter,
+          sajda: {
+            recommended: ayahData.meta_sajda_recommended,
+            obligatory: ayahData.meta_sajda_obligatory,
+          },
+        },
+        surah: ayahData.surah,
+      }));
+      return c.json({ status: true, data: formattedData }, 200);
+    },
+  );
+
+  // GET /quran/page/:number - Get ayahs by Page
+  app.openapi(
+    createRoute({
+      method: "get",
+      path: "/quran/page/{number}",
+      tags: ["Quran"],
+      summary: "Ayat per Halaman",
+      description: `Mendapatkan semua ayat dalam halaman tertentu. Al-Quran memiliki 604 halaman.`,
+      request: {
+        params: z.object({
+          number: z.string().transform((v) => parseInt(v, 10)).pipe(
+            z.number().min(1).max(604),
+          ),
+        }),
+      },
+      responses: {
+        200: {
+          description: "Daftar Ayat dalam Halaman",
+          content: {
+            "application/json": {
+              schema: z.object({
+                status: z.boolean(),
+                data: z.array(ayahSchema.extend({
+                  surah: z.object({
+                    number: z.number(),
+                    name: z.string(),
+                    name_latin: z.string(),
+                    number_of_ayahs: z.number(),
+                    translation: z.string(),
+                    revelation: z.string(),
+                  }),
+                })),
+              }),
+            },
+          },
+        },
+      },
+    }),
+    (c) => {
+      const { number } = c.req.valid("param");
+      const data = quranService.getAyahsByPage(number);
+      const formattedData = data.map((ayahData) => ({
+        id: ayahData.id,
+        surah_number: ayahData.surah_number,
+        ayah_number: ayahData.ayah_number,
+        arab: ayahData.arab,
+        translation: ayahData.translation,
+        audio_url: ayahData.audio_url,
+        image_url: ayahData.image_url,
+        tafsir: {
+          kemenag: {
+            short: ayahData.tafsir_kemenag_short,
+            long: ayahData.tafsir_kemenag_long,
+          },
+          quraish: ayahData.tafsir_quraish,
+          jalalayn: ayahData.tafsir_jalalayn,
+        },
+        meta: {
+          juz: ayahData.meta_juz,
+          page: ayahData.meta_page,
+          manzil: ayahData.meta_manzil,
+          ruku: ayahData.meta_ruku,
+          hizb_quarter: ayahData.meta_hizb_quarter,
+          sajda: {
+            recommended: ayahData.meta_sajda_recommended,
+            obligatory: ayahData.meta_sajda_obligatory,
+          },
+        },
+        surah: ayahData.surah,
+      }));
+      return c.json({ status: true, data: formattedData }, 200);
+    },
+  );
+
+  // GET /quran/manzil/:number - Get ayahs by Manzil
+  app.openapi(
+    createRoute({
+      method: "get",
+      path: "/quran/manzil/{number}",
+      tags: ["Quran"],
+      summary: "Ayat per Manzil",
+      description: `Mendapatkan semua ayat dalam Manzil tertentu. Al-Quran dibagi menjadi 7 Manzil untuk memudahkan pembacaan mingguan.`,
+      request: {
+        params: z.object({
+          number: z.string().transform((v) => parseInt(v, 10)).pipe(
+            z.number().min(1).max(7),
+          ),
+        }),
+      },
+      responses: {
+        200: {
+          description: "Daftar Ayat dalam Manzil",
+          content: {
+            "application/json": {
+              schema: z.object({
+                status: z.boolean(),
+                data: z.array(ayahSchema.extend({
+                  surah: z.object({
+                    number: z.number(),
+                    name: z.string(),
+                    name_latin: z.string(),
+                    number_of_ayahs: z.number(),
+                    translation: z.string(),
+                    revelation: z.string(),
+                  }),
+                })),
+              }),
+            },
+          },
+        },
+      },
+    }),
+    (c) => {
+      const { number } = c.req.valid("param");
+      const data = quranService.getAyahsByManzil(number);
+      const formattedData = data.map((ayahData) => ({
+        id: ayahData.id,
+        surah_number: ayahData.surah_number,
+        ayah_number: ayahData.ayah_number,
+        arab: ayahData.arab,
+        translation: ayahData.translation,
+        audio_url: ayahData.audio_url,
+        image_url: ayahData.image_url,
+        tafsir: {
+          kemenag: {
+            short: ayahData.tafsir_kemenag_short,
+            long: ayahData.tafsir_kemenag_long,
+          },
+          quraish: ayahData.tafsir_quraish,
+          jalalayn: ayahData.tafsir_jalalayn,
+        },
+        meta: {
+          juz: ayahData.meta_juz,
+          page: ayahData.meta_page,
+          manzil: ayahData.meta_manzil,
+          ruku: ayahData.meta_ruku,
+          hizb_quarter: ayahData.meta_hizb_quarter,
+          sajda: {
+            recommended: ayahData.meta_sajda_recommended,
+            obligatory: ayahData.meta_sajda_obligatory,
+          },
+        },
+        surah: ayahData.surah,
+      }));
+      return c.json({ status: true, data: formattedData }, 200);
+    },
+  );
+
+  // GET /quran/ruku/:number - Get ayahs by Ruku
+  app.openapi(
+    createRoute({
+      method: "get",
+      path: "/quran/ruku/{number}",
+      tags: ["Quran"],
+      summary: "Ayat per Ruku",
+      description: `Mendapatkan semua ayat dalam Ruku tertentu. Ruku adalah pembagian tematik dalam Al-Quran.`,
+      request: {
+        params: z.object({
+          number: z.string().transform((v) => parseInt(v, 10)).pipe(
+            z.number().min(1),
+          ),
+        }),
+      },
+      responses: {
+        200: {
+          description: "Daftar Ayat dalam Ruku",
+          content: {
+            "application/json": {
+              schema: z.object({
+                status: z.boolean(),
+                data: z.array(ayahSchema.extend({
+                  surah: z.object({
+                    number: z.number(),
+                    name: z.string(),
+                    name_latin: z.string(),
+                    number_of_ayahs: z.number(),
+                    translation: z.string(),
+                    revelation: z.string(),
+                  }),
+                })),
+              }),
+            },
+          },
+        },
+      },
+    }),
+    (c) => {
+      const { number } = c.req.valid("param");
+      const data = quranService.getAyahsByRuku(number);
+      const formattedData = data.map((ayahData) => ({
+        id: ayahData.id,
+        surah_number: ayahData.surah_number,
+        ayah_number: ayahData.ayah_number,
+        arab: ayahData.arab,
+        translation: ayahData.translation,
+        audio_url: ayahData.audio_url,
+        image_url: ayahData.image_url,
+        tafsir: {
+          kemenag: {
+            short: ayahData.tafsir_kemenag_short,
+            long: ayahData.tafsir_kemenag_long,
+          },
+          quraish: ayahData.tafsir_quraish,
+          jalalayn: ayahData.tafsir_jalalayn,
+        },
+        meta: {
+          juz: ayahData.meta_juz,
+          page: ayahData.meta_page,
+          manzil: ayahData.meta_manzil,
+          ruku: ayahData.meta_ruku,
+          hizb_quarter: ayahData.meta_hizb_quarter,
+          sajda: {
+            recommended: ayahData.meta_sajda_recommended,
+            obligatory: ayahData.meta_sajda_obligatory,
+          },
+        },
+        surah: ayahData.surah,
+      }));
+      return c.json({ status: true, data: formattedData }, 200);
+    },
+  );
+
+  // GET /quran/hizb/:number - Get ayahs by Hizb Quarter
+  app.openapi(
+    createRoute({
+      method: "get",
+      path: "/quran/hizb/{number}",
+      tags: ["Quran"],
+      summary: "Ayat per Hizb",
+      description: `Mendapatkan semua ayat dalam Hizb Quarter tertentu. Al-Quran dibagi menjadi 240 Hizb Quarter (60 Hizb × 4 quarters).`,
+      request: {
+        params: z.object({
+          number: z.string().transform((v) => parseInt(v, 10)).pipe(
+            z.number().min(1).max(240),
+          ),
+        }),
+      },
+      responses: {
+        200: {
+          description: "Daftar Ayat dalam Hizb Quarter",
+          content: {
+            "application/json": {
+              schema: z.object({
+                status: z.boolean(),
+                data: z.array(ayahSchema.extend({
+                  surah: z.object({
+                    number: z.number(),
+                    name: z.string(),
+                    name_latin: z.string(),
+                    number_of_ayahs: z.number(),
+                    translation: z.string(),
+                    revelation: z.string(),
+                  }),
+                })),
+              }),
+            },
+          },
+        },
+      },
+    }),
+    (c) => {
+      const { number } = c.req.valid("param");
+      const data = quranService.getAyahsByHizb(number);
+      const formattedData = data.map((ayahData) => ({
+        id: ayahData.id,
+        surah_number: ayahData.surah_number,
+        ayah_number: ayahData.ayah_number,
+        arab: ayahData.arab,
+        translation: ayahData.translation,
+        audio_url: ayahData.audio_url,
+        image_url: ayahData.image_url,
+        tafsir: {
+          kemenag: {
+            short: ayahData.tafsir_kemenag_short,
+            long: ayahData.tafsir_kemenag_long,
+          },
+          quraish: ayahData.tafsir_quraish,
+          jalalayn: ayahData.tafsir_jalalayn,
+        },
+        meta: {
+          juz: ayahData.meta_juz,
+          page: ayahData.meta_page,
+          manzil: ayahData.meta_manzil,
+          ruku: ayahData.meta_ruku,
+          hizb_quarter: ayahData.meta_hizb_quarter,
+          sajda: {
+            recommended: ayahData.meta_sajda_recommended,
+            obligatory: ayahData.meta_sajda_obligatory,
+          },
+        },
+        surah: ayahData.surah,
+      }));
+      return c.json({ status: true, data: formattedData }, 200);
+    },
+  );
+
   // GET /quran/:surah - Get specific surah details (with or without ayahs could be option, here maybe just info or list)
   // To keep it simple, let's return surah info + list of ayahs if requested?
   // Standard practice often: /quran/:id returns surah info. /quran/:id/ayahs returns ayahs.

@@ -244,6 +244,231 @@ export const createQuranService = (dbPath: string) => {
     }));
   };
 
+  const getAyahsByJuz = (juzNumber: number): AyahWithSurah[] => {
+    const rows = db.query(
+      `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
+              a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
+              a.audio_url, a.image_url, a.meta_juz, a.meta_page, a.meta_manzil, a.meta_ruku, a.meta_hizb_quarter,
+              a.meta_sajda_recommended, a.meta_sajda_obligatory,
+              s.number, s.name, s.name_latin, s.number_of_ayahs, s.translation, s.revelation
+       FROM ayahs a
+       JOIN surahs s ON a.surah_number = s.number
+       WHERE a.meta_juz = ?
+       ORDER BY a.surah_number, a.ayah_number ASC`,
+      [juzNumber],
+    );
+
+    // deno-lint-ignore no-explicit-any
+    return rows.map((r: any) => ({
+      id: r[0],
+      surah_number: r[1],
+      ayah_number: r[2],
+      arab: r[3],
+      translation: r[4],
+      tafsir_kemenag_short: r[5],
+      tafsir_kemenag_long: r[6],
+      tafsir_quraish: r[7],
+      tafsir_jalalayn: r[8],
+      audio_url: r[9],
+      image_url: r[10],
+      meta_juz: r[11],
+      meta_page: r[12],
+      meta_manzil: r[13],
+      meta_ruku: r[14],
+      meta_hizb_quarter: r[15],
+      meta_sajda_recommended: Boolean(r[16]),
+      meta_sajda_obligatory: Boolean(r[17]),
+      surah: {
+        number: r[18],
+        name: r[19],
+        name_latin: r[20],
+        number_of_ayahs: r[21],
+        translation: r[22],
+        revelation: r[23],
+      },
+    }));
+  };
+
+  const getAyahsByPage = (pageNumber: number): AyahWithSurah[] => {
+    const rows = db.query(
+      `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
+              a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
+              a.audio_url, a.image_url, a.meta_juz, a.meta_page, a.meta_manzil, a.meta_ruku, a.meta_hizb_quarter,
+              a.meta_sajda_recommended, a.meta_sajda_obligatory,
+              s.number, s.name, s.name_latin, s.number_of_ayahs, s.translation, s.revelation
+       FROM ayahs a
+       JOIN surahs s ON a.surah_number = s.number
+       WHERE a.meta_page = ?
+       ORDER BY a.surah_number, a.ayah_number ASC`,
+      [pageNumber],
+    );
+
+    // deno-lint-ignore no-explicit-any
+    return rows.map((r: any) => ({
+      id: r[0],
+      surah_number: r[1],
+      ayah_number: r[2],
+      arab: r[3],
+      translation: r[4],
+      tafsir_kemenag_short: r[5],
+      tafsir_kemenag_long: r[6],
+      tafsir_quraish: r[7],
+      tafsir_jalalayn: r[8],
+      audio_url: r[9],
+      image_url: r[10],
+      meta_juz: r[11],
+      meta_page: r[12],
+      meta_manzil: r[13],
+      meta_ruku: r[14],
+      meta_hizb_quarter: r[15],
+      meta_sajda_recommended: Boolean(r[16]),
+      meta_sajda_obligatory: Boolean(r[17]),
+      surah: {
+        number: r[18],
+        name: r[19],
+        name_latin: r[20],
+        number_of_ayahs: r[21],
+        translation: r[22],
+        revelation: r[23],
+      },
+    }));
+  };
+
+  const getAyahsByManzil = (manzilNumber: number): AyahWithSurah[] => {
+    const rows = db.query(
+      `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
+              a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
+              a.audio_url, a.image_url, a.meta_juz, a.meta_page, a.meta_manzil, a.meta_ruku, a.meta_hizb_quarter,
+              a.meta_sajda_recommended, a.meta_sajda_obligatory,
+              s.number, s.name, s.name_latin, s.number_of_ayahs, s.translation, s.revelation
+       FROM ayahs a
+       JOIN surahs s ON a.surah_number = s.number
+       WHERE a.meta_manzil = ?
+       ORDER BY a.surah_number, a.ayah_number ASC`,
+      [manzilNumber],
+    );
+
+    // deno-lint-ignore no-explicit-any
+    return rows.map((r: any) => ({
+      id: r[0],
+      surah_number: r[1],
+      ayah_number: r[2],
+      arab: r[3],
+      translation: r[4],
+      tafsir_kemenag_short: r[5],
+      tafsir_kemenag_long: r[6],
+      tafsir_quraish: r[7],
+      tafsir_jalalayn: r[8],
+      audio_url: r[9],
+      image_url: r[10],
+      meta_juz: r[11],
+      meta_page: r[12],
+      meta_manzil: r[13],
+      meta_ruku: r[14],
+      meta_hizb_quarter: r[15],
+      meta_sajda_recommended: Boolean(r[16]),
+      meta_sajda_obligatory: Boolean(r[17]),
+      surah: {
+        number: r[18],
+        name: r[19],
+        name_latin: r[20],
+        number_of_ayahs: r[21],
+        translation: r[22],
+        revelation: r[23],
+      },
+    }));
+  };
+
+  const getAyahsByRuku = (rukuNumber: number): AyahWithSurah[] => {
+    const rows = db.query(
+      `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
+              a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
+              a.audio_url, a.image_url, a.meta_juz, a.meta_page, a.meta_manzil, a.meta_ruku, a.meta_hizb_quarter,
+              a.meta_sajda_recommended, a.meta_sajda_obligatory,
+              s.number, s.name, s.name_latin, s.number_of_ayahs, s.translation, s.revelation
+       FROM ayahs a
+       JOIN surahs s ON a.surah_number = s.number
+       WHERE a.meta_ruku = ?
+       ORDER BY a.surah_number, a.ayah_number ASC`,
+      [rukuNumber],
+    );
+
+    // deno-lint-ignore no-explicit-any
+    return rows.map((r: any) => ({
+      id: r[0],
+      surah_number: r[1],
+      ayah_number: r[2],
+      arab: r[3],
+      translation: r[4],
+      tafsir_kemenag_short: r[5],
+      tafsir_kemenag_long: r[6],
+      tafsir_quraish: r[7],
+      tafsir_jalalayn: r[8],
+      audio_url: r[9],
+      image_url: r[10],
+      meta_juz: r[11],
+      meta_page: r[12],
+      meta_manzil: r[13],
+      meta_ruku: r[14],
+      meta_hizb_quarter: r[15],
+      meta_sajda_recommended: Boolean(r[16]),
+      meta_sajda_obligatory: Boolean(r[17]),
+      surah: {
+        number: r[18],
+        name: r[19],
+        name_latin: r[20],
+        number_of_ayahs: r[21],
+        translation: r[22],
+        revelation: r[23],
+      },
+    }));
+  };
+
+  const getAyahsByHizb = (hizbNumber: number): AyahWithSurah[] => {
+    const rows = db.query(
+      `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
+              a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
+              a.audio_url, a.image_url, a.meta_juz, a.meta_page, a.meta_manzil, a.meta_ruku, a.meta_hizb_quarter,
+              a.meta_sajda_recommended, a.meta_sajda_obligatory,
+              s.number, s.name, s.name_latin, s.number_of_ayahs, s.translation, s.revelation
+       FROM ayahs a
+       JOIN surahs s ON a.surah_number = s.number
+       WHERE a.meta_hizb_quarter = ?
+       ORDER BY a.surah_number, a.ayah_number ASC`,
+      [hizbNumber],
+    );
+
+    // deno-lint-ignore no-explicit-any
+    return rows.map((r: any) => ({
+      id: r[0],
+      surah_number: r[1],
+      ayah_number: r[2],
+      arab: r[3],
+      translation: r[4],
+      tafsir_kemenag_short: r[5],
+      tafsir_kemenag_long: r[6],
+      tafsir_quraish: r[7],
+      tafsir_jalalayn: r[8],
+      audio_url: r[9],
+      image_url: r[10],
+      meta_juz: r[11],
+      meta_page: r[12],
+      meta_manzil: r[13],
+      meta_ruku: r[14],
+      meta_hizb_quarter: r[15],
+      meta_sajda_recommended: Boolean(r[16]),
+      meta_sajda_obligatory: Boolean(r[17]),
+      surah: {
+        number: r[18],
+        name: r[19],
+        name_latin: r[20],
+        number_of_ayahs: r[21],
+        translation: r[22],
+        revelation: r[23],
+      },
+    }));
+  };
+
   const close = () => db.close();
 
   return {
@@ -253,6 +478,11 @@ export const createQuranService = (dbPath: string) => {
     getAyah,
     getRandomAyah,
     getSajdaAyahs,
+    getAyahsByJuz,
+    getAyahsByPage,
+    getAyahsByManzil,
+    getAyahsByRuku,
+    getAyahsByHizb,
     close,
   };
 };
