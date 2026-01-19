@@ -637,8 +637,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
       method: "get",
       path: "/quran/{surah}",
       tags: ["Quran"],
-      summary: "Detail Surat dan Ayat",
-      description: `Detail surat dan ayat adalah informasi lengkap mengenai surat tertentu dalam Al-Quran, termasuk semua ayat yang terkandung di dalamnya.`,
+      summary: "Ayat per Surat",
+      description: `Ayat per Surat adalah informasi lengkap mengenai surat tertentu dalam Al-Quran, termasuk semua ayat yang terkandung di dalamnya.`,
       request: {
         params: z.object({
           surah: z.string().transform((v) => parseInt(v, 10)).pipe(
