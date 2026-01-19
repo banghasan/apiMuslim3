@@ -22,6 +22,7 @@ export type Ayah = {
   tafsir_quraish: string | null;
   tafsir_jalalayn: string | null;
   audio_url: string | null;
+  image_url: string | null;
   meta_juz: number | null;
   meta_page: number | null;
   meta_manzil: number | null;
@@ -91,7 +92,7 @@ export const createQuranService = (dbPath: string) => {
     const rows = db.query(
       `SELECT id, surah_number, ayah_number, arab, translation, 
               tafsir_kemenag_short, tafsir_kemenag_long, tafsir_quraish, tafsir_jalalayn,
-              audio_url, meta_juz, meta_page, meta_manzil, meta_ruku, meta_hizb_quarter,
+              audio_url, image_url, meta_juz, meta_page, meta_manzil, meta_ruku, meta_hizb_quarter,
               meta_sajda_recommended, meta_sajda_obligatory
        FROM ayahs WHERE surah_number = ? ORDER BY ayah_number ASC`,
       [surahNumber],
@@ -109,13 +110,14 @@ export const createQuranService = (dbPath: string) => {
       tafsir_quraish: r[7],
       tafsir_jalalayn: r[8],
       audio_url: r[9],
-      meta_juz: r[10],
-      meta_page: r[11],
-      meta_manzil: r[12],
-      meta_ruku: r[13],
-      meta_hizb_quarter: r[14],
-      meta_sajda_recommended: Boolean(r[15]),
-      meta_sajda_obligatory: Boolean(r[16]),
+      image_url: r[10],
+      meta_juz: r[11],
+      meta_page: r[12],
+      meta_manzil: r[13],
+      meta_ruku: r[14],
+      meta_hizb_quarter: r[15],
+      meta_sajda_recommended: Boolean(r[16]),
+      meta_sajda_obligatory: Boolean(r[17]),
     }));
   };
 
@@ -123,7 +125,7 @@ export const createQuranService = (dbPath: string) => {
     const rows = db.query(
       `SELECT id, surah_number, ayah_number, arab, translation, 
               tafsir_kemenag_short, tafsir_kemenag_long, tafsir_quraish, tafsir_jalalayn,
-              audio_url, meta_juz, meta_page, meta_manzil, meta_ruku, meta_hizb_quarter,
+              audio_url, image_url, meta_juz, meta_page, meta_manzil, meta_ruku, meta_hizb_quarter,
               meta_sajda_recommended, meta_sajda_obligatory
        FROM ayahs WHERE surah_number = ? AND ayah_number = ?`,
       [surahNumber, ayahNumber],
@@ -143,13 +145,14 @@ export const createQuranService = (dbPath: string) => {
       tafsir_quraish: r[7],
       tafsir_jalalayn: r[8],
       audio_url: r[9],
-      meta_juz: r[10],
-      meta_page: r[11],
-      meta_manzil: r[12],
-      meta_ruku: r[13],
-      meta_hizb_quarter: r[14],
-      meta_sajda_recommended: Boolean(r[15]),
-      meta_sajda_obligatory: Boolean(r[16]),
+      image_url: r[10],
+      meta_juz: r[11],
+      meta_page: r[12],
+      meta_manzil: r[13],
+      meta_ruku: r[14],
+      meta_hizb_quarter: r[15],
+      meta_sajda_recommended: Boolean(r[16]),
+      meta_sajda_obligatory: Boolean(r[17]),
     };
   };
 
@@ -157,7 +160,7 @@ export const createQuranService = (dbPath: string) => {
     const rows = db.query(
       `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
               a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
-              a.audio_url, a.meta_juz, a.meta_page, a.meta_manzil, a.meta_ruku, a.meta_hizb_quarter,
+              a.audio_url, a.image_url, a.meta_juz, a.meta_page, a.meta_manzil, a.meta_ruku, a.meta_hizb_quarter,
               a.meta_sajda_recommended, a.meta_sajda_obligatory,
               s.number, s.name, s.name_latin, s.number_of_ayahs, s.translation, s.revelation
        FROM ayahs a
@@ -178,20 +181,21 @@ export const createQuranService = (dbPath: string) => {
       tafsir_quraish: r[7],
       tafsir_jalalayn: r[8],
       audio_url: r[9],
-      meta_juz: r[10],
-      meta_page: r[11],
-      meta_manzil: r[12],
-      meta_ruku: r[13],
-      meta_hizb_quarter: r[14],
-      meta_sajda_recommended: Boolean(r[15]),
-      meta_sajda_obligatory: Boolean(r[16]),
+      image_url: r[10],
+      meta_juz: r[11],
+      meta_page: r[12],
+      meta_manzil: r[13],
+      meta_ruku: r[14],
+      meta_hizb_quarter: r[15],
+      meta_sajda_recommended: Boolean(r[16]),
+      meta_sajda_obligatory: Boolean(r[17]),
       surah: {
-        number: r[17],
-        name: r[18],
-        name_latin: r[19],
-        number_of_ayahs: r[20],
-        translation: r[21],
-        revelation: r[22],
+        number: r[18],
+        name: r[19],
+        name_latin: r[20],
+        number_of_ayahs: r[21],
+        translation: r[22],
+        revelation: r[23],
       },
     };
   };

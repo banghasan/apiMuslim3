@@ -32,6 +32,7 @@ export const registerQuranRoutes = ({
     arab: z.string().openapi({ example: "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ" }),
     translation: z.string().openapi({ example: "Dengan nama Allah ..." }),
     audio_url: z.string().nullable().openapi({ example: "https://..." }),
+    image_url: z.string().nullable().openapi({ example: "https://..." }),
     tafsir: z.object({
       kemenag: z.object({
         short: z.string().nullable(),
@@ -121,6 +122,7 @@ export const registerQuranRoutes = ({
         arab: ayahData.arab,
         translation: ayahData.translation,
         audio_url: ayahData.audio_url,
+        image_url: ayahData.image_url,
         tafsir: {
           kemenag: {
             short: ayahData.tafsir_kemenag_short,
@@ -207,6 +209,7 @@ export const registerQuranRoutes = ({
         arab: a.arab,
         translation: a.translation,
         audio_url: a.audio_url,
+        image_url: a.image_url,
         tafsir: {
           kemenag: {
             short: a.tafsir_kemenag_short,
@@ -292,6 +295,7 @@ export const registerQuranRoutes = ({
         arab: ayahData.arab,
         translation: ayahData.translation,
         audio_url: ayahData.audio_url,
+        image_url: ayahData.image_url,
         tafsir: {
           kemenag: {
             short: ayahData.tafsir_kemenag_short,

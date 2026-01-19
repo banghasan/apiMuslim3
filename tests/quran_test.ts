@@ -26,6 +26,7 @@ Deno.test("Quran Service - Get Ayahs of Surah", () => {
   assertEquals(ayahs[0].ayah_number, 1);
   assert(ayahs[0].arab.length > 0);
   assert(ayahs[0].translation.length > 0);
+  assert(ayahs[0].image_url, "Image URL harus ada");
 });
 
 Deno.test("Quran Service - Get Specific Ayah", () => {
@@ -33,6 +34,7 @@ Deno.test("Quran Service - Get Specific Ayah", () => {
   assert(ayah !== null);
   assertEquals(ayah?.surah_number, 1);
   assertEquals(ayah?.ayah_number, 1);
+  assert(ayah?.image_url, "Image URL harus ada");
 });
 
 Deno.test("Quran Service - Get Random Ayah", () => {
@@ -42,6 +44,7 @@ Deno.test("Quran Service - Get Random Ayah", () => {
   assert(ayah.surah_number >= 1 && ayah.surah_number <= 114);
   assert(ayah.ayah_number >= 1);
   assert(ayah.arab.length > 0);
+  assert(ayah.image_url, "Image URL harus ada");
   assert(ayah.surah !== undefined, "Surah object should be present");
   assert(ayah.surah.name.length > 0, "Surah name should be present");
   console.log(`Random Ayah: Surah ${ayah.surah_number} (${ayah.surah.name_latin}), Ayah ${ayah.ayah_number}`);
