@@ -53,6 +53,20 @@ export const registerQuranRoutes = ({
     }),
   });
 
+  const randomAyahResponseSchema = z.object({
+    status: z.boolean(),
+    data: ayahSchema.extend({
+      surah: z.object({
+        number: z.number().openapi({ example: 1 }),
+        name: z.string().openapi({ example: "Al-Fatihah" }),
+        name_latin: z.string().openapi({ example: "Al-Fatihah" }),
+        number_of_ayahs: z.number().openapi({ example: 7 }),
+        translation: z.string().openapi({ example: "Pembukaan" }),
+        revelation: z.string().openapi({ example: "Makkiyah" }),
+      }),
+    }),
+  });
+
   // GET /quran - List all surahs
   app.openapi(
     createRoute({
@@ -92,19 +106,7 @@ export const registerQuranRoutes = ({
           description: "Detail Ayat Acak",
           content: {
             "application/json": {
-              schema: z.object({
-                status: z.boolean(),
-                data: ayahSchema.extend({
-                  surah: z.object({
-                    number: z.number().openapi({ example: 1 }),
-                    name: z.string().openapi({ example: "Al-Fatihah" }),
-                    name_latin: z.string().openapi({ example: "Al-Fatihah" }),
-                    number_of_ayahs: z.number().openapi({ example: 7 }),
-                    translation: z.string().openapi({ example: "Pembukaan" }),
-                    revelation: z.string().openapi({ example: "Makkiyah" }),
-                  }),
-                }),
-              }),
+              schema: randomAyahResponseSchema,
             },
           },
         },
