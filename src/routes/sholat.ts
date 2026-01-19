@@ -2,15 +2,11 @@ import type { Context } from "hono";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute, z } from "@hono/zod-openapi";
 import { buildCodeSamples } from "~/lib/docs.ts";
-import type {
-  JadwalResponseData,
-  JadwalService,
-} from "~/services/jadwal.ts";
+import type { JadwalResponseData, JadwalService } from "~/services/jadwal.ts";
 import { parseSchedulePeriod } from "~/services/jadwal.ts";
 import type { Location, SholatService } from "~/services/sholat.ts";
 import type { AppEnv } from "~/types.ts";
 import { sholatConfig } from "~/config/sholat.ts";
-
 
 const locationSchema = z
   .object({
@@ -98,8 +94,6 @@ const sholatInfoResponseSchema = z
     data: sholatInfoSchema,
   })
   .openapi("SholatInfoResponse");
-
-
 
 const successResponse = (data: Location[]) => ({
   status: true as const,
@@ -643,5 +637,4 @@ export const registerSholatRoutes = (
   }
 
   // Imsakiyah (Ramadan) Routes
-
 };

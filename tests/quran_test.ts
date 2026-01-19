@@ -1,6 +1,8 @@
-
 import { createQuranService } from "../src/services/quran.ts";
-import { assertEquals, assert } from "https://deno.land/std@0.224.0/assert/mod.ts";
+import {
+  assert,
+  assertEquals,
+} from "https://deno.land/std@0.224.0/assert/mod.ts";
 
 const dbPath = new URL("../data/quran/quran.db", import.meta.url).pathname;
 const service = createQuranService(decodeURIComponent(dbPath));

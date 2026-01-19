@@ -349,15 +349,18 @@ export const getRamadanMonthsForCeYear = (
     for (let day = 1; day <= 28; day += 14) {
       const date = createZonedDate({ year: ceYear, month, day }, timeZone);
       const parts = extractParts(formatter.formatToParts(date));
-      
+
       // Month 9 is Ramadan in Islamic calendar
       if (parts.month === 9) {
         // Avoid duplicates
-        if (!results.some((r) => r.year === String(ceYear) && r.month === pad2(month))) {
+        if (
+          !results.some((r) =>
+            r.year === String(ceYear) && r.month === pad2(month)
+          )
+        ) {
           results.push({ year: String(ceYear), month: pad2(month) });
         }
       }
-
     }
   }
 
@@ -379,9 +382,9 @@ export const convertRamadanHijriToCe = (
     calendar,
     timeZone,
   );
-  
+
   if (!ramadanStart) return null;
-  
+
   const parts = getGregorianParts(ramadanStart, timeZone);
   return {
     year: String(parts.year),

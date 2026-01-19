@@ -336,7 +336,8 @@ Pilihan metode yang dapat dipilih:
   },
   {
     name: "Quran",
-    description: "Endpoint Al-Quran lengkap dengan terjemahan, tafsir dan audio.",
+    description:
+      "Endpoint Al-Quran lengkap dengan terjemahan, tafsir dan audio.",
   },
 ];
 

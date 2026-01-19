@@ -73,7 +73,10 @@ export const registerQiblaRoutes = ({ app, docBaseUrl }: RegisterQiblaDeps) => {
     const { coordinate } = c.req.valid("param");
     const parsed = parseQiblaCoordinate(coordinate);
     if (!parsed) {
-      return c.json({ status: false as const, message: "Koordinat tidak valid." }, 400);
+      return c.json({
+        status: false as const,
+        message: "Koordinat tidak valid.",
+      }, 400);
     }
     const direction = getQiblaDirection(parsed);
     return c.json({

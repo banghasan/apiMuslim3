@@ -1,4 +1,3 @@
-
 import type { App, AppEnv } from "~/types.ts";
 import type { QuranService } from "~/services/quran.ts";
 import { createRoute, z } from "@hono/zod-openapi";
@@ -77,14 +76,14 @@ export const registerQuranRoutes = ({
     (c) => {
       const data = quranService.getAllSurahs();
       return c.json({ status: true, data });
-    }
+    },
   );
 
   // GET /quran/:surah - Get specific surah details (with or without ayahs could be option, here maybe just info or list)
-  // To keep it simple, let's return surah info + list of ayahs if requested? 
+  // To keep it simple, let's return surah info + list of ayahs if requested?
   // Standard practice often: /quran/:id returns surah info. /quran/:id/ayahs returns ayahs.
   // Let's make /quran/:surah return surah info + all ayahs for convenience as requested in plan.
-  
+
   app.openapi(
     createRoute({
       method: "get",
@@ -93,7 +92,9 @@ export const registerQuranRoutes = ({
       summary: "Detail Surat dan Ayat",
       request: {
         params: z.object({
-          surah: z.string().transform((v) => parseInt(v, 10)).pipe(z.number().min(1).max(114)),
+          surah: z.string().transform((v) => parseInt(v, 10)).pipe(
+            z.number().min(1).max(114),
+          ),
         }),
       },
       responses: {
@@ -129,9 +130,9 @@ export const registerQuranRoutes = ({
       if (!surahData) {
         return c.json({ status: false, message: "Surah not found" }, 404);
       }
-      
+
       const ayahsData = quranService.getAyahs(surah);
-      const formattedAyahs = ayahsData.map(a => ({
+      const formattedAyahs = ayahsData.map((a) => ({
         id: a.id,
         surah_number: a.surah_number,
         ayah_number: a.ayah_number,
@@ -159,11 +160,11 @@ export const registerQuranRoutes = ({
         },
       }));
 
-      return c.json({ 
-        status: true, 
-        data: { ...surahData, ayahs: formattedAyahs } 
+      return c.json({
+        status: true,
+        data: { ...surahData, ayahs: formattedAyahs },
       });
-    }
+    },
   );
 
   // GET /quran/:surah/:ayah - Get specific ayah
@@ -175,8 +176,12 @@ export const registerQuranRoutes = ({
       summary: "Detail Ayat",
       request: {
         params: z.object({
-          surah: z.string().transform((v) => parseInt(v, 10)).pipe(z.number().min(1).max(114)),
-          ayah: z.string().transform((v) => parseInt(v, 10)).pipe(z.number().min(1)),
+          surah: z.string().transform((v) => parseInt(v, 10)).pipe(
+            z.number().min(1).max(114),
+          ),
+          ayah: z.string().transform((v) => parseInt(v, 10)).pipe(
+            z.number().min(1),
+          ),
         }),
       },
       responses: {
@@ -241,7 +246,6 @@ export const registerQuranRoutes = ({
       };
 
       return c.json({ status: true, data: formattedAyah });
-    }
+    },
   );
-
 };

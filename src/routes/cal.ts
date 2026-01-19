@@ -208,8 +208,7 @@ export const registerCalRoutes = (
     method: "get",
     path: "/cal/holidays",
     summary: "Liburan",
-    description:
-      `Menampilkan semua hari libur dalam tahun tertentu.
+    description: `Menampilkan semua hari libur dalam tahun tertentu.
       
 #### GET /cal/holidays 
 daftar semua hari libur tahun ini; parameter \`year\`, \`month\`, dan \`day\` tersedia untuk filter.  

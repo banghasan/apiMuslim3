@@ -1,4 +1,3 @@
-
 import { DB } from "sqlite";
 
 export type Surah = {
@@ -38,8 +37,10 @@ export const createQuranService = (dbPath: string) => {
   const db = new DB(dbPath);
 
   const getAllSurahs = (): Surah[] => {
-    const rows = db.query<[number, string, string, number, string, string, string, string]>(
-      "SELECT number, name, name_latin, number_of_ayahs, translation, revelation, description, audio_url FROM surahs ORDER BY number ASC"
+    const rows = db.query<
+      [number, string, string, number, string, string, string, string]
+    >(
+      "SELECT number, name, name_latin, number_of_ayahs, translation, revelation, description, audio_url FROM surahs ORDER BY number ASC",
     );
     return rows.map((row) => ({
       number: row[0],
@@ -54,9 +55,11 @@ export const createQuranService = (dbPath: string) => {
   };
 
   const getSurah = (surahNumber: number): Surah | null => {
-    const row = db.query<[number, string, string, number, string, string, string, string]>(
+    const row = db.query<
+      [number, string, string, number, string, string, string, string]
+    >(
       "SELECT number, name, name_latin, number_of_ayahs, translation, revelation, description, audio_url FROM surahs WHERE number = ?",
-      [surahNumber]
+      [surahNumber],
     );
     if (row.length === 0) return null;
     const r = row[0];
@@ -79,7 +82,7 @@ export const createQuranService = (dbPath: string) => {
               audio_url, meta_juz, meta_page, meta_manzil, meta_ruku, meta_hizb_quarter,
               meta_sajda_recommended, meta_sajda_obligatory
        FROM ayahs WHERE surah_number = ? ORDER BY ayah_number ASC`,
-      [surahNumber]
+      [surahNumber],
     );
 
     // deno-lint-ignore no-explicit-any
@@ -111,7 +114,7 @@ export const createQuranService = (dbPath: string) => {
               audio_url, meta_juz, meta_page, meta_manzil, meta_ruku, meta_hizb_quarter,
               meta_sajda_recommended, meta_sajda_obligatory
        FROM ayahs WHERE surah_number = ? AND ayah_number = ?`,
-      [surahNumber, ayahNumber]
+      [surahNumber, ayahNumber],
     );
 
     if (rows.length === 0) return null;
