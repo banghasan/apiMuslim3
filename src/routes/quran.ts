@@ -3,6 +3,7 @@ import type { QuranService } from "~/services/quran.ts";
 import type { QuranSearchService } from "~/services/quran_search.ts";
 import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
+import { buildCodeSamples } from "~/lib/docs.ts";
 
 export type RegisterQuranRoutesOptions = {
   app: OpenAPIHono<AppEnv>;
@@ -13,7 +14,7 @@ export type RegisterQuranRoutesOptions = {
 
 export const registerQuranRoutes = ({
   app,
-  // docBaseUrl,
+  docBaseUrl,
   quranService,
   quranSearchService,
 }: RegisterQuranRoutesOptions) => {
@@ -128,6 +129,7 @@ export const registerQuranRoutes = ({
           },
         },
       },
+      "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/quran/random"),
     }),
     (c) => {
       const ayahData = quranService.getRandomAyah();
@@ -209,6 +211,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
           },
         },
       },
+      "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/quran/sajda"),
     }),
     (c) => {
       const data = quranService.getSajdaAyahs();
@@ -284,6 +287,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
           },
         },
       },
+      "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/quran/juz/30"),
     }),
     (c) => {
       const { number } = c.req.valid("param");
@@ -361,6 +365,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
           },
         },
       },
+      "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/quran/page/1"),
     }),
     (c) => {
       const { number } = c.req.valid("param");
@@ -438,6 +443,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
           },
         },
       },
+      "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/quran/manzil/1"),
     }),
     (c) => {
       const { number } = c.req.valid("param");
@@ -515,6 +521,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
           },
         },
       },
+      "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/quran/ruku/1"),
     }),
     (c) => {
       const { number } = c.req.valid("param");
@@ -592,6 +599,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
           },
         },
       },
+      "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/quran/hizb/1"),
     }),
     (c) => {
       const { number } = c.req.valid("param");
@@ -677,6 +685,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
           },
         },
       },
+      "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/quran/1"),
     }),
     (c) => {
       const { surah } = c.req.valid("param");
@@ -767,6 +776,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
           },
         },
       },
+      "x-codeSamples": buildCodeSamples(docBaseUrl, "GET", "/quran/1/1"),
     }),
     (c) => {
       const { surah, ayah } = c.req.valid("param");
@@ -875,6 +885,12 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
       },
     },
+    "x-codeSamples": buildCodeSamples(
+      docBaseUrl,
+      "POST",
+      "/quran/search",
+      JSON.stringify({ keyword: "pujian", limit: 10 }),
+    ),
   });
 
   app.openapi(searchRoute, async (c) => {
