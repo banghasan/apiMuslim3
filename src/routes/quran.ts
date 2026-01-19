@@ -54,6 +54,17 @@ export const registerQuranRoutes = ({
     }),
   });
 
+  const paginationQuerySchema = z.object({
+    page: z.string().optional().default("1").transform((v) => parseInt(v, 10)).pipe(z.number().min(1)),
+    limit: z.string().optional().default("10").transform((v) => parseInt(v, 10)).pipe(z.number().min(1).max(100)),
+  });
+
+  const paginationMetaSchema = z.object({
+    page: z.number(),
+    limit: z.number(),
+    total: z.number(),
+  });
+
   const randomAyahResponseSchema = z.object({
     status: z.boolean(),
     data: ayahSchema.extend({
@@ -245,6 +256,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
             z.number().min(1).max(30),
           ),
         }),
+        query: paginationQuerySchema,
       },
       responses: {
         200: {
@@ -263,6 +275,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
                     revelation: z.string(),
                   }),
                 })),
+                pagination: paginationMetaSchema,
               }),
             },
           },
@@ -271,7 +284,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
     }),
     (c) => {
       const { number } = c.req.valid("param");
-      const data = quranService.getAyahsByJuz(number);
+      const { page, limit } = c.req.valid("query");
+      const { data, total } = quranService.getAyahsByJuz(number, page, limit);
       const formattedData = data.map((ayahData) => ({
         id: ayahData.id,
         surah_number: ayahData.surah_number,
@@ -301,7 +315,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
         surah: ayahData.surah,
       }));
-      return c.json({ status: true, data: formattedData }, 200);
+      return c.json({ status: true, data: formattedData, pagination: { page, limit, total } }, 200);
     },
   );
 
@@ -319,6 +333,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
             z.number().min(1).max(604),
           ),
         }),
+        query: paginationQuerySchema,
       },
       responses: {
         200: {
@@ -337,6 +352,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
                     revelation: z.string(),
                   }),
                 })),
+                pagination: paginationMetaSchema,
               }),
             },
           },
@@ -345,7 +361,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
     }),
     (c) => {
       const { number } = c.req.valid("param");
-      const data = quranService.getAyahsByPage(number);
+      const { page, limit } = c.req.valid("query");
+      const { data, total } = quranService.getAyahsByPage(number, page, limit);
       const formattedData = data.map((ayahData) => ({
         id: ayahData.id,
         surah_number: ayahData.surah_number,
@@ -375,7 +392,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
         surah: ayahData.surah,
       }));
-      return c.json({ status: true, data: formattedData }, 200);
+      return c.json({ status: true, data: formattedData, pagination: { page, limit, total } }, 200);
     },
   );
 
@@ -393,6 +410,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
             z.number().min(1).max(7),
           ),
         }),
+        query: paginationQuerySchema,
       },
       responses: {
         200: {
@@ -411,6 +429,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
                     revelation: z.string(),
                   }),
                 })),
+                pagination: paginationMetaSchema,
               }),
             },
           },
@@ -419,7 +438,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
     }),
     (c) => {
       const { number } = c.req.valid("param");
-      const data = quranService.getAyahsByManzil(number);
+      const { page, limit } = c.req.valid("query");
+      const { data, total } = quranService.getAyahsByManzil(number, page, limit);
       const formattedData = data.map((ayahData) => ({
         id: ayahData.id,
         surah_number: ayahData.surah_number,
@@ -449,7 +469,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
         surah: ayahData.surah,
       }));
-      return c.json({ status: true, data: formattedData }, 200);
+      return c.json({ status: true, data: formattedData, pagination: { page, limit, total } }, 200);
     },
   );
 
@@ -467,6 +487,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
             z.number().min(1),
           ),
         }),
+        query: paginationQuerySchema,
       },
       responses: {
         200: {
@@ -485,6 +506,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
                     revelation: z.string(),
                   }),
                 })),
+                pagination: paginationMetaSchema,
               }),
             },
           },
@@ -493,7 +515,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
     }),
     (c) => {
       const { number } = c.req.valid("param");
-      const data = quranService.getAyahsByRuku(number);
+      const { page, limit } = c.req.valid("query");
+      const { data, total } = quranService.getAyahsByRuku(number, page, limit);
       const formattedData = data.map((ayahData) => ({
         id: ayahData.id,
         surah_number: ayahData.surah_number,
@@ -523,7 +546,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
         surah: ayahData.surah,
       }));
-      return c.json({ status: true, data: formattedData }, 200);
+      return c.json({ status: true, data: formattedData, pagination: { page, limit, total } }, 200);
     },
   );
 
@@ -541,6 +564,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
             z.number().min(1).max(240),
           ),
         }),
+        query: paginationQuerySchema,
       },
       responses: {
         200: {
@@ -559,6 +583,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
                     revelation: z.string(),
                   }),
                 })),
+                pagination: paginationMetaSchema,
               }),
             },
           },
@@ -567,7 +592,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
     }),
     (c) => {
       const { number } = c.req.valid("param");
-      const data = quranService.getAyahsByHizb(number);
+      const { page, limit } = c.req.valid("query");
+      const { data, total } = quranService.getAyahsByHizb(number, page, limit);
       const formattedData = data.map((ayahData) => ({
         id: ayahData.id,
         surah_number: ayahData.surah_number,
@@ -597,7 +623,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
         surah: ayahData.surah,
       }));
-      return c.json({ status: true, data: formattedData }, 200);
+      return c.json({ status: true, data: formattedData, pagination: { page, limit, total } }, 200);
     },
   );
 
@@ -619,6 +645,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
             z.number().min(1).max(114),
           ),
         }),
+        query: paginationQuerySchema,
       },
       responses: {
         200: {
@@ -630,6 +657,7 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
                 data: surahSchema.extend({
                   ayahs: z.array(ayahSchema),
                 }),
+                pagination: paginationMetaSchema,
               }),
             },
           },
@@ -649,12 +677,13 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
     }),
     (c) => {
       const { surah } = c.req.valid("param");
+      const { page, limit } = c.req.valid("query");
       const surahData = quranService.getSurah(surah);
       if (!surahData) {
         return c.json({ status: false, message: "Surah not found" }, 404);
       }
 
-      const ayahsData = quranService.getAyahs(surah);
+      const { data: ayahsData, total } = quranService.getAyahs(surah, page, limit);
       const formattedAyahs = ayahsData.map((a) => ({
         id: a.id,
         surah_number: a.surah_number,
@@ -684,10 +713,12 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
       }));
 
-      return c.json({
-        status: true,
-        data: { ...surahData, ayahs: formattedAyahs },
-      }, 200);
+      const responseData = {
+        ...surahData,
+        ayahs: formattedAyahs,
+      };
+
+      return c.json({ status: true, data: responseData, pagination: { page, limit, total } }, 200);
     },
   );
 

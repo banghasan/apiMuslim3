@@ -234,7 +234,7 @@ export const createQuranService = (dbPath: string) => {
     );
 
     // deno-lint-ignore no-explicit-any
-    return rows.map((r: any) => ({
+    const data = rows.map((r: any) => ({
       id: r[0],
       surah_number: r[1],
       ayah_number: r[2],
@@ -262,6 +262,7 @@ export const createQuranService = (dbPath: string) => {
         revelation: r[23],
       },
     }));
+    return data;
   };
 
   const getAyahsByJuz = (
@@ -322,7 +323,19 @@ export const createQuranService = (dbPath: string) => {
     return { data, total };
   };
 
-  const getAyahsByPage = (pageNumber: number): AyahWithSurah[] => {
+  const getAyahsByPage = (
+    pageNumber: number,
+    page = 1,
+    limit = 10,
+  ): PaginatedResult<AyahWithSurah> => {
+    const offset = (page - 1) * limit;
+
+    const countRows = db.query<[number]>(
+      `SELECT COUNT(*) FROM ayahs WHERE meta_page = ?`,
+      [pageNumber],
+    );
+    const total = countRows[0][0];
+
     const rows = db.query(
       `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
               a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
@@ -332,8 +345,8 @@ export const createQuranService = (dbPath: string) => {
        FROM ayahs a
        JOIN surahs s ON a.surah_number = s.number
        WHERE a.meta_page = ?
-       ORDER BY a.surah_number, a.ayah_number ASC`,
-      [pageNumber],
+       ORDER BY a.surah_number, a.ayah_number ASC LIMIT ? OFFSET ?`,
+      [pageNumber, limit, offset],
     );
 
     // deno-lint-ignore no-explicit-any
@@ -368,7 +381,19 @@ export const createQuranService = (dbPath: string) => {
     return { data, total };
   };
 
-  const getAyahsByManzil = (manzilNumber: number): AyahWithSurah[] => {
+  const getAyahsByManzil = (
+    manzilNumber: number,
+    page = 1,
+    limit = 10,
+  ): PaginatedResult<AyahWithSurah> => {
+    const offset = (page - 1) * limit;
+
+    const countRows = db.query<[number]>(
+      `SELECT COUNT(*) FROM ayahs WHERE meta_manzil = ?`,
+      [manzilNumber],
+    );
+    const total = countRows[0][0];
+
     const rows = db.query(
       `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
               a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
@@ -378,8 +403,8 @@ export const createQuranService = (dbPath: string) => {
        FROM ayahs a
        JOIN surahs s ON a.surah_number = s.number
        WHERE a.meta_manzil = ?
-       ORDER BY a.surah_number, a.ayah_number ASC`,
-      [manzilNumber],
+       ORDER BY a.surah_number, a.ayah_number ASC LIMIT ? OFFSET ?`,
+      [manzilNumber, limit, offset],
     );
 
     // deno-lint-ignore no-explicit-any
@@ -414,7 +439,19 @@ export const createQuranService = (dbPath: string) => {
     return { data, total };
   };
 
-  const getAyahsByRuku = (rukuNumber: number): AyahWithSurah[] => {
+  const getAyahsByRuku = (
+    rukuNumber: number,
+    page = 1,
+    limit = 10,
+  ): PaginatedResult<AyahWithSurah> => {
+    const offset = (page - 1) * limit;
+
+    const countRows = db.query<[number]>(
+      `SELECT COUNT(*) FROM ayahs WHERE meta_ruku = ?`,
+      [rukuNumber],
+    );
+    const total = countRows[0][0];
+
     const rows = db.query(
       `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
               a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
@@ -424,8 +461,8 @@ export const createQuranService = (dbPath: string) => {
        FROM ayahs a
        JOIN surahs s ON a.surah_number = s.number
        WHERE a.meta_ruku = ?
-       ORDER BY a.surah_number, a.ayah_number ASC`,
-      [rukuNumber],
+       ORDER BY a.surah_number, a.ayah_number ASC LIMIT ? OFFSET ?`,
+      [rukuNumber, limit, offset],
     );
 
     // deno-lint-ignore no-explicit-any
@@ -460,7 +497,19 @@ export const createQuranService = (dbPath: string) => {
     return { data, total };
   };
 
-  const getAyahsByHizb = (hizbNumber: number): AyahWithSurah[] => {
+  const getAyahsByHizb = (
+    hizbNumber: number,
+    page = 1,
+    limit = 10,
+  ): PaginatedResult<AyahWithSurah> => {
+    const offset = (page - 1) * limit;
+
+    const countRows = db.query<[number]>(
+      `SELECT COUNT(*) FROM ayahs WHERE meta_hizb_quarter = ?`,
+      [hizbNumber],
+    );
+    const total = countRows[0][0];
+
     const rows = db.query(
       `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
               a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
@@ -470,8 +519,8 @@ export const createQuranService = (dbPath: string) => {
        FROM ayahs a
        JOIN surahs s ON a.surah_number = s.number
        WHERE a.meta_hizb_quarter = ?
-       ORDER BY a.surah_number, a.ayah_number ASC`,
-      [hizbNumber],
+       ORDER BY a.surah_number, a.ayah_number ASC LIMIT ? OFFSET ?`,
+      [hizbNumber, limit, offset],
     );
 
     // deno-lint-ignore no-explicit-any
