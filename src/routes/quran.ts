@@ -149,6 +149,71 @@ export const registerQuranRoutes = ({
     },
   );
 
+  // GET /quran/sajda - Get all sajda ayahs
+  app.openapi(
+    createRoute({
+      method: "get",
+      path: "/quran/sajda",
+      tags: ["Quran"],
+      summary: "Daftar Ayat Sajdah",
+      responses: {
+        200: {
+          description: "Daftar Ayat Sajdah",
+          content: {
+            "application/json": {
+              schema: z.object({
+                status: z.boolean(),
+                data: z.array(ayahSchema.extend({
+                  surah: z.object({
+                    number: z.number(),
+                    name: z.string(),
+                    name_latin: z.string(),
+                    number_of_ayahs: z.number(),
+                    translation: z.string(),
+                    revelation: z.string(),
+                  }),
+                })),
+              }),
+            },
+          },
+        },
+      },
+    }),
+    (c) => {
+      const data = quranService.getSajdaAyahs();
+      const formattedData = data.map((ayahData) => ({
+        id: ayahData.id,
+        surah_number: ayahData.surah_number,
+        ayah_number: ayahData.ayah_number,
+        arab: ayahData.arab,
+        translation: ayahData.translation,
+        audio_url: ayahData.audio_url,
+        image_url: ayahData.image_url,
+        tafsir: {
+          kemenag: {
+            short: ayahData.tafsir_kemenag_short,
+            long: ayahData.tafsir_kemenag_long,
+          },
+          quraish: ayahData.tafsir_quraish,
+          jalalayn: ayahData.tafsir_jalalayn,
+        },
+        meta: {
+          juz: ayahData.meta_juz,
+          page: ayahData.meta_page,
+          manzil: ayahData.meta_manzil,
+          ruku: ayahData.meta_ruku,
+          hizb_quarter: ayahData.meta_hizb_quarter,
+          sajda: {
+            recommended: ayahData.meta_sajda_recommended,
+            obligatory: ayahData.meta_sajda_obligatory,
+          },
+        },
+        surah: ayahData.surah,
+      }));
+      return c.json({ status: true, data: formattedData }, 200);
+    },
+  );
+
   // GET /quran/:surah - Get specific surah details (with or without ayahs could be option, here maybe just info or list)
   // To keep it simple, let's return surah info + list of ayahs if requested?
   // Standard practice often: /quran/:id returns surah info. /quran/:id/ayahs returns ayahs.

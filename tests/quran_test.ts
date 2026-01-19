@@ -49,3 +49,16 @@ Deno.test("Quran Service - Get Random Ayah", () => {
   assert(ayah.surah.name.length > 0, "Surah name should be present");
   console.log(`Random Ayah: Surah ${ayah.surah_number} (${ayah.surah.name_latin}), Ayah ${ayah.ayah_number}`);
 });
+
+Deno.test("Quran Service - Get Sajda Ayahs", () => {
+  const ayahs = service.getSajdaAyahs();
+  assert(ayahs.length > 0, "Should return sajda ayahs");
+  ayahs.forEach((ayah) => {
+    assert(
+      ayah.meta_sajda_recommended || ayah.meta_sajda_obligatory,
+      `Ayah ${ayah.surah_number}:${ayah.ayah_number} should have sajda marker`
+    );
+    assert(ayah.surah !== undefined, "Surah object should be present");
+  });
+  console.log(`Found ${ayahs.length} Sajda Ayahs`);
+});
