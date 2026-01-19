@@ -23,6 +23,8 @@ import { createHadisSearchService } from "~/services/hadis_search.ts";
 import type { AppEnv } from "~/types.ts";
 import { registerHealthRoutes } from "~/routes/health.ts";
 import { createRateLimitMiddleware } from "~/middleware/rate_limit.ts";
+import { registerQuranRoutes } from "~/routes/quran.ts";
+import { createQuranService } from "~/services/quran.ts";
 
 const faviconFile = new URL("../favicon.ico", import.meta.url);
 const faviconBytes = await Deno.readFile(faviconFile);
@@ -73,6 +75,9 @@ const hadisEncDbFile = new URL(
 );
 const hadisEncDbPath = decodeURIComponent(hadisEncDbFile.pathname);
 const hadisEncService = createHadisEncService(hadisEncDbPath);
+const quranDbFile = new URL("../data/quran/quran.db", import.meta.url);
+const quranDbPath = decodeURIComponent(quranDbFile.pathname);
+const quranService = createQuranService(quranDbPath);
 const hadisSearchService = config.meiliHost
   ? createHadisSearchService({
     host: config.meiliHost,
@@ -262,6 +267,11 @@ registerHadisPerawiRoutes({
   docBaseUrl: config.docBaseUrl,
   hadisPerawiService,
 });
+registerQuranRoutes({
+  app,
+  docBaseUrl: config.docBaseUrl,
+  quranService,
+});
 registerHealthRoutes({
   app,
   docBaseUrl: config.docBaseUrl,
@@ -324,6 +334,10 @@ Pilihan metode yang dapat dipilih:
     name: "Stats",
     description: "Statistik pemakaian API berdasarkan tahun dan bulan.",
   },
+  {
+    name: "Quran",
+    description: "Endpoint Al-Quran lengkap dengan terjemahan, tafsir dan audio.",
+  },
 ];
 
 app.doc("/doc/apimuslim", {
@@ -349,7 +363,7 @@ Saran, ide, diskusi dan komunikasi dapat melalui:
   "x-tagGroups": [
     {
       name: "API Muslim Indonesia",
-      tags: ["Sholat", "Hadis", "Kalender", "Qibla", "Tools", "Stats"],
+      tags: ["Sholat", "Quran", "Hadis", "Kalender", "Qibla", "Tools", "Stats"],
     },
   ],
   servers: [
