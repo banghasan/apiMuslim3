@@ -75,6 +75,7 @@ export const registerQuranRoutes = ({
       path: "/quran",
       tags: ["Quran"],
       summary: "Daftar Surat",
+      description: `Daftar surat adalah daftar semua surat yang ada di dalam Al-Quran.`,
       responses: {
         200: {
           description: "Daftar Surat",
@@ -102,6 +103,7 @@ export const registerQuranRoutes = ({
       path: "/quran/random",
       tags: ["Quran"],
       summary: "Ayat Acak",
+      description: `Ayat acak adalah ayat yang dipilih secara acak dari Al-Quran. Ayat ini bisa berupa ayat dari surah mana saja dan dari juz berapa saja. Ayat acak ini bisa digunakan untuk berbagai keperluan, seperti untuk dibaca sebagai motivasi atau untuk dibagikan kepada orang lain.`,
       responses: {
         200: {
           description: "Detail Ayat Acak",
@@ -155,7 +157,22 @@ export const registerQuranRoutes = ({
       method: "get",
       path: "/quran/sajda",
       tags: ["Quran"],
-      summary: "Daftar Ayat Sajdah",
+      summary: "Ayat Sajdah",
+      description: `Dalam konteks database Al-Quran, kolom sajadah (atau sujud tilawah) biasanya digunakan untuk menandai ayat-ayat yang mengharuskan atau menyarankan pembacanya untuk bersujud setelah membacanya.
+
+Pembagian menjadi Recommended dan Obligatory berkaitan dengan perbedaan hukum fiqih di antara madzhab-madzhab Islam:
+
+1. **Obligatory (Wajib):**
+   - Merujuk pada ayat-ayat sujud yang diwajibkan oleh mayoritas ulama atau madzhab tertentu.
+   - Dalam praktik, ini berarti pembaca harus melakukan sujud tilawah jika membaca atau mendengar ayat ini.
+   - Contoh paling umum adalah ayat-ayat sujud yang disepakati oleh hampir semua madzhab.
+
+2. **Recommended (Sunnah/Dianjurkan):**
+   - Merujuk pada ayat-ayat sujud yang dianjurkan (sunnah) oleh sebagian ulama atau madzhab, tetapi tidak diwajibkan.
+   - Pembaca dianjurkan untuk bersujud, tetapi tidak berdosa jika tidak melakukannya.
+   - Ini bisa mencakup ayat-ayat yang dianggap sujud oleh beberapa madzhab tetapi tidak oleh yang lain, atau ayat-ayat yang memiliki status hukum yang sedikit berbeda tergantung pada interpretasi.
+
+Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdasarkan tingkat kewajiban hukumnya, memungkinkan aplikasi untuk memberikan panduan yang sesuai dengan interpretasi fiqih yang berbeda.`,
       responses: {
         200: {
           description: "Daftar Ayat Sajdah",
@@ -225,6 +242,7 @@ export const registerQuranRoutes = ({
       path: "/quran/{surah}",
       tags: ["Quran"],
       summary: "Detail Surat dan Ayat",
+      description: `Detail surat dan ayat adalah informasi lengkap mengenai surat tertentu dalam Al-Quran, termasuk semua ayat yang terkandung di dalamnya.`,
       request: {
         params: z.object({
           surah: z.string().transform((v) => parseInt(v, 10)).pipe(
@@ -310,6 +328,7 @@ export const registerQuranRoutes = ({
       path: "/quran/{surah}/{ayah}",
       tags: ["Quran"],
       summary: "Detail Ayat",
+      description: `Detail ayat adalah informasi lengkap mengenai ayat tertentu dalam Al-Quran, termasuk semua ayat yang terkandung di dalamnya.`,
       request: {
         params: z.object({
           surah: z.string().transform((v) => parseInt(v, 10)).pipe(
