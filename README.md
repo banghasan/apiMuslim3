@@ -139,6 +139,21 @@ deno test --allow-env --allow-read
 
 ## Endpoint Utama
 
+**Al-Quran**
+
+- `GET /quran` – Daftar semua surat.
+- `GET /quran/{number}` – Detail surat beserta ayat-ayatnya.
+- `GET /quran/{number}/{ayah}` – Detail ayat spesifik.
+- `GET /quran/random` – Satu ayat acak.
+- `GET /quran/sajda` – Daftar ayat-ayat sajadah.
+- `GET /quran/juz/{number}` – Daftar ayat dalam Juz (1-30).
+- `GET /quran/page/{number}` – Daftar ayat dalam Halaman (1-604).
+- `GET /quran/manzil/{number}` – Daftar ayat dalam Manzil (1-7).
+- `GET /quran/ruku/{number}` – Daftar ayat dalam Ruku.
+- `GET /quran/hizb/{number}` – Daftar ayat dalam Hizb Quarter (1-240).
+
+**Sholat & Kalender**
+
 - `GET /sholat/kota/all`, `/sholat/kota/semua`, `/sholat/kabkota/all`,
   `/sholat/kabkota/semua` – daftar seluruh lokasi.
 - `GET /sholat/kota/{id}`, `/sholat/kabkota/{id}` – detail lokasi tertentu.
@@ -304,6 +319,21 @@ Beberapa fitur membutuhkan konfigurasi tambahan melalui environment variable:
 export MEILISEARCH_HOST="https://meili.example.com"
 export MEILISEARCH_API_KEY="your_api_key_here"
 ```
+
+## Utilitas
+
+### Indexing Meilisearch
+
+Untuk mengaktifkan fitur pencarian (jika endpoint pencarian diimplementasikan
+menggunakan Meilisearch), jalankan script indexing berikut:
+
+```bash
+deno run -A scripts/index_meili.ts
+```
+
+Script ini akan membaca `data/quran/quran.db` dan memasukkannya ke index `quran`
+di Meilisearch. Pastikan variable environment `MEILISEARCH_HOST` dan
+`MEILISEARCH_API_KEY` sudah diset.
 
 ## Kontak
 
