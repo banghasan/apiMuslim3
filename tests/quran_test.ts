@@ -42,5 +42,7 @@ Deno.test("Quran Service - Get Random Ayah", () => {
   assert(ayah.surah_number >= 1 && ayah.surah_number <= 114);
   assert(ayah.ayah_number >= 1);
   assert(ayah.arab.length > 0);
-  console.log(`Random Ayah: Surah ${ayah.surah_number}, Ayah ${ayah.ayah_number}`);
+  assert(ayah.surah !== undefined, "Surah object should be present");
+  assert(ayah.surah.name.length > 0, "Surah name should be present");
+  console.log(`Random Ayah: Surah ${ayah.surah_number} (${ayah.surah.name_latin}), Ayah ${ayah.ayah_number}`);
 });

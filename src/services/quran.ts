@@ -31,6 +31,18 @@ export type Ayah = {
   meta_sajda_obligatory: boolean;
 };
 
+export type AyahWithSurah = Ayah & {
+  surah: Pick<
+    Surah,
+    | "number"
+    | "name"
+    | "name_latin"
+    | "number_of_ayahs"
+    | "translation"
+    | "revelation"
+  >;
+};
+
 export type QuranService = ReturnType<typeof createQuranService>;
 
 export const createQuranService = (dbPath: string) => {
@@ -141,13 +153,16 @@ export const createQuranService = (dbPath: string) => {
     };
   };
 
-  const getRandomAyah = (): Ayah => {
+  const getRandomAyah = (): AyahWithSurah => {
     const rows = db.query(
-      `SELECT id, surah_number, ayah_number, arab, translation, 
-              tafsir_kemenag_short, tafsir_kemenag_long, tafsir_quraish, tafsir_jalalayn,
-              audio_url, meta_juz, meta_page, meta_manzil, meta_ruku, meta_hizb_quarter,
-              meta_sajda_recommended, meta_sajda_obligatory
-       FROM ayahs ORDER BY RANDOM() LIMIT 1`,
+      `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
+              a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
+              a.audio_url, a.meta_juz, a.meta_page, a.meta_manzil, a.meta_ruku, a.meta_hizb_quarter,
+              a.meta_sajda_recommended, a.meta_sajda_obligatory,
+              s.number, s.name, s.name_latin, s.number_of_ayahs, s.translation, s.revelation
+       FROM ayahs a
+       JOIN surahs s ON a.surah_number = s.number
+       ORDER BY RANDOM() LIMIT 1`,
     );
 
     // deno-lint-ignore no-explicit-any
@@ -170,6 +185,14 @@ export const createQuranService = (dbPath: string) => {
       meta_hizb_quarter: r[14],
       meta_sajda_recommended: Boolean(r[15]),
       meta_sajda_obligatory: Boolean(r[16]),
+      surah: {
+        number: r[17],
+        name: r[18],
+        name_latin: r[19],
+        number_of_ayahs: r[20],
+        translation: r[21],
+        revelation: r[22],
+      },
     };
   };
 

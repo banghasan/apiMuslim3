@@ -94,7 +94,16 @@ export const registerQuranRoutes = ({
             "application/json": {
               schema: z.object({
                 status: z.boolean(),
-                data: ayahSchema,
+                data: ayahSchema.extend({
+                  surah: z.object({
+                    number: z.number().openapi({ example: 1 }),
+                    name: z.string().openapi({ example: "Al-Fatihah" }),
+                    name_latin: z.string().openapi({ example: "Al-Fatihah" }),
+                    number_of_ayahs: z.number().openapi({ example: 7 }),
+                    translation: z.string().openapi({ example: "Pembukaan" }),
+                    revelation: z.string().openapi({ example: "Makkiyah" }),
+                  }),
+                }),
               }),
             },
           },
@@ -129,6 +138,7 @@ export const registerQuranRoutes = ({
             obligatory: ayahData.meta_sajda_obligatory,
           },
         },
+        surah: ayahData.surah,
       };
 
       return c.json({ status: true, data: formattedAyah }, 200);
