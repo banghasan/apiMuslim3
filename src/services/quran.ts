@@ -44,6 +44,11 @@ export type AyahWithSurah = Ayah & {
   >;
 };
 
+export type PaginatedResult<T> = {
+  data: T[];
+  total: number;
+};
+
 export type QuranService = ReturnType<typeof createQuranService>;
 
 export const createQuranService = (dbPath: string) => {
@@ -88,18 +93,31 @@ export const createQuranService = (dbPath: string) => {
     };
   };
 
-  const getAyahs = (surahNumber: number): Ayah[] => {
+  const getAyahs = (
+    surahNumber: number,
+    page = 1,
+    limit = 10,
+  ): PaginatedResult<Ayah> => {
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    const countRows = db.query<[number]>(
+      `SELECT COUNT(*) FROM ayahs WHERE surah_number = ?`,
+      [surahNumber],
+    );
+    const total = countRows[0][0];
+
     const rows = db.query(
       `SELECT id, surah_number, ayah_number, arab, translation, 
               tafsir_kemenag_short, tafsir_kemenag_long, tafsir_quraish, tafsir_jalalayn,
               audio_url, image_url, meta_juz, meta_page, meta_manzil, meta_ruku, meta_hizb_quarter,
               meta_sajda_recommended, meta_sajda_obligatory
-       FROM ayahs WHERE surah_number = ? ORDER BY ayah_number ASC`,
-      [surahNumber],
+       FROM ayahs WHERE surah_number = ? ORDER BY ayah_number ASC LIMIT ? OFFSET ?`,
+      [surahNumber, limit, offset],
     );
 
     // deno-lint-ignore no-explicit-any
-    return rows.map((r: any) => ({
+    const data = rows.map((r: any) => ({
       id: r[0],
       surah_number: r[1],
       ayah_number: r[2],
@@ -119,6 +137,8 @@ export const createQuranService = (dbPath: string) => {
       meta_sajda_recommended: Boolean(r[16]),
       meta_sajda_obligatory: Boolean(r[17]),
     }));
+
+    return { data, total };
   };
 
   const getAyah = (surahNumber: number, ayahNumber: number): Ayah | null => {
@@ -244,7 +264,19 @@ export const createQuranService = (dbPath: string) => {
     }));
   };
 
-  const getAyahsByJuz = (juzNumber: number): AyahWithSurah[] => {
+  const getAyahsByJuz = (
+    juzNumber: number,
+    page = 1,
+    limit = 10,
+  ): PaginatedResult<AyahWithSurah> => {
+    const offset = (page - 1) * limit;
+
+    const countRows = db.query<[number]>(
+      `SELECT COUNT(*) FROM ayahs WHERE meta_juz = ?`,
+      [juzNumber],
+    );
+    const total = countRows[0][0];
+
     const rows = db.query(
       `SELECT a.id, a.surah_number, a.ayah_number, a.arab, a.translation, 
               a.tafsir_kemenag_short, a.tafsir_kemenag_long, a.tafsir_quraish, a.tafsir_jalalayn,
@@ -254,12 +286,12 @@ export const createQuranService = (dbPath: string) => {
        FROM ayahs a
        JOIN surahs s ON a.surah_number = s.number
        WHERE a.meta_juz = ?
-       ORDER BY a.surah_number, a.ayah_number ASC`,
-      [juzNumber],
+       ORDER BY a.surah_number, a.ayah_number ASC LIMIT ? OFFSET ?`,
+      [juzNumber, limit, offset],
     );
 
     // deno-lint-ignore no-explicit-any
-    return rows.map((r: any) => ({
+    const data = rows.map((r: any) => ({
       id: r[0],
       surah_number: r[1],
       ayah_number: r[2],
@@ -287,6 +319,7 @@ export const createQuranService = (dbPath: string) => {
         revelation: r[23],
       },
     }));
+    return { data, total };
   };
 
   const getAyahsByPage = (pageNumber: number): AyahWithSurah[] => {
@@ -304,7 +337,7 @@ export const createQuranService = (dbPath: string) => {
     );
 
     // deno-lint-ignore no-explicit-any
-    return rows.map((r: any) => ({
+    const data = rows.map((r: any) => ({
       id: r[0],
       surah_number: r[1],
       ayah_number: r[2],
@@ -332,6 +365,7 @@ export const createQuranService = (dbPath: string) => {
         revelation: r[23],
       },
     }));
+    return { data, total };
   };
 
   const getAyahsByManzil = (manzilNumber: number): AyahWithSurah[] => {
@@ -349,7 +383,7 @@ export const createQuranService = (dbPath: string) => {
     );
 
     // deno-lint-ignore no-explicit-any
-    return rows.map((r: any) => ({
+    const data = rows.map((r: any) => ({
       id: r[0],
       surah_number: r[1],
       ayah_number: r[2],
@@ -377,6 +411,7 @@ export const createQuranService = (dbPath: string) => {
         revelation: r[23],
       },
     }));
+    return { data, total };
   };
 
   const getAyahsByRuku = (rukuNumber: number): AyahWithSurah[] => {
@@ -394,7 +429,7 @@ export const createQuranService = (dbPath: string) => {
     );
 
     // deno-lint-ignore no-explicit-any
-    return rows.map((r: any) => ({
+    const data = rows.map((r: any) => ({
       id: r[0],
       surah_number: r[1],
       ayah_number: r[2],
@@ -422,6 +457,7 @@ export const createQuranService = (dbPath: string) => {
         revelation: r[23],
       },
     }));
+    return { data, total };
   };
 
   const getAyahsByHizb = (hizbNumber: number): AyahWithSurah[] => {
@@ -439,7 +475,7 @@ export const createQuranService = (dbPath: string) => {
     );
 
     // deno-lint-ignore no-explicit-any
-    return rows.map((r: any) => ({
+    const data = rows.map((r: any) => ({
       id: r[0],
       surah_number: r[1],
       ayah_number: r[2],
@@ -467,6 +503,7 @@ export const createQuranService = (dbPath: string) => {
         revelation: r[23],
       },
     }));
+    return { data, total };
   };
 
   const close = () => db.close();
