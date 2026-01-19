@@ -80,6 +80,61 @@ export const registerQuranRoutes = ({
     },
   );
 
+  // GET /quran/random - Get a random ayah
+  app.openapi(
+    createRoute({
+      method: "get",
+      path: "/quran/random",
+      tags: ["Quran"],
+      summary: "Ayat Acak",
+      responses: {
+        200: {
+          description: "Detail Ayat Acak",
+          content: {
+            "application/json": {
+              schema: z.object({
+                status: z.boolean(),
+                data: ayahSchema,
+              }),
+            },
+          },
+        },
+      },
+    }),
+    (c) => {
+      const ayahData = quranService.getRandomAyah();
+      const formattedAyah = {
+        id: ayahData.id,
+        surah_number: ayahData.surah_number,
+        ayah_number: ayahData.ayah_number,
+        arab: ayahData.arab,
+        translation: ayahData.translation,
+        audio_url: ayahData.audio_url,
+        tafsir: {
+          kemenag: {
+            short: ayahData.tafsir_kemenag_short,
+            long: ayahData.tafsir_kemenag_long,
+          },
+          quraish: ayahData.tafsir_quraish,
+          jalalayn: ayahData.tafsir_jalalayn,
+        },
+        meta: {
+          juz: ayahData.meta_juz,
+          page: ayahData.meta_page,
+          manzil: ayahData.meta_manzil,
+          ruku: ayahData.meta_ruku,
+          hizb_quarter: ayahData.meta_hizb_quarter,
+          sajda: {
+            recommended: ayahData.meta_sajda_recommended,
+            obligatory: ayahData.meta_sajda_obligatory,
+          },
+        },
+      };
+
+      return c.json({ status: true, data: formattedAyah }, 200);
+    },
+  );
+
   // GET /quran/:surah - Get specific surah details (with or without ayahs could be option, here maybe just info or list)
   // To keep it simple, let's return surah info + list of ayahs if requested?
   // Standard practice often: /quran/:id returns surah info. /quran/:id/ayahs returns ayahs.

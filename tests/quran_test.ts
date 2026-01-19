@@ -1,3 +1,4 @@
+
 import { createQuranService } from "../src/services/quran.ts";
 import { assert, assertEquals } from "@std/assert";
 
@@ -32,4 +33,14 @@ Deno.test("Quran Service - Get Specific Ayah", () => {
   assert(ayah !== null);
   assertEquals(ayah?.surah_number, 1);
   assertEquals(ayah?.ayah_number, 1);
+});
+
+Deno.test("Quran Service - Get Random Ayah", () => {
+  const ayah = service.getRandomAyah();
+  assert(ayah !== null);
+  assert(ayah.id > 0);
+  assert(ayah.surah_number >= 1 && ayah.surah_number <= 114);
+  assert(ayah.ayah_number >= 1);
+  assert(ayah.arab.length > 0);
+  console.log(`Random Ayah: Surah ${ayah.surah_number}, Ayah ${ayah.ayah_number}`);
 });

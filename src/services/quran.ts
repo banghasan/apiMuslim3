@@ -141,7 +141,39 @@ export const createQuranService = (dbPath: string) => {
     };
   };
 
+  const getRandomAyah = (): Ayah => {
+    const rows = db.query(
+      `SELECT id, surah_number, ayah_number, arab, translation, 
+              tafsir_kemenag_short, tafsir_kemenag_long, tafsir_quraish, tafsir_jalalayn,
+              audio_url, meta_juz, meta_page, meta_manzil, meta_ruku, meta_hizb_quarter,
+              meta_sajda_recommended, meta_sajda_obligatory
+       FROM ayahs ORDER BY RANDOM() LIMIT 1`,
+    );
+
+    // deno-lint-ignore no-explicit-any
+    const r: any = rows[0];
+    return {
+      id: r[0],
+      surah_number: r[1],
+      ayah_number: r[2],
+      arab: r[3],
+      translation: r[4],
+      tafsir_kemenag_short: r[5],
+      tafsir_kemenag_long: r[6],
+      tafsir_quraish: r[7],
+      tafsir_jalalayn: r[8],
+      audio_url: r[9],
+      meta_juz: r[10],
+      meta_page: r[11],
+      meta_manzil: r[12],
+      meta_ruku: r[13],
+      meta_hizb_quarter: r[14],
+      meta_sajda_recommended: Boolean(r[15]),
+      meta_sajda_obligatory: Boolean(r[16]),
+    };
+  };
+
   const close = () => db.close();
 
-  return { getAllSurahs, getSurah, getAyahs, getAyah, close };
+  return { getAllSurahs, getSurah, getAyahs, getAyah, getRandomAyah, close };
 };
