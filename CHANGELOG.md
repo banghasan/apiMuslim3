@@ -1,3 +1,7 @@
+## v3.1.0 — 2026-01-20
+
+- Version bump to v3.1.0
+
 # Changelog
 
 All notable changes to this project will be documented in this file.

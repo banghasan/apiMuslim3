@@ -4,7 +4,10 @@
     "start": "deno run -A src/main.ts",
     "test": "deno test -A",
     "fmt": "deno fmt",
-    "lint": "deno lint"
+    "lint": "deno lint",
+    "version-patch": "deno run --allow-read --allow-write scripts/version_bump.ts patch",
+    "version-minor": "deno run --allow-read --allow-write scripts/version_bump.ts minor",
+    "version-major": "deno run --allow-read --allow-write scripts/version_bump.ts major"
   },
   "fmt": {
     "exclude": ["src/static/redoc.standalone.js"]

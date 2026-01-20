@@ -13,7 +13,7 @@ const parsePositiveInt = (value: string | undefined, fallback: number) => {
   return normalized > 0 ? normalized : fallback;
 };
 
-export const APP_VERSION = "v3.0.0";
+export const APP_VERSION = "v3.1.0";
 
 export type AppConfig = {
   version: string;

@@ -135,6 +135,8 @@
     "https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.js": "9a9d301dbbbe29cb68e4dd1b71fe2063bf9ca68315b6ab782b8ba4406c285a99",
     "https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js": "6161c09d5eb3e975c04c6bc136bece212973f5eb225cddecc9f74e01bade572c",
     "https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/cjs/Adhan.js": "c2842523250c33eb67d07759e3e447f5767aa53a5d86fc0b0fbfc1c7cc1e24ee",
+    "https://deno.land/std@0.170.0/_util/asserts.ts": "d0844e9b62510f89ce1f9878b046f6a57bf88f208a10304aab50efcb48365272",
+    "https://deno.land/std@0.170.0/flags/mod.ts": "4f50ec6383c02684db35de38b3ffb2cd5b9fcfcc0b1147055d1980c49e82521c",
     "https://deno.land/std@0.224.0/assert/_constants.ts": "a271e8ef5a573f1df8e822a6eb9d09df064ad66a4390f21b3e31f820a38e0975",
     "https://deno.land/std@0.224.0/assert/assert.ts": "09d30564c09de846855b7b071e62b5974b001bb72a4b797958fe0660e7849834",
     "https://deno.land/std@0.224.0/assert/assert_almost_equals.ts": "9e416114322012c9a21fa68e187637ce2d7df25bcbdbfd957cd639e65d3cf293",
