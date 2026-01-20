@@ -62,7 +62,7 @@ export const createQuranSearchService = ({
       limit,
       offset,
       // We retrieve all attributes because we want to return the full Ayah structure
-      // attributesToRetrieve: ["*"], 
+      // attributesToRetrieve: ["*"],
     };
     const response = await fetch(endpoint, {
       method: "POST",
@@ -74,12 +74,14 @@ export const createQuranSearchService = ({
     }
     const payload = (await response.json()) as MeiliSearchResponse;
     const total = payload.estimatedTotalHits ?? payload.totalHits ?? 0;
-    
+
     // cast hits to QuranSearchHit (which is AyahWithSurah)
     // assuming Meilisearch index stores nearly identical structure to AyahWithSurah
     // deno-lint-ignore no-explicit-any
-    const hits = (payload.hits ?? []).map((item: any) => item as QuranSearchHit);
-    
+    const hits = (payload.hits ?? []).map((item: any) =>
+      item as QuranSearchHit
+    );
+
     return { total, hits };
   };
 

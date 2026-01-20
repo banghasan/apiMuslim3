@@ -1,4 +1,3 @@
-
 import { createQuranService } from "../src/services/quran.ts";
 import { assert, assertEquals } from "@std/assert";
 
@@ -47,7 +46,9 @@ Deno.test("Quran Service - Get Random Ayah", () => {
   assert(ayah.image_url, "Image URL harus ada");
   assert(ayah.surah !== undefined, "Surah object should be present");
   assert(ayah.surah.name.length > 0, "Surah name should be present");
-  console.log(`Random Ayah: Surah ${ayah.surah_number} (${ayah.surah.name_latin}), Ayah ${ayah.ayah_number}`);
+  console.log(
+    `Random Ayah: Surah ${ayah.surah_number} (${ayah.surah.name_latin}), Ayah ${ayah.ayah_number}`,
+  );
 });
 
 Deno.test("Quran Service - Get Sajda Ayahs", () => {
@@ -56,7 +57,7 @@ Deno.test("Quran Service - Get Sajda Ayahs", () => {
   ayahs.forEach((ayah) => {
     assert(
       ayah.meta_sajda_recommended || ayah.meta_sajda_obligatory,
-      `Ayah ${ayah.surah_number}:${ayah.ayah_number} should have sajda marker`
+      `Ayah ${ayah.surah_number}:${ayah.ayah_number} should have sajda marker`,
     );
     assert(ayah.surah !== undefined, "Surah object should be present");
   });

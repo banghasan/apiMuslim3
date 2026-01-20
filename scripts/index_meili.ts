@@ -4,7 +4,8 @@ import { MeiliSearch } from "meilisearch";
 import "jsr:@std/dotenv/load";
 
 const DB_PATH = "data/quran/quran.db";
-const MEILISEARCH_HOST = Deno.env.get("MEILISEARCH_HOST") || "http://localhost:7700";
+const MEILISEARCH_HOST = Deno.env.get("MEILISEARCH_HOST") ||
+  "http://localhost:7700";
 const MEILISEARCH_API_KEY = Deno.env.get("MEILISEARCH_API_KEY") || "";
 
 if (!MEILISEARCH_API_KEY) {
@@ -73,11 +74,11 @@ async function main() {
   console.log(`Fetched ${documents.length} ayahs.`);
 
   console.log(`Connecting to Meilisearch at ${MEILISEARCH_HOST}...`);
-  
+
   const index = client.index(indexName);
 
   console.log("Updating index settings...");
-  
+
   await index.updateFilterableAttributes([
     "surah_number",
     "ayah_number",
@@ -87,7 +88,7 @@ async function main() {
     "meta_ruku",
     "meta_hizb_quarter",
     "meta_sajda_recommended",
-    "meta_sajda_obligatory"
+    "meta_sajda_obligatory",
   ]);
 
   await index.updateSearchableAttributes([
@@ -98,32 +99,32 @@ async function main() {
     "tafsir_jalalayn",
     "surah.name_latin",
     "surah.translation",
-    "arab" 
+    "arab",
   ]);
-  
+
   await index.updateSortableAttributes([
     "surah_number",
-    "ayah_number"
+    "ayah_number",
   ]);
 
   console.log("Adding documents...");
   // Meilisearch v0.30+ addDocuments returns a Task object, not EnqueuedTask in all versions?
   // Let's assume standard behavior.
   const task = await index.addDocuments(documents, { primaryKey: "id" });
-  
+
   console.log(`Task enqueued: ${task.taskUid}`);
   console.log("Waiting for task to complete...");
-  
+
   // Use client.waitForTask for v0.30+, or index.waitForTask for older/some wrappers.
   // Actually, checking docs: v0.40+ `client.waitForTask(uid)`
   const result = await client.waitForTask(task.taskUid);
-  
-  if (result.status === 'succeeded') {
-      console.log("Import completed successfully!");
-      console.log(`Indexed ${documents.length} documents.`);
+
+  if (result.status === "succeeded") {
+    console.log("Import completed successfully!");
+    console.log(`Indexed ${documents.length} documents.`);
   } else {
-      console.error("Import failed with status:", result.status);
-      console.error(result.error);
+    console.error("Import failed with status:", result.status);
+    console.error(result.error);
   }
 }
 
