@@ -1,3 +1,15 @@
+## v3.1.3 — 2026-01-20
+
+- Version bump to v3.1.3
+
+## v3.1.2 — 2026-01-20
+
+- Version bump to v3.1.2
+
+## v3.1.1 — 2026-01-20
+
+- Version bump to v3.1.1
+
 ## v3.1.0 — 2026-01-20
 
 - Version bump to v3.1.0

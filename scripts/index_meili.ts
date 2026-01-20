@@ -1,7 +1,6 @@
-console.log("Script started");
 import { DB } from "sqlite";
 import { MeiliSearch } from "meilisearch";
-import "jsr:@std/dotenv/load";
+import "@std/dotenv/load";
 
 const DB_PATH = "data/quran/quran.db";
 const MEILISEARCH_HOST = Deno.env.get("MEILISEARCH_HOST") ||
@@ -19,6 +18,31 @@ const client = new MeiliSearch({
 });
 
 const indexName = "quran";
+
+type QuranRow = [
+  number, // id
+  number, // surah_number
+  number, // ayah_number
+  string, // arab
+  string, // translation
+  string | null, // tafsir_kemenag_short
+  string | null, // tafsir_kemenag_long
+  string | null, // tafsir_quraish
+  string | null, // tafsir_jalalayn
+  string | null, // audio_url
+  string | null, // image_url
+  number | null, // meta_juz
+  number | null, // meta_page
+  number | null, // meta_manzil
+  number | null, // meta_ruku
+  number | null, // meta_hizb_quarter
+  number | null, // meta_sajda_recommended
+  number | null, // meta_sajda_obligatory
+  string, // surah_name
+  string, // surah_name_latin
+  string, // surah_translation
+  string, // surah_revelation
+];
 
 async function main() {
   console.log("Opening database...");
@@ -39,12 +63,11 @@ async function main() {
     ORDER BY a.surah_number, a.ayah_number ASC
   `;
 
-  const rows = db.query(query);
+  const rows = db.query<QuranRow>(query);
   db.close();
 
   // proper mapping because sqlite returns array of values
-  // deno-lint-ignore no-explicit-any
-  const documents = rows.map((r: any) => ({
+  const documents = rows.map((r) => ({
     id: r[0], // Unique ID for Meilisearch (using the ayah PKEY id)
     surah_number: r[1],
     ayah_number: r[2],

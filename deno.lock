@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@std/assert@~0.225.3": "0.225.3",
     "jsr:@std/async@^1.0.0-rc.2": "1.0.15",
+    "jsr:@std/cli@^1.0.6": "1.0.24",
     "jsr:@std/data-structures@^1.0.0-rc.1": "1.0.9",
     "jsr:@std/dotenv@*": "0.225.5",
     "jsr:@std/dotenv@~0.225.2": "0.225.5",
@@ -27,6 +28,9 @@
     },
     "@std/async@1.0.15": {
       "integrity": "55d1d9d04f99403fe5730ab16bdcc3c47f658a6bf054cafb38a50f046238116e"
+    },
+    "@std/cli@1.0.24": {
+      "integrity": "b655a5beb26aa94f98add6bc8889f5fb9bc3ee2cc3fc954e151201f4c4200a5e"
     },
     "@std/data-structures@1.0.9": {
       "integrity": "033d6e17e64bf1f84a614e647c1b015fa2576ae3312305821e1a4cb20674bb4d"
@@ -192,6 +196,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@~0.225.3",
+      "jsr:@std/cli@^1.0.6",
       "jsr:@std/dotenv@~0.225.2",
       "jsr:@std/testing@~0.225.2",
       "npm:@hono/zod-openapi@^1.1.5",

@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write --allow-env
 
-import { parse } from "https://deno.land/std@0.170.0/flags/mod.ts";
+import { parseArgs as parse } from "@std/cli/parse-args";
 
 /**
  * Version Bump Script for ApiMuslim
@@ -74,7 +74,8 @@ try {
   await Deno.writeTextFile(changelogPath, newChangelogEntry);
   console.log(`Updated ${changelogPath} with new version entry`);
 } catch (error) {
-  console.error(`Warning: Could not update changelog: ${error.message}`);
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`Warning: Could not update changelog: ${message}`);
 }
 
 console.log(
