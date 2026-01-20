@@ -59,8 +59,10 @@ export const registerQuranRoutes = ({
   });
 
   const paginationQuerySchema = z.object({
-    page: z.string().optional().default("1").transform((v) => parseInt(v, 10)).pipe(z.number().min(1)),
-    limit: z.string().optional().default("10").transform((v) => parseInt(v, 10)).pipe(z.number().min(1).max(100)),
+    page: z.string().optional().default("1").transform((v) => parseInt(v, 10))
+      .pipe(z.number().min(1)),
+    limit: z.string().optional().default("10").transform((v) => parseInt(v, 10))
+      .pipe(z.number().min(1).max(100)),
   });
 
   const paginationMetaSchema = z.object({
@@ -90,7 +92,8 @@ export const registerQuranRoutes = ({
       path: "/quran",
       tags: ["Quran"],
       summary: "Daftar Surat",
-      description: `Daftar surat adalah daftar semua surat yang ada di dalam Al-Quran.`,
+      description:
+        `Daftar surat adalah daftar semua surat yang ada di dalam Al-Quran.`,
       responses: {
         200: {
           description: "Daftar Surat",
@@ -118,7 +121,8 @@ export const registerQuranRoutes = ({
       path: "/quran/random",
       tags: ["Quran"],
       summary: "Ayat Acak",
-      description: `Ayat acak adalah ayat yang dipilih secara acak dari Al-Quran. Ayat ini bisa berupa ayat dari surah mana saja dan dari juz berapa saja. Ayat acak ini bisa digunakan untuk berbagai keperluan, seperti untuk dibaca sebagai motivasi atau untuk dibagikan kepada orang lain.`,
+      description:
+        `Ayat acak adalah ayat yang dipilih secara acak dari Al-Quran. Ayat ini bisa berupa ayat dari surah mana saja dan dari juz berapa saja. Ayat acak ini bisa digunakan untuk berbagai keperluan, seperti untuk dibaca sebagai motivasi atau untuk dibagikan kepada orang lain.`,
       responses: {
         200: {
           description: "Detail Ayat Acak",
@@ -174,7 +178,8 @@ export const registerQuranRoutes = ({
       path: "/quran/sajda",
       tags: ["Quran"],
       summary: "Ayat Sajdah",
-      description: `Dalam konteks database Al-Quran, kolom sajadah (atau sujud tilawah) biasanya digunakan untuk menandai ayat-ayat yang mengharuskan atau menyarankan pembacanya untuk bersujud setelah membacanya.
+      description:
+        `Dalam konteks database Al-Quran, kolom sajadah (atau sujud tilawah) biasanya digunakan untuk menandai ayat-ayat yang mengharuskan atau menyarankan pembacanya untuk bersujud setelah membacanya.
 
 Pembagian menjadi Recommended dan Obligatory berkaitan dengan perbedaan hukum fiqih di antara madzhab-madzhab Islam:
 
@@ -255,7 +260,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
       path: "/quran/juz/{number}",
       tags: ["Quran"],
       summary: "Ayat per Juz",
-      description: `Mendapatkan semua ayat dalam Juz tertentu. Al-Quran dibagi menjadi 30 Juz.`,
+      description:
+        `Mendapatkan semua ayat dalam Juz tertentu. Al-Quran dibagi menjadi 30 Juz.`,
       request: {
         params: z.object({
           number: z.string().transform((v) => parseInt(v, 10)).pipe(
@@ -322,7 +328,11 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
         surah: ayahData.surah,
       }));
-      return c.json({ status: true, data: formattedData, pagination: { page, limit, total } }, 200);
+      return c.json({
+        status: true,
+        data: formattedData,
+        pagination: { page, limit, total },
+      }, 200);
     },
   );
 
@@ -333,7 +343,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
       path: "/quran/page/{number}",
       tags: ["Quran"],
       summary: "Ayat per Halaman",
-      description: `Mendapatkan semua ayat dalam halaman tertentu. Al-Quran memiliki 604 halaman.`,
+      description:
+        `Mendapatkan semua ayat dalam halaman tertentu. Al-Quran memiliki 604 halaman.`,
       request: {
         params: z.object({
           number: z.string().transform((v) => parseInt(v, 10)).pipe(
@@ -349,6 +360,16 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
             "application/json": {
               schema: z.object({
                 status: z.boolean(),
+                meta: z.object({
+                  url: z.object({
+                    audio: z.string().openapi({
+                      example: "https://cdn.myquran.com/audio/page/1.mp3",
+                    }),
+                    image: z.string().openapi({
+                      example: "https://cdn.myquran.com/img/page/1.png",
+                    }),
+                  }),
+                }),
                 data: z.array(ayahSchema.extend({
                   surah: z.object({
                     number: z.number(),
@@ -400,7 +421,18 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
         surah: ayahData.surah,
       }));
-      return c.json({ status: true, data: formattedData, pagination: { page, limit, total } }, 200);
+      const meta = {
+        url: {
+          audio: `https://cdn.myquran.com/audio/page/${number}.mp3`,
+          image: `https://cdn.myquran.com/img/page/${number}.png`,
+        },
+      };
+      return c.json({
+        status: true,
+        meta,
+        data: formattedData,
+        pagination: { page, limit, total },
+      }, 200);
     },
   );
 
@@ -411,7 +443,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
       path: "/quran/manzil/{number}",
       tags: ["Quran"],
       summary: "Ayat per Manzil",
-      description: `Mendapatkan semua ayat dalam Manzil tertentu. Al-Quran dibagi menjadi 7 Manzil untuk memudahkan pembacaan mingguan.`,
+      description:
+        `Mendapatkan semua ayat dalam Manzil tertentu. Al-Quran dibagi menjadi 7 Manzil untuk memudahkan pembacaan mingguan.`,
       request: {
         params: z.object({
           number: z.string().transform((v) => parseInt(v, 10)).pipe(
@@ -448,7 +481,11 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
     (c) => {
       const { number } = c.req.valid("param");
       const { page, limit } = c.req.valid("query");
-      const { data, total } = quranService.getAyahsByManzil(number, page, limit);
+      const { data, total } = quranService.getAyahsByManzil(
+        number,
+        page,
+        limit,
+      );
       const formattedData = data.map((ayahData) => ({
         id: ayahData.id,
         surah_number: ayahData.surah_number,
@@ -478,7 +515,11 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
         surah: ayahData.surah,
       }));
-      return c.json({ status: true, data: formattedData, pagination: { page, limit, total } }, 200);
+      return c.json({
+        status: true,
+        data: formattedData,
+        pagination: { page, limit, total },
+      }, 200);
     },
   );
 
@@ -489,7 +530,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
       path: "/quran/ruku/{number}",
       tags: ["Quran"],
       summary: "Ayat per Ruku",
-      description: `Mendapatkan semua ayat dalam Ruku tertentu. Ruku adalah pembagian tematik dalam Al-Quran.`,
+      description:
+        `Mendapatkan semua ayat dalam Ruku tertentu. Ruku adalah pembagian tematik dalam Al-Quran.`,
       request: {
         params: z.object({
           number: z.string().transform((v) => parseInt(v, 10)).pipe(
@@ -556,7 +598,11 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
         surah: ayahData.surah,
       }));
-      return c.json({ status: true, data: formattedData, pagination: { page, limit, total } }, 200);
+      return c.json({
+        status: true,
+        data: formattedData,
+        pagination: { page, limit, total },
+      }, 200);
     },
   );
 
@@ -567,7 +613,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
       path: "/quran/hizb/{number}",
       tags: ["Quran"],
       summary: "Ayat per Hizb",
-      description: `Mendapatkan semua ayat dalam Hizb Quarter tertentu. Al-Quran dibagi menjadi 240 Hizb Quarter (60 Hizb × 4 quarters).`,
+      description:
+        `Mendapatkan semua ayat dalam Hizb Quarter tertentu. Al-Quran dibagi menjadi 240 Hizb Quarter (60 Hizb × 4 quarters).`,
       request: {
         params: z.object({
           number: z.string().transform((v) => parseInt(v, 10)).pipe(
@@ -634,7 +681,11 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         },
         surah: ayahData.surah,
       }));
-      return c.json({ status: true, data: formattedData, pagination: { page, limit, total } }, 200);
+      return c.json({
+        status: true,
+        data: formattedData,
+        pagination: { page, limit, total },
+      }, 200);
     },
   );
 
@@ -649,7 +700,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
       path: "/quran/{surah}",
       tags: ["Quran"],
       summary: "Ayat per Surat",
-      description: `Ayat per Surat adalah informasi lengkap mengenai surat tertentu dalam Al-Quran, termasuk semua ayat yang terkandung di dalamnya.`,
+      description:
+        `Ayat per Surat adalah informasi lengkap mengenai surat tertentu dalam Al-Quran, termasuk semua ayat yang terkandung di dalamnya.`,
       request: {
         params: z.object({
           surah: z.string().transform((v) => parseInt(v, 10)).pipe(
@@ -695,7 +747,11 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         return c.json({ status: false, message: "Surah not found" }, 404);
       }
 
-      const { data: ayahsData, total } = quranService.getAyahs(surah, page, limit);
+      const { data: ayahsData, total } = quranService.getAyahs(
+        surah,
+        page,
+        limit,
+      );
       const formattedAyahs = ayahsData.map((a) => ({
         id: a.id,
         surah_number: a.surah_number,
@@ -730,7 +786,11 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
         ayahs: formattedAyahs,
       };
 
-      return c.json({ status: true, data: responseData, pagination: { page, limit, total } }, 200);
+      return c.json({
+        status: true,
+        data: responseData,
+        pagination: { page, limit, total },
+      }, 200);
     },
   );
 
@@ -741,7 +801,8 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
       path: "/quran/{surah}/{ayah}",
       tags: ["Quran"],
       summary: "Detail Ayat",
-      description: `Detail ayat adalah informasi lengkap mengenai ayat tertentu dalam Al-Quran, termasuk semua ayat yang terkandung di dalamnya.`,
+      description:
+        `Detail ayat adalah informasi lengkap mengenai ayat tertentu dalam Al-Quran, termasuk semua ayat yang terkandung di dalamnya.`,
       request: {
         params: z.object({
           surah: z.string().transform((v) => parseInt(v, 10)).pipe(
@@ -833,7 +894,9 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
             schema: z.object({
               keyword: z.string().min(3).openapi({ example: "pujian" }),
               page: z.number().int().min(1).default(1).openapi({ example: 1 }),
-              limit: z.number().int().min(1).max(100).default(10).openapi({ example: 10 }),
+              limit: z.number().int().min(1).max(100).default(10).openapi({
+                example: 10,
+              }),
             }),
           },
         },
@@ -895,12 +958,19 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
 
   app.openapi(searchRoute, async (c) => {
     if (!quranSearchService) {
-      return c.json({ status: false, message: "Layanan pencarian belum tersedia" }, 503);
+      return c.json({
+        status: false,
+        message: "Layanan pencarian belum tersedia",
+      }, 503);
     }
     const { keyword, page, limit } = c.req.valid("json");
     try {
-      const { total, hits } = await quranSearchService.search(keyword, page, limit);
-      
+      const { total, hits } = await quranSearchService.search(
+        keyword,
+        page,
+        limit,
+      );
+
       const formattedData = hits.map((ayahData) => ({
         id: ayahData.id,
         surah_number: ayahData.surah_number,
@@ -939,7 +1009,10 @@ Secara keseluruhan, kolom ini membantu mengklasifikasikan ayat-ayat sujud berdas
       }, 200);
     } catch (error) {
       console.error(error);
-      return c.json({ status: false, message: "Gagal memproses pencarian" }, 500);
+      return c.json(
+        { status: false, message: "Gagal memproses pencarian" },
+        500,
+      );
     }
   });
 };
